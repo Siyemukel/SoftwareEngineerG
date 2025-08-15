@@ -7,9 +7,8 @@ This directory contains the React frontend for the SoftwareEngineerG project, a 
 - **Framework:** React (with Vite for fast development)
 - **Styling:** Tailwind CSS
 - **Routing:** React Router v7
-- **Authentication:** Firebase Authentication
 
-The frontend provides user interfaces for students, admins, and authentication, communicating with the backend API and Firebase.
+The frontend provides user interfaces for students, admins, and authentication, communicating with the backend API.
 
 ---
 
@@ -20,10 +19,23 @@ client/
 ├── public/                # Static assets 
 ├── src/
 │   ├── admin/             # Admin dashboard and pages
-│   ├── authentication/    # Auth pages, logic, and Firebase config
+│   │   ├── Admin.jsx
+│   │   └── pages/
+│   │       └── AdminDashboard.jsx
+│   ├── authentication/    # Auth pages and logic
+│   │   ├── Authentication.jsx
+│   │   └── pages/
+│   │       ├── Login.jsx
+│   │       └── Signup.jsx
 │   ├── components/        # Shared React components (future use)
 │   ├── landing/           # Landing and home pages
+│   │   ├── Index.jsx
+│   │   └── pages/
+│   │       └── Home.jsx
 │   ├── user/              # User dashboard and pages
+│   │   ├── User.jsx
+│   │   └── pages/
+│   │       └── UserDashboard.jsx
 │   ├── main.css           # Tailwind CSS entrypoint
 │   ├── main.jsx           # App entrypoint
 │   └── router.jsx         # App routes
@@ -54,14 +66,6 @@ Each section uses a layout component with nested routes for extensibility.
 
 ---
 
-## Authentication
-
-- Uses Firebase Authentication for user sign up, login, and logout.
-- Firebase config is in [`src/authentication/firebase/firebase.config.jsx`](src/authentication/firebase/firebase.config.jsx).
-- Auth logic is in [`src/authentication/firebase/firebase.controllers.jsx`](src/authentication/firebase/firebase.controllers.jsx).
-
----
-
 ## Styling
 
 - Tailwind CSS is used for utility-first styling.
@@ -87,10 +91,6 @@ Each section uses a layout component with nested routes for extensibility.
 
 3. The app will be available at `http://localhost:5173` (default Vite port).
 
-### Environment Variables
-
-- Firebase credentials are stored in `.env` using the `VITE_` prefix for Vite compatibility.
-
 ---
 
 ## Useful References
@@ -98,6 +98,5 @@ Each section uses a layout component with nested routes for extensibility.
 - [Vite Documentation](https://vite.dev/guide/)
 - [React Router Documentation](https://reactrouter.com/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs/installation/using-vite)
-- [Firebase Authentication Docs](https://firebase.google.com/docs/auth)
 
 ---
