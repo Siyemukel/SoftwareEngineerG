@@ -1,0 +1,250 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numeraid - Learning Platform for Dyscalculia Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box;}
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #ffffff, #fff7f1);
+      color: #333;
+      margin: 0;
+      position: relative;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+    }
+
+    /* Navigation */
+    .navbar {
+      background-color: #ff8000;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .navbar .logo {font-size: 1.5rem; font-weight: bold;}
+    .navbar .nav-links {
+      list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0;
+    }
+    .navbar .nav-links a {
+      color: #fff; text-decoration: none; font-weight: 600;
+    }
+    .navbar .nav-links a:hover {text-decoration: underline;}
+
+    /* Hero Section */
+    .hero {text-align: center; padding: 5rem 2rem 3rem 2rem; position: relative; z-index: 2;}
+    .hero h1 {font-size: 2.8rem; margin-bottom: 1rem; color: #222;}
+    .hero p {font-size: 1.2rem; max-width: 700px; margin: 0 auto; color: #555;}
+
+    /* Hero Slider */
+    .hero-slider {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 1000px;
+      height: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.5rem;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    .hero-slider img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+    }
+    .hero-slider img.active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 1;
+    }
+
+    /* About Section */
+    .about {
+      padding: 3rem 2rem;
+      background-color: #fff;
+      text-align: center;
+      z-index: 2;
+      position: relative;
+    }
+    .about h2 {font-size: 2rem; margin-bottom: 1rem; color: #ff8000;}
+    .about p {
+      font-family: 'Cardo', serif;
+      font-size: 1.1rem;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+      color: #444;
+      background: rgba(255, 255, 255, 0.6);
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Services Section */
+    .services {
+      background-color: #fff7f1;
+      padding: 3rem 2rem;
+      text-align: center;
+      z-index: 2;
+    }
+    .services h2 {margin-bottom: 2rem; font-size: 2rem; color: #222;}
+    .service-box {
+      display: inline-block;
+      width: 280px;
+      padding: 1.5rem;
+      margin: 1rem;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.3s;
+      position: relative;
+    }
+    .service-box:hover {transform: translateY(-5px);}
+    .service-box h3 {color: #ff8000;}
+    .service-box p {color: #555;}
+    .service-box img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Decorative Section */
+    .decor {
+      position: relative;
+      background: #fff7f1;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-top: 2rem;
+      border-radius: 1rem;
+    }
+    .decor h2 {font-size: 2rem; color: #222; margin-bottom: 1rem;}
+    .decor p {font-size: 1.1rem; color: #555;}
+    .circle {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: orange; position: absolute;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+    .circle.small {width: 40px; height: 40px; background: #f8c67a;}
+    .circle.purple {background: #d6ccff;}
+
+    /* Contact Section */
+    .contact {background: #fff; padding: 3rem 2rem; text-align: center;}
+    .contact h2 {color: #ff8000; margin-bottom: 1rem;}
+    .contact p {margin: 0.5rem 0; color: #444;}
+
+    /* Footer */
+    .footer {text-align: center; padding: 1rem; background-color: #fff; color: #666; font-size: 0.9rem; margin-top: auto;}
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">Numeraid</div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#login">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Welcome to Numeraid</h1>
+    <p>Your digital companion for overcoming dyscalculia and mastering numbers with confidence.</p>
+
+    <!-- Hero Slider -->
+    <div class="hero-slider">
+      <img src="https://i.pinimg.com/1200x/a5/3a/ce/a53ace526291f7d8f05544e91237fa19.jpg" class="active">
+      <img src="https://i.pinimg.com/1200x/57/2b/f9/572bf9b8a0ac7390934f5dd78f9746bd.jpg">
+      <img src="https://i.pinimg.com/1200x/d3/c5/08/d3c50833fb353e8142f203b62e875acd.jpg">
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about">
+    <h2>About Numeraid</h2>
+    <p>
+      Dyscalculia is a learning difference that affects how individuals understand numbers and mathematical concepts. 
+      At Numeraid, we provide tailored tools, step-by-step explanations, and engaging exercises designed to make learning accessible and stress-free. 
+      Whether you're preparing for exams or just need everyday number support, Numeraid is here to guide you on your journey to numerical confidence.
+    </p>
+  </section>
+
+  <!-- Services Section (Static Images Now) -->
+  <section class="services">
+    <h2>Why Choose Numeraid?</h2>
+    <div class="service-box">
+      <img src="https://i.pinimg.com/1200x/be/57/ca/be57cab38b125c95635cc7103a38cab6.jpg">
+      <h3>Step-by-Step Help</h3>
+      <p>Clear, guided solutions to help you understand problems at your own pace.</p>
+    </div>
+    <div class="service-box">
+      <img src="https://i.pinimg.com/1200x/0b/cf/74/0bcf7404be523bc5c8b704f47fa008d8.jpg">
+      <h3>Personalized Tools</h3>
+      <p>Interactive exercises and adaptive features tailored to your learning style.</p>
+    </div>
+    <div class="service-box">
+      <img src="https://i.pinimg.com/1200x/ee/b5/58/eeb5582d75de4838c474d93db464df97.jpg">
+      <h3>Confidence Building</h3>
+      <p>Boost your confidence in math with practice designed to reduce anxiety.</p>
+    </div>
+  </section>
+
+  <!-- Decorative Section -->
+  <section class="decor">
+    <h2>Get Instant Study Help</h2>
+    <p>From your first assignment to your final exam, get the right tools designed to help you learn.</p>
+    <button style="background:#ff8000; color:#fff; border:none; padding:0.8rem 1.5rem; border-radius:30px; margin-top:1rem; cursor:pointer;">Join now</button>
+    <div class="circle purple" style="left:20px; bottom:-20px;"></div>
+    <div class="circle" style="right:40px; top:-20px;"></div>
+    <div class="circle small" style="right:100px; bottom:20px;"></div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <p>Email: support@numeraid.com</p>
+    <p>Phone: +1 (555) 123-4567</p>
+    <p>Address: 123 Learning Lane, Education City, SA</p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2024 Numeraid | All Rights Reserved</p>
+  </footer>
+
+  <script>
+    // Hero slider with pop-up effect
+    (function(){
+      const heroSlider = document.querySelector('.hero-slider');
+      const slides = heroSlider.querySelectorAll('img');
+      let index = 0;
+      setInterval(() => {
+        slides.forEach(s => s.classList.remove('active'));
+        index = (index + 1) % slides.length;
+        slides[index].classList.add('active');
+      }, 4000); // change every 4s
+    })();
+  </script>
+</body>
+</html>
