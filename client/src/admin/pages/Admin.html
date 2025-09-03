@@ -1,0 +1,123 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page - Numeraid</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .role-select {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    .role-option {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      transition: 0.3s;
+    }
+    .role-option img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 5px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .role-option.active {
+      border: 2px solid #ff8000;
+      background: #fff4e5;
+    }
+    .login-fields {
+      margin-top: 15px;
+      display: none;
+      flex-direction: column;
+    }
+    .login-fields input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background bubbles -->
+  <div class="bubble orange"></div>
+  <div class="bubble purple"></div>
+
+  <div class="container">
+    <div class="form-section">
+      <h1>Numeraid</h1>
+      <p>Welcome Back!</p>
+
+      <!-- Student / Staff selection -->
+      <div class="role-select">
+        <div class="role-option" id="student-option">
+          <!-- Replace this image with your own -->
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="Student Icon">
+          <span>Student</span>
+        </div>
+        <div class="role-option" id="staff-option">
+          <!-- Replace this image with your own -->
+          <img src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png" alt="Staff Icon">
+          <span>Staff</span>
+        </div>
+      </div>
+
+      <div class="divider">
+        <span>Log in below</span>
+      </div>
+
+      <!-- Dynamic login fields -->
+      <div class="login-fields" id="login-fields">
+        <input type="text" id="identifier" placeholder="">
+        <input type="password" id="password" placeholder="Password">
+      </div>
+
+      <div class="remember-section">
+        <label><input type="checkbox"> Remember me</label>
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <button id="login-btn">Log In</button>
+
+      <div class="signup-link">
+        Don't have an account? <a href="#" id="signup-btn">Sign up</a>
+      </div>
+    </div>
+    <div class="image-section"></div>
+  </div>
+
+  <script>
+    const studentOption = document.getElementById("student-option");
+    const staffOption = document.getElementById("staff-option");
+    const identifierInput = document.getElementById("identifier");
+    const loginFields = document.getElementById("login-fields");
+
+    // Role select event for Student
+    studentOption.addEventListener("click", () => {
+      studentOption.classList.add("active");
+      staffOption.classList.remove("active");
+
+      loginFields.style.display = "flex";
+      identifierInput.placeholder = "Student Number";
+    });
+
+    // Role select event for Staff
+    staffOption.addEventListener("click", () => {
+      staffOption.classList.add("active");
+      studentOption.classList.remove("active");
+
+      loginFields.style.display = "flex";
+      identifierInput.placeholder = "Staff Number";
+    });
+  </script>
+</body>
+</html>
