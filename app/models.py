@@ -32,8 +32,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-# ✅ Instead of separate Staff/Student models, keep one User table with `role`.
-#    If you want separate tables, you’d need joined-table inheritance. But one table is simpler.
+
 
 class Test(db.Model):
     __tablename__ = "tests"
