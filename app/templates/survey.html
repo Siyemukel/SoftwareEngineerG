@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Discalculia Survey</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.math_difficulty.label }}
+            {{ form.math_difficulty(class="form-select") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.reading_numbers.label }}<br>
+            {{ form.reading_numbers() }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.math_anxiety.label }}<br>
+            {{ form.math_anxiety() }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.time_management.label }}<br>
+            {{ form.time_management() }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.previous_diagnosis.label }}<br>
+            {{ form.previous_diagnosis() }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.support_needed.label }}
+            {{ form.support_needed(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.daily_challenges.label }}
+            {{ form.daily_challenges(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

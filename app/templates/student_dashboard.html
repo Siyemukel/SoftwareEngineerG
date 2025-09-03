@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Student Dashboard</h2>
+    
+    <!-- Profile Info -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Welcome, {{ student.name }} {{ student.surname }}!</h5>
+            <p>Email: {{ student.student_email }}</p>
+            <p>Course: {{ student.course }} (Year {{ student.year_of_study }})</p>
+            <p>Faculty: {{ student.faculty }}</p>
+        </div>
+    </div>
+
+    <!-- Survey Status -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Survey</h5>
+            {% if student.survey %}
+                <p class="text-success">Survey completed!</p>
+            {% else %}
+                <a href="{{ url_for('main.survey') }}" class="btn btn-warning">Complete Survey</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Dyscalculia Test (Sequential) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Dyscalculia Test</h5>
+            {% if student_results %}
+                {% if student_results.numbers_score is none %}
+                    <a href="{{ url_for('main.test_part', part='numbers') }}" class="btn btn-primary">Start Numbers Test</a>
+                {% elif student_results.logic_score is none %}
+                    <a href="{{ url_for('main.test_part', part='logic') }}" class="btn btn-primary">Continue Logic Test</a>
+                {% elif student_results.shapes_score is none %}
+                    <a href="{{ url_for('main.test_part', part='shapes') }}" class="btn btn-primary">Continue Shapes Test</a>
+                {% else %}
+                    <span class="badge bg-success">All tests completed ✅</span>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-primary">Start Test</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Last Test Result -->
+    {% if student_results %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Last Test Result</h5>
+            <p>Numbers: {{ student_results.numbers_score if student_results.numbers_score is not none else "Not attempted" }}</p>
+            <p>Logic: {{ student_results.logic_score if student_results.logic_score is not none else "Not attempted" }}</p>
+            <p>Shapes: {{ student_results.shapes_score if student_results.shapes_score is not none else "Not attempted" }}</p>
+            <p>Disability Likelihood: {{ student_results.disability_likelihood if student_results.disability_likelihood else "Pending" }}</p>
+            <p>Message: {{ student_results.outcome_message if student_results.outcome_message else "Pending" }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Logout -->
+    <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Student Sign Up{% endblock %}
+
+{% block content %}
+    <h2>Student Sign Up</h2>
+    <form method="POST" action="{{ url_for('main.signup') }}">
+        {{ form.hidden_tag() }}
+
+        <label for="name">First Name:</label>
+        {{ form.name(size=32) }}
+
+        <label for="surname">Surname:</label>
+        {{ form.surname(size=32) }}
+
+        <label for="email">Student Email:</label>
+        {{ form.email(size=32) }}
+
+        <label for="course">Course:</label>
+        {{ form.course(size=32) }}
+
+        <label for="year_of_study">Year of Study:</label>
+        {{ form.year_of_study() }}
+
+        <label for="faculty">Faculty:</label>
+        {{ form.faculty(size=32) }}
+
+        <label for="password">Password:</label>
+        {{ form.password() }}
+
+        <label for="confirm_password">Confirm Password:</label>
+        {{ form.confirm_password() }}
+
+        {{ form.submit() }}
+    </form>
+{% endblock %}

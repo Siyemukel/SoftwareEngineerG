@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ part }} Test</h2>
+
+<form method="POST">
+    {% for q in questions %}
+        <div class="question-block">
+            <p><strong>{{ loop.index }}. {{ q.q }}</strong></p>
+
+            {% if part == "Numbers" or part == "Shapes" %}
+                {# Multiple-choice questions #}
+                {% for opt in q.options %}
+                    <label>
+                        <input type="radio" name="q{{ q.id }}" value="{{ opt }}" required>
+                        {{ opt }}
+                    </label><br>
+                {% endfor %}
+            
+            {% elif part == "Logic" %}
+                {# Open text-based answer #}
+                <textarea name="q{{ q.id }}" rows="3" cols="40" required></textarea>
+            {% endif %}
+        </div>
+        <hr>
+    {% endfor %}
+
+    <button type="submit">Submit {{ part }} Test</button>
+</form>
+{% endblock %}

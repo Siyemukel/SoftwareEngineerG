@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Welcome, {{ staff.name }} {{ staff.surname }}!</h2>
+    <p>Username: {{ staff.username }}</p>
+
+    {% if staff.is_admin %}
+        <p>Status: Admin</p>
+        <h3>Admin Dashboard</h3>
+    {% else %}
+        <p>Status: Staff</p>
+        <h3>Staff Dashboard</h3>
+    {% endif %}
+
+    <ul>
+        <li><a href="{{ url_for('main.manage_students') }}">Manage Students</a></li>
+
+
+        {% if staff.is_admin %}
+            <li><a href="{{ url_for('main.manage_staff') }}">Manage Staff</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
