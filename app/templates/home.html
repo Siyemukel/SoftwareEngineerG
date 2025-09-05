@@ -1,21 +1,69 @@
 <!-- templates/home.html -->
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Numeraid{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Welcome to the Student Assessment Portal</h1>
-    {% if current_user.is_authenticated %}
-        <p>Hello, {{ current_user.name or current_user.full_name }}!</p>
-        {% if current_user.get_id().startswith('student') %}
-            <p><a href="{{ url_for('main.student_dashboard') }}">Go to Student Dashboard</a></p>
-        {% elif current_user.get_id().startswith('staff') %}
-            <p><a href="{{ url_for('main.staff_dashboard') }}">Go to Staff Dashboard</a></p>
-        {% endif %}
-        <a href="{{ url_for('main.logout') }}" class="btn btn-danger mt-3">Logout</a>
-    {% else %}
-        <p><a href="{{ url_for('main.login') }}">Login</a> or <a href="{{ url_for('main.signup') }}">Sign Up</a></p>
-    {% endif %}
+<div class="home">
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to Numeraid</h1>
+        <p>Your digital companion for overcoming dyscalculia and mastering numbers with confidence.</p>
+
+        <!-- Hero Slider -->
+        <div class="hero-slider">
+        <img src="https://i.pinimg.com/1200x/a5/3a/ce/a53ace526291f7d8f05544e91237fa19.jpg" class="active">
+        <img src="https://i.pinimg.com/1200x/57/2b/f9/572bf9b8a0ac7390934f5dd78f9746bd.jpg">
+        <img src="https://i.pinimg.com/1200x/d3/c5/08/d3c50833fb353e8142f203b62e875acd.jpg">
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <h2>About Numeraid</h2>
+        <p>
+        Dyscalculia is a learning difference that affects how individuals understand numbers and mathematical concepts. 
+        At Numeraid, we provide tailored tools, step-by-step explanations, and engaging exercises designed to make learning accessible and stress-free. 
+        Whether you're preparing for exams or just need everyday number support, Numeraid is here to guide you on your journey to numerical confidence.
+        </p>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <h2>Why Choose Numeraid?</h2>
+        <div class="service-box">
+        <img src="https://i.pinimg.com/1200x/be/57/ca/be57cab38b125c95635cc7103a38cab6.jpg">
+        <h3>Step-by-Step Help</h3>
+        <p>Clear, guided solutions to help you understand problems at your own pace.</p>
+        </div>
+        <div class="service-box">
+        <img src="https://i.pinimg.com/1200x/0b/cf/74/0bcf7404be523bc5c8b704f47fa008d8.jpg">
+        <h3>Personalized Tools</h3>
+        <p>Interactive exercises and adaptive features tailored to your learning style.</p>
+        </div>
+        <div class="service-box">
+        <img src="https://i.pinimg.com/1200x/ee/b5/58/eeb5582d75de4838c474d93db464df97.jpg">
+        <h3>Confidence Building</h3>
+        <p>Boost your confidence in math with practice designed to reduce anxiety.</p>
+        </div>
+    </section>
+
+    <!-- Decorative Section -->
+    <section class="decor">
+        <h2>Get Instant Study Help</h2>
+        <p>From your first assignment to your final exam, get the right tools designed to help you learn.</p>
+        <button class="join-btn">Join now</button>
+        <div class="circle purple" style="left:20px; bottom:-20px;"></div>
+        <div class="circle" style="right:40px; top:-20px;"></div>
+        <div class="circle small" style="right:100px; bottom:20px;"></div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <p>Email: support@numeraid.com</p>
+        <p>Phone: +1 (555) 123-4567</p>
+        <p>Address: 123 Learning Lane, Education City, SA</p>
+    </section>
 </div>
 {% endblock %}

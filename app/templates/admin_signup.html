@@ -1,39 +1,61 @@
 {% extends "base.html" %}
 
+{% block title %}Admin Sign Up{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-3">Admin Sign Up</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
+<div class="signup">
+    <div class="bubble orange"></div>
+    <div class="bubble purple"></div>
 
-        <div class="form-group mb-3">
-            {{ form.username.label(class="form-label") }}
-            {{ form.username(class="form-control", placeholder="Enter username") }}
+    <div class="auth-container">
+        <div class="form-header">
+            <h1>Numeraid</h1>
+            <p>Academic Assistance & Disability Support</p>
         </div>
 
-        <div class="form-group mb-3">
-            {{ form.name.label(class="form-label") }}
-            {{ form.name(class="form-control", placeholder="Enter first name") }}
-        </div>
+        <form method="POST" action="{{ url_for('main.home') }}">
+            {{ form.hidden_tag() }}
 
-        <div class="form-group mb-3">
-            {{ form.surname.label(class="form-label") }}
-            {{ form.surname(class="form-control", placeholder="Enter surname") }}
-        </div>
+            <div class="form-group mb-3">
+                {{ form.username(class="form-control", placeholder="Username") }}
+                {% for error in form.username.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
 
-        <div class="form-group mb-3">
-            {{ form.password.label(class="form-label") }}
-            {{ form.password(class="form-control", placeholder="Enter password") }}
-        </div>
+            <div class="form-group mb-3">
+                {{ form.name(class="form-control", placeholder="Name") }}
+                {% for error in form.name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
 
-        <div class="form-group mb-3">
-            {{ form.confirm_password.label(class="form-label") }}
-            {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
-        </div>
+            <div class="form-group mb-3">
+                {{ form.surname(class="form-control", placeholder="Surname") }}
+                {% for error in form.surname.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
 
-        <div class="form-group">
-            {{ form.submit(class="btn btn-success") }}
+            <div class="form-group mb-3">
+                {{ form.password(class="form-control", placeholder="Password") }}
+                {% for error in form.password.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                {% for error in form.confirm_password.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            {{ form.submit(class="btn btn-primary submit-btn w-100") }}
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="/login">Log in</a>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

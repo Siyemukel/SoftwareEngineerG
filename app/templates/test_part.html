@@ -1,30 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ part }} Test</h2>
+<h2>{{ part }} Test - Question {{ q_num }}</h2>
 
 <form method="POST">
-    {% for q in questions %}
-        <div class="question-block">
-            <p><strong>{{ loop.index }}. {{ q.q }}</strong></p>
+    <div class="question-block">
+        {# The backend now passes a 'question' object with the full question text #}
+        <p><strong>{{ question }}</strong></p>
 
-            {% if part == "Numbers" or part == "Shapes" %}
-                {# Multiple-choice questions #}
-                {% for opt in q.options %}
-                    <label>
-                        <input type="radio" name="q{{ q.id }}" value="{{ opt }}" required>
-                        {{ opt }}
-                    </label><br>
-                {% endfor %}
-            
-            {% elif part == "Logic" %}
-                {# Open text-based answer #}
-                <textarea name="q{{ q.id }}" rows="3" cols="40" required></textarea>
-            {% endif %}
-        </div>
-        <hr>
-    {% endfor %}
-
-    <button type="submit">Submit {{ part }} Test</button>
+        {% if part.lower() == "numbers" %}
+            {# For numbers, the question text from Gemini should include A, B, C, D #}
+            {# So we'll render it as is and provide radio buttons #}
+            <div class="options-group">
+                <label>
+                    <input type="radio" name="answer" value="A" required> A
+                </label><br>
+                <label>
+                    <input type="radio" name="answer" value="B" required> B
+                </label><br>
+                <label>
+                    <input type="radio" name="answer" value="C" required> C
+                </label><br>
+                <label>
+                    <input type="radio" name="answer" value="D" required> D
+                </label><br>
+            </div>
+        {% else %}
+            {# Open text answer for logic/shapes #}
+            <textarea name="answer" rows="3" cols="40" required></textarea>
+        {% endif %}
+    </div>
+    <button type="submit">Submit Answer</button>
 </form>
 {% endblock %}

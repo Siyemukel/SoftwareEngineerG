@@ -4,65 +4,47 @@ from .forms import SignupForm, StudentLoginForm, StaffLoginForm,StaffSignupForm,
 from .models import *
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.exc import IntegrityError
-from . import db 
+from .extensions import db 
 import json
-import google.generativeai as genai
 import os
 
+import mimetypes
+from google import genai
+from google.genai import types
 
-model = genai.GenerativeModel("gemini-1")  # or "gemini-1" if lighter
-
-# Define the blueprint
 main = Blueprint("main", __name__)
 
-#--------------------Home Page--------------------
-@main.route("/", methods=["GET", "POST"]) 
-def home():
-    # Check if any staff exists. If not, trigger the admin setup process.
-    if not Staff.query.first():
-        form = StaffSignupForm()
-        if form.validate_on_submit():
-            try:
-                # Create the first user and assign them the 'admin' role.
-                new_admin = Staff(
-                    username=form.username.data,
-                    name=form.name.data,
-                    surname=form.surname.data,
-                    is_admin=True, # Ensure the first user has admin privileges
-                   
-                )
-                new_admin.set_password(form.password.data)
-                
-                db.session.add(new_admin)
-                db.session.commit()
+def setup_admin_account():
+    form = StaffSignupForm()
+    if form.validate_on_submit():
+        try:
+            # Create the first user and assign them the 'admin' role.
+            new_admin = Staff(
+                username=form.username.data,
+                name=form.name.data,
+                surname=form.surname.data,
+                is_admin=True,
+            )
+            new_admin.set_password(form.password.data)
+            
+            db.session.add(new_admin)
+            db.session.commit()
 
-                flash("Admin account created successfully! Please log in.", "success")
-                # Changed from "auth.login" to "main.login" to match your login_manager setup
-                return redirect(url_for("main.login"))
+            flash("Admin account created successfully! Please log in.", "success")
+            return redirect(url_for("main.home"))
 
-            except IntegrityError:
-                db.session.rollback()
-                flash("That username is already taken. Please choose another.", "danger")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"An error occurred: {e}", "danger")
+        except IntegrityError:
+            db.session.rollback()
+            flash("That username is already taken. Please choose another.", "danger")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred: {e}", "danger")
 
-        # Show the first-time admin setup page
-        return render_template("admin_signup.html", form=form, title="Initial Admin Setup")
+    return render_template("admin_signup.html", form=form, title="Initial Admin Setup")
 
-    # If an admin/staff already exists, render the normal home page
-    student_count = Student.query.count()
-    staff_count = Staff.query.count()
-    return render_template("home.html", student_count=student_count, staff_count=staff_count)
-
-
-#--------------------Student Signup--------------------
-@main.route("/signup", methods=["GET", "POST"])
-def signup():
+def setup_student_account():
     form = SignupForm()  
-
-    if form.validate_on_submit(): #Get data from the form
-
+    if form.validate_on_submit():
         name = form.name.data
         surname = form.surname.data
         email = form.email.data
@@ -71,12 +53,10 @@ def signup():
         faculty = form.faculty.data
         password = form.password.data
 
-     # Check if email already exists
         existing_student = Student.query.filter_by(student_email=email).first()
         if existing_student:
             flash("Email already registered!", "danger")
             return redirect(url_for("main.signup"))
-
    
         new_student = Student(
             name=name,
@@ -94,32 +74,57 @@ def signup():
         flash("Account created successfully!", "success")
         return redirect(url_for("main.home"))
 
-
     return render_template("student_signup.html", form=form)
 
+def login_user_account():
+    username_or_email = request.form.get("username")
+    password = request.form.get("password")
+
+    student = Student.query.filter_by(student_email=username_or_email).first()
+    if student and student.check_password(password):
+        login_user(student)
+        flash("Logged in as student!", "success")
+        return redirect(url_for("main.student_dashboard"))
+
+    staff = Staff.query.filter_by(username=username_or_email).first()
+    if staff and staff.check_password(password):
+        login_user(staff)
+        flash("Logged in as staff!", "success")
+        return redirect(url_for("main.staff_dashboard"))
+
+    flash("Invalid credentials, please try again.", "danger")
+
+#--------------------Home Page--------------------
+@main.route("/", methods=["GET", "POST"]) 
+def home():
+    if not Staff.query.first():
+        return setup_admin_account()
+
+    student_count = Student.query.count()
+    staff_count = Staff.query.count()
+    print("Student count:", student_count)
+    
+    return render_template("home.html", student_count=student_count, staff_count=staff_count)
+
+
+#--------------------Student Signup--------------------
+@main.route("/signup", methods=["GET", "POST"])
+def signup():
+    if not Staff.query.first():
+        return setup_admin_account()
+    
+    return setup_student_account()
 
 #--------------------Login for both students and staff--------------------
 @main.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "POST":
-        username_or_email = request.form.get("username")
-        password = request.form.get("password")
+    if not Staff.query.first():
+        return setup_admin_account()
+    elif request.method == "POST":
+        response = login_user_account()
 
-        # 1. Try to log in student (by email)
-        student = Student.query.filter_by(student_email=username_or_email).first()
-        if student and student.check_password(password):
-            login_user(student)
-            flash("Logged in as student!", "success")
-            return redirect(url_for("main.student_dashboard"))
-
-        # 2. Try to log in staff (by username)
-        staff = Staff.query.filter_by(username=username_or_email).first()
-        if staff and staff.check_password(password):
-            login_user(staff)
-            flash("Logged in as staff!", "success")
-            return redirect(url_for("main.staff_dashboard"))
-
-        flash("Invalid credentials, please try again.", "danger")
+        if response:
+            return response
 
     return render_template("login.html")
 
@@ -216,6 +221,7 @@ def start_test():
 
         
 #--------------------Test Parts (students only)--------------------
+from .services import get_next_question, ai_evaluate_answer
 
 @main.route("/test/<part>/<int:q_num>/<difficulty>", methods=["GET", "POST"])
 @login_required
@@ -227,8 +233,15 @@ def test_part(part, q_num, difficulty):
     # POST: process student's answer
     if request.method == "POST":
         student_answer = request.form.get("answer")
-        question_text = session.get(f"{part}_{q_num}_text")
-        correct_answer = question_text  # For now assume AI will judge it
+        question_data = session.get(f"question_data_{part}_{q_num}")
+        
+        if not question_data or "answer" not in question_data:
+            flash("Error: Question data not found or is incomplete.", "danger")
+            return redirect(url_for("main.student_dashboard"))
+
+        correct_answer = question_data["answer"]
+        question_text = question_data["question"]
+        
         correct = ai_evaluate_answer(student_answer, correct_answer, part, question_text)
         
         # Save score in session
@@ -237,7 +250,14 @@ def test_part(part, q_num, difficulty):
         # Determine next question or part
         if q_num < 5:
             next_q = q_num + 1
-            next_diff = "medium" if q_num == 2 else "hard" if q_num == 5 else "easy"
+            # Your difficulty logic here is a bit tricky. Let's simplify:
+            if q_num == 1:
+                next_diff = "easy"
+            elif q_num == 2 or q_num == 3:
+                next_diff = "medium"
+            else:
+                next_diff = "hard"
+                
             return redirect(url_for("main.test_part", part=part, q_num=next_q, difficulty=next_diff))
         else:
             # Move to next part
@@ -248,9 +268,17 @@ def test_part(part, q_num, difficulty):
                 return redirect(url_for("main.test_results"))
 
     # GET: generate question dynamically
-    question_text = get_next_question(part, difficulty)
-    session[f"{part}_{q_num}_text"] = question_text
-    return render_template("test_part.html", part=part.capitalize(), q_num=q_num, question=question_text)
+    question_data = get_next_question(part, difficulty)
+    
+    # Check if there was an error generating the question
+    if "error" in question_data:
+        flash(question_data["error"], "danger")
+        return redirect(url_for("main.student_dashboard"))
+
+    # Store the question and its answer in the session
+    session[f"question_data_{part}_{q_num}"] = question_data
+
+    return render_template("test_part.html", part=part.capitalize(), q_num=q_num, question=question_data["question"])
 
 # ------------------Display final results------------------
 @main.route("/results")
@@ -491,82 +519,6 @@ def staff_view_student_surveys(student_id):
     return render_template("staff_view_surveys.html", student=student, surveys=surveys)
 
  
-
-# ---------------- AI Question Generator ----------------
-def get_next_question(part, difficulty="easy"):
-    """
-    Generate one question per test part: numbers, logic, shapes.
-    """
-    if part == "numbers":
-        prompt = f"""
-        Generate one {difficulty} math multiple-choice question.
-        Provide options A, B, C, D and specify the correct answer clearly.
-        Format:
-        Question: ...
-        A) ...
-        B) ...
-        C) ...
-        D) ...
-        Answer: <letter>
-        """
-    elif part == "logic":
-        prompt = f"""
-        Generate one {difficulty} logic reasoning test question in plain text.
-        Give a single correct short answer at the end.
-        Format:
-        Question: ...
-        Answer: ...
-        """
-    elif part == "shapes":
-        prompt = f"""
-        Generate one {difficulty} spatial reasoning question using text description (like shapes, rotations, or sequences).
-        Give a single correct short answer at the end.
-        Format:
-        Question: ...
-        Answer: ...
-        """
-    else:
-        return {"error": "Invalid test part"}
-
-    try:
-        response = model.generate_content(prompt)
-        text = response.text.strip()
-        # Split into question and answer
-        if "Answer:" in text:
-            question, answer = text.split("Answer:", 1)
-            return {"question": question.strip(), "answer": answer.strip()}
-        else:
-            return {"question": text, "answer": None}
-    except Exception as e:
-        print("Gemini question generation failed:", e)
-        return {"question": "Error generating question", "answer": None}
-    
-
-# ---------------- AI Answer Evaluator ----------------
-def ai_evaluate_answer(student_answer, correct_answer, part, question_text):
-    """ 
-    Evaluate student's answer with Gemini.
-    """
-    # For Numbers (MCQs), direct match with letter
-    if part == "numbers" and student_answer.strip().upper() == correct_answer.strip().upper():
-        return True
-
-    # For text answers (logic & shapes), AI check
-    prompt = f"""
-    You are an examiner. Question: "{question_text}".
-    Student answered: "{student_answer}".
-    Expected correct answer: "{correct_answer}".
-    Reply ONLY with 'yes' if correct or 'no' if incorrect.
-    """
-
-    try:
-        response = model.generate_content(prompt)
-        result = response.text.strip().lower()
-        return "yes" in result
-    except Exception as e:
-        print("AI evaluation failed:", e)
-        return False
-
 #--------------------Logout--------------------
 @main.route("/logout")
 @login_required

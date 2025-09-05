@@ -1,38 +1,42 @@
 {% extends "base.html" %}
 
+{% block title %}Login{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="text-center mb-4">Login</h2>
-            
-            <!-- Flash messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            
-            <!-- Login form -->
+<div class="login">
+    <!-- Background bubbles -->
+    <div class="bubble orange"></div>
+    <div class="bubble purple"></div>
+
+    <div class="login-container">
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Numeraid</h1>
+                <p>Welcome Back!</p>
+            </div>
+
+            <div class="divider">
+                <span>Login</span>
+            </div>
+
             <form method="POST" action="{{ url_for('main.login') }}">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Email (Students) / Username (Staff)</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                <div class="form-group mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your email or username" required>
                 </div>
                 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                <div class="form-group mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary submit-btn w-100">Login</button>
+                
+                <div class="signup-link">
+                    Don't have an account? <a href="/signup">Sign up</a>
+                </div>
             </form>
         </div>
+
+        <div class="image-section"></div>
     </div>
 </div>
 {% endblock %}
+
