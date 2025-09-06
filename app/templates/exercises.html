@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Recommended Exercises</h2>
+{% if exercises %}
+    <ul>
+    {% for ex in exercises %}
+        <li>
+            <strong>{{ ex.title }}</strong> ({{ ex.part }})<br>
+            {{ ex.description }}<br>
+            {% if ex.video_link %}
+                <a href="{{ ex.video_link }}" target="_blank">Watch Video</a><br>
+            {% endif %}
+            <a href="{{ url_for('main.complete_exercise', exercise_id=ex.id) }}" class="btn btn-success btn-sm mt-1">
+                Mark as Completed
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No exercises available at the moment.</p>
+{% endif %}
+{% endblock %}

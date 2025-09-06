@@ -1,13 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Test Results</h2>
-<p>Numbers Score: {{ numbers_score }}/5</p>
-<p>Logic Score: {{ logic_score }}/5</p>
-<p>Shapes Score: {{ shapes_score }}/5</p>
-<p>Total Score: {{ total_score }}/15</p>
+<h2>Your Test Results</h2>
 <h3>Disability Likelihood: {{ likelihood }}</h3>
 <p>{{ message }}</p>
 
-<a href="{{ url_for('main.student_dashboard') }}">Go to Dashboard</a>
+<a class="btn btn-primary" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard</a>
 {% endblock %}

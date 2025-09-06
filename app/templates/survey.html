@@ -1,45 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <h2>Discalculia Survey</h2>
+    <p>Please answer honestly. Your responses help us understand your learning needs.</p>
     <form method="POST">
         {{ form.hidden_tag() }}
 
+        <!-- Numbers / Math Section -->
+        <h4>Numbers & Math</h4>
         <div class="mb-3">
             {{ form.math_difficulty.label }}
             {{ form.math_difficulty(class="form-select") }}
         </div>
+        <div class="mb-3">{{ form.reading_numbers.label }}<br>{{ form.reading_numbers() }}</div>
+        <div class="mb-3">{{ form.math_anxiety.label }}<br>{{ form.math_anxiety() }}</div>
+        <div class="mb-3">{{ form.time_management.label }}<br>{{ form.time_management() }}</div>
+        <div class="mb-3">{{ form.previous_diagnosis.label }}<br>{{ form.previous_diagnosis() }}</div>
 
-        <div class="mb-3">
-            {{ form.reading_numbers.label }}<br>
-            {{ form.reading_numbers() }}
-        </div>
+        <!-- Reading / Writing / Memory Section -->
+        <h4>Reading, Writing & Memory</h4>
+        <div class="mb-3">{{ form.reading_difficulty.label }}<br>{{ form.reading_difficulty() }}</div>
+        <div class="mb-3">{{ form.writing_numbers.label }}<br>{{ form.writing_numbers() }}</div>
+        <div class="mb-3">{{ form.memory_issues.label }}<br>{{ form.memory_issues() }}</div>
+        <div class="mb-3">{{ form.attention_difficulty.label }}<br>{{ form.attention_difficulty() }}</div>
 
-        <div class="mb-3">
-            {{ form.math_anxiety.label }}<br>
-            {{ form.math_anxiety() }}
-        </div>
+        <!-- Real-Life Challenges -->
+        <h4>Daily Challenges</h4>
+        <div class="mb-3">{{ form.daily_math_challenges.label }}<br>{{ form.daily_math_challenges(class="form-control") }}</div>
+        <div class="mb-3">{{ form.daily_challenges.label }}<br>{{ form.daily_challenges(class="form-control") }}</div>
 
-        <div class="mb-3">
-            {{ form.time_management.label }}<br>
-            {{ form.time_management() }}
-        </div>
+        <!-- Support & Accommodations -->
+        <h4>Support Needed</h4>
+        <div class="mb-3">{{ form.support_needed.label }}<br>{{ form.support_needed(class="form-control") }}</div>
 
-        <div class="mb-3">
-            {{ form.previous_diagnosis.label }}<br>
-            {{ form.previous_diagnosis() }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.support_needed.label }}
-            {{ form.support_needed(class="form-control") }}
-        </div>
-
-        <div class="mb-3">
-            {{ form.daily_challenges.label }}
-            {{ form.daily_challenges(class="form-control") }}
-        </div>
+        <!-- Additional Key Areas -->
+        <h4>Other Areas</h4>
+        <div class="mb-3">{{ form.processing_speed.label }}<br>{{ form.processing_speed() }}</div>
+        <div class="mb-3">{{ form.problem_solving_difficulty.label }}<br>{{ form.problem_solving_difficulty() }}</div>
+        <div class="mb-3">{{ form.visual_confusion.label }}<br>{{ form.visual_confusion() }}</div>
+        <div class="mb-3">{{ form.anxiety_other_subjects.label }}<br>{{ form.anxiety_other_subjects() }}</div>
+        <div class="mb-3">{{ form.fatigue.label }}<br>{{ form.fatigue() }}</div>
 
         <div class="mb-3">
             {{ form.submit(class="btn btn-primary") }}

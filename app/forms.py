@@ -67,6 +67,7 @@ class StaffLoginForm(FlaskForm):
 
 #----------Student Survey Form---------------
 class DiscalculiaSurveyForm(FlaskForm):
+    # Numbers / math
     math_difficulty = SelectField(
         "Rate your difficulty with numbers and calculations",
         choices=[("1", "1 - No difficulty"), ("2", "2"), ("3", "3 - Moderate"), ("4", "4"), ("5", "5 - Severe")],
@@ -92,15 +93,75 @@ class DiscalculiaSurveyForm(FlaskForm):
         choices=[("Yes", "Yes"), ("No", "No")],
         validators=[DataRequired()]
     )
-    support_needed = TextAreaField(
-        "What kind of support do you think would help you succeed in math?",
+
+    # Reading / writing / memory
+    reading_difficulty = RadioField(
+        "Do you find it difficult to read or understand numbers in text or word problems?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    writing_numbers = RadioField(
+        "Do you make mistakes when writing numbers or performing calculations?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    memory_issues = RadioField(
+        "Do you often forget steps in calculations or math procedures?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    attention_difficulty = RadioField(
+        "Do you find it hard to concentrate during math tasks or problem solving?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+
+    # Real-life challenges
+    daily_math_challenges = TextAreaField(
+        "Describe challenges you face in daily activities that involve numbers (shopping, time, money, etc.)",
         validators=[DataRequired()]
     )
     daily_challenges = TextAreaField(
         "Briefly describe any challenges you face in daily school activities related to numbers.",
         validators=[DataRequired()]
     )
+
+    # Support & accommodations
+    support_needed = TextAreaField(
+        "What kind of support do you think would help you succeed in math?",
+        validators=[DataRequired()]
+    )
+
+    # Additional key areas for disability evaluation
+    processing_speed = RadioField(
+        "Do you often feel slow when completing math tasks compared to peers?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    problem_solving_difficulty = RadioField(
+        "Do you find it difficult to plan or solve multi-step problems?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    visual_confusion = RadioField(
+        "Do you confuse symbols, shapes, or numbers when looking at them quickly?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    anxiety_other_subjects = RadioField(
+        "Do you feel anxious or stressed in subjects other than math?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+    fatigue = RadioField(
+        "Do you get tired or mentally exhausted quickly when working on math tasks?",
+        choices=[("Yes", "Yes"), ("No", "No")],
+        validators=[DataRequired()]
+    )
+
+    # Submit
     submit = SubmitField("Submit Survey")
+
 
 
 

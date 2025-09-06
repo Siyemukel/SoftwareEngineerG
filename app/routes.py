@@ -9,8 +9,9 @@ import json
 import os
 
 import mimetypes
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from .services import get_next_question, ai_evaluate_answer
+
 
 main = Blueprint("main", __name__)
 
@@ -170,19 +171,32 @@ def survey():
 
     form = DiscalculiaSurveyForm()
     if form.validate_on_submit():
-        survey_data = {
-            "math_difficulty": form.math_difficulty.data,
-            "reading_numbers": form.reading_numbers.data,
-            "math_anxiety": form.math_anxiety.data,
-            "time_management": form.time_management.data,
-            "previous_diagnosis": form.previous_diagnosis.data,
-            "support_needed": form.support_needed.data,
-            "daily_challenges": form.daily_challenges.data
+        # Convert responses to numeric scores
+        def score_yes_no(ans):
+            return 1 if ans == "Yes" else 0
+
+        survey_scores = {
+            "math_difficulty": int(form.math_difficulty.data),
+            "reading_numbers": score_yes_no(form.reading_numbers.data),
+            "math_anxiety": score_yes_no(form.math_anxiety.data),
+            "time_management": score_yes_no(form.time_management.data),
+            "previous_diagnosis": score_yes_no(form.previous_diagnosis.data),
+            # Add other questions if present
+            "reading_difficulty": score_yes_no(getattr(form, "reading_difficulty", "No")),
+            "writing_numbers": score_yes_no(getattr(form, "writing_numbers", "No")),
+            "memory_issues": score_yes_no(getattr(form, "memory_issues", "No")),
+            "attention_difficulty": score_yes_no(getattr(form, "attention_difficulty", "No")),
+            "processing_speed": score_yes_no(getattr(form, "processing_speed", "No")),
+            "problem_solving_difficulty": score_yes_no(getattr(form, "problem_solving_difficulty", "No")),
+            "visual_confusion": score_yes_no(getattr(form, "visual_confusion", "No")),
+            "anxiety_other_subjects": score_yes_no(getattr(form, "anxiety_other_subjects", "No")),
+            "fatigue": score_yes_no(getattr(form, "fatigue", "No"))
         }
 
+        # Save survey numeric scores
         new_survey = StudentSurvey(
             student_id=current_user.id,
-            survey_data=json.dumps(survey_data)
+            survey_data=json.dumps(survey_scores)
         )
         db.session.add(new_survey)
         db.session.commit()
@@ -193,16 +207,6 @@ def survey():
     return render_template("survey.html", form=form)
 
 
-#--------------------Staff Dashboard--------------------
-@main.route("/staff_dashboard", methods=["GET", "POST"]) 
-@login_required
-def staff_dashboard(): 
-    # Only allow staff to access
-    if not hasattr(current_user, "username"):
-        flash("Access denied!", "danger")
-        return redirect(url_for("main.login")) 
-
-    return render_template("staff_dashboard.html", staff=current_user)
  
 
 #--------------------Start Test (students only)--------------------
@@ -221,8 +225,6 @@ def start_test():
 
         
 #--------------------Test Parts (students only)--------------------
-from .services import get_next_question, ai_evaluate_answer
-
 @main.route("/test/<part>/<int:q_num>/<difficulty>", methods=["GET", "POST"])
 @login_required
 def test_part(part, q_num, difficulty):
@@ -231,33 +233,39 @@ def test_part(part, q_num, difficulty):
         return redirect(url_for("main.student_dashboard"))
 
     # POST: process student's answer
-    if request.method == "POST":
+    if request.method == "POST": 
         student_answer = request.form.get("answer")
         question_data = session.get(f"question_data_{part}_{q_num}")
-        
-        if not question_data or "answer" not in question_data:
+
+        # Safety check for missing question data
+        if not question_data or "answer" not in question_data or "question" not in question_data:
             flash("Error: Question data not found or is incomplete.", "danger")
             return redirect(url_for("main.student_dashboard"))
 
-        correct_answer = question_data["answer"]
-        question_text = question_data["question"]
-        
+        correct_answer = question_data.get("answer")
+        question_text = question_data.get("question")
+
+        # Debugging prints (optional)
+        print("student_answer:", student_answer or "").strip()
+        print("correct_answer:", correct_answer or "").strip()
+
+        # Safely evaluate the answer
         correct = ai_evaluate_answer(student_answer, correct_answer, part, question_text)
-        
+
         # Save score in session
         session[part + "_score"] = session.get(part + "_score", 0) + (1 if correct else 0)
 
         # Determine next question or part
         if q_num < 5:
             next_q = q_num + 1
-            # Your difficulty logic here is a bit tricky. Let's simplify:
+            # Simplified difficulty logic
             if q_num == 1:
                 next_diff = "easy"
-            elif q_num == 2 or q_num == 3:
+            elif q_num in [2, 3]:
                 next_diff = "medium"
             else:
                 next_diff = "hard"
-                
+
             return redirect(url_for("main.test_part", part=part, q_num=next_q, difficulty=next_diff))
         else:
             # Move to next part
@@ -269,37 +277,75 @@ def test_part(part, q_num, difficulty):
 
     # GET: generate question dynamically
     question_data = get_next_question(part, difficulty)
-    
+
     # Check if there was an error generating the question
-    if "error" in question_data:
-        flash(question_data["error"], "danger")
+    if not question_data or "error" in question_data:
+        flash(question_data.get("error", "Failed to generate question."), "danger")
         return redirect(url_for("main.student_dashboard"))
 
     # Store the question and its answer in the session
     session[f"question_data_{part}_{q_num}"] = question_data
 
-    return render_template("test_part.html", part=part.capitalize(), q_num=q_num, question=question_data["question"])
+    return render_template(
+        "test_part.html",
+        part=part.capitalize(),
+        q_num=q_num,
+        question=question_data.get("question", "Question not available.")
+    )
+
+
 
 # ------------------Display final results------------------
 @main.route("/results")
 @login_required
 def test_results():
-
+    # --- Get test scores ---
     numbers_score = session.get("numbers_score", 0)
     logic_score = session.get("logic_score", 0)
     shapes_score = session.get("shapes_score", 0)
+    max_test_score = 5  # per section
 
-    total_score = numbers_score + logic_score + shapes_score
+    # --- Invert test score for risk ---
+    test_risk_score = (max_test_score * 3) - (numbers_score + logic_score + shapes_score)
 
-    # Determine disability likelihood
-    if total_score <= 7:  # Example threshold
+    # --- Load survey scores ---
+    survey = StudentSurvey.query.filter_by(student_id=current_user.id).first()
+    survey_scores = {}
+    survey_struggles = []
+    if survey:
+        survey_scores = json.loads(survey.survey_data)
+        for key, value in survey_scores.items():
+            if value > 0:
+                survey_struggles.append(key.replace("_", " ").capitalize())
+
+    # --- Identify low-performing test sections ---
+    low_test_sections = []
+    if numbers_score < 3:
+        low_test_sections.append("Numbers")
+    if logic_score < 3:
+        low_test_sections.append("Logic")
+    if shapes_score < 3:
+        low_test_sections.append("Shapes")
+
+    # --- Combine risk areas ---
+    risk_areas = set(low_test_sections + survey_struggles)
+
+    # --- Combine risk score ---
+    total_survey_score = sum(survey_scores.values()) if survey_scores else 0
+    combined_risk_score = test_risk_score + total_survey_score
+
+    # --- Determine likelihood ---
+    if combined_risk_score >= 15:
         likelihood = "High"
-        message = "You may need extra support with numbers and logic."
+        message = f"You may need extra support in: {', '.join(risk_areas)}. A staff member will review your results."
+    elif combined_risk_score >= 8:
+        likelihood = "Moderate"
+        message = f"You show some areas that could use support: {', '.join(risk_areas)}. Staff may follow up if needed."
     else:
         likelihood = "Low"
-        message = "Your results are within the expected range."
+        message = "Your results are within the expected range. Keep up the good work!"
 
-    # Save to database
+    # --- Save result to DB ---
     test_result = TestResult(
         student_id=current_user.id,
         numbers_score=numbers_score,
@@ -307,12 +353,19 @@ def test_results():
         shapes_score=shapes_score,
         disability_likelihood=likelihood,
         outcome_message=message,
-        staff_breakdown={}  # optional
+        staff_breakdown={
+            "test_scores": {
+                "numbers": numbers_score,
+                "logic": logic_score,
+                "shapes": shapes_score
+            },
+            "survey_scores": survey_scores
+        }
     )
     db.session.add(test_result)
     db.session.commit()
 
-    # Clear session scores
+    # --- Clear session ---
     session.pop("numbers_score", None)
     session.pop("logic_score", None)
     session.pop("shapes_score", None)
@@ -322,10 +375,43 @@ def test_results():
         numbers_score=numbers_score,
         logic_score=logic_score,
         shapes_score=shapes_score,
-        total_score=total_score,
+        total_test_score=numbers_score + logic_score + shapes_score,
+        total_survey_score=total_survey_score,
+        combined_risk_score=combined_risk_score,
         likelihood=likelihood,
         message=message
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#--------------------Staff Dashboard--------------------
+@main.route("/staff_dashboard", methods=["GET", "POST"]) 
+@login_required
+def staff_dashboard(): 
+    # Only allow staff to access
+    if not hasattr(current_user, "username"):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.login")) 
+
+    return render_template("staff_dashboard.html", staff=current_user)
+
 
 
 #--------------------For managing staff accounts (admin only)------------------
