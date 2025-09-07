@@ -70,7 +70,8 @@ class StudentSurvey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False, unique=True)
     survey_data = db.Column(db.JSON, nullable=False)  # Store responses as JSON
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
     staff_views = db.relationship("StudentSurveyStaffView", backref="survey", lazy=True)
 
@@ -141,3 +142,25 @@ class StaffStudentLink(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     staff_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
+
+
+class DeletionRequest(db.Model):
+    __tablename__ = "deletion_requests"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=True)
+    requested_by_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default="Pending")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    reviewed_by_id = db.Column(db.Integer, db.ForeignKey("staff.id"))
+    reviewed_at = db.Column(db.DateTime)
+
+    # Relationships
+    student = db.relationship("Student", backref="deletion_requests")
+    requested_by = db.relationship("Staff", foreign_keys=[requested_by_id], backref="deletion_requests_made")
+    reviewed_by = db.relationship("Staff", foreign_keys=[reviewed_by_id], backref="deletion_requests_reviewed")
+
+
+
+

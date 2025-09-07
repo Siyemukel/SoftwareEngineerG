@@ -1,25 +1,170 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>Welcome, {{ staff.name }} {{ staff.surname }}!</h2>
-    <p>Username: {{ staff.username }}</p>
+<div class="d-flex">
 
-    {% if staff.is_admin %}
-        <p>Status: Admin</p>
-        <h3>Admin Dashboard</h3>
-    {% else %}
-        <p>Status: Staff</p>
-        <h3>Staff Dashboard</h3>
-    {% endif %}
+    <!-- Sidebar -->
+    <nav class="bg-dark text-white flex-shrink-0 p-3" style="width: 250px; min-height: 100vh;">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="fs-4">Dashboard</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="{{ url_for('main.staff_dashboard') }}" class="nav-link text-white">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.manage_students') }}" class="nav-link text-white">
+                    <i class="bi bi-people"></i> Manage Students
+                </a>
+            </li>
+            {% if user.is_admin %}
+            <li>
+                <a href="{{ url_for('main.add_staff') }}" class="nav-link text-white">
+                    <i class="bi bi-person-plus"></i> Add Staff
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.assign_staff') }}" class="nav-link text-white">
+                    <i class="bi bi-person-lines-fill"></i> Assign Staff
+                </a>
+            </li>
+                        <li>
+                <a href="{{ url_for('main.review_deletion_requests') }}" class="nav-link text-white">
+                    <i class="bi bi-box-arrow-right"></i> Review Deletion Requests
+                </a>
+            </li>
+            {% endif %}
 
-    <ul>
-        <li><a href="{{ url_for('main.manage_students') }}">Manage Students</a></li>
+                        <li>
+                <a href="{{ url_for('main.logout') }}" class="nav-link text-white">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
 
+    <!-- Main Content -->
+    <div class="flex-grow-1 p-4">
 
-        {% if staff.is_admin %}
-            <li><a href="{{ url_for('main.manage_staff') }}">Manage Staff</a></li>
-        {% endif %}
-    </ul>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Welcome, {{ user.name }}!</h2>
+            <span class="badge bg-success">
+                {% if user.is_admin %} Admin Dashboard {% else %} Staff Dashboard {% endif %}
+            </span>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="d-flex flex-wrap gap-3 mb-4 overflow-auto">
+            <div class="card shadow-sm p-3 text-center flex-fill" style="min-width: 150px;">
+                <h6>Total Students</h6>
+                <h3>{{ total_students }}</h3>
+            </div>
+            <div class="card shadow-sm p-3 text-center flex-fill" style="min-width: 150px;">
+                <h6>Exercises In Progress</h6>
+                <h3>{{ exercises_in_progress }}</h3>
+            </div>
+            <div class="card shadow-sm p-3 text-center flex-fill" style="min-width: 150px;">
+                <h6>Tests Pending Review</h6>
+                <h3>{{ tests_pending_review }}</h3>
+            </div>
+            <div class="card shadow-sm p-3 text-center flex-fill" style="min-width: 150px;">
+                <h6>Flagged Students</h6>
+                <h3>{{ flagged_students }}</h3>
+            </div>
+            {% if user.is_admin %}
+            <div class="card shadow-sm p-3 text-center flex-fill" style="min-width: 150px;">
+                <h6>Total Staff</h6>
+                <h3>{{ total_staff }}</h3>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Search/Filter -->
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <input type="text" id="studentSearch" class="form-control w-50" placeholder="Search by name or email...">
+            {% if user.is_admin %}
+            <select id="staffFilter" class="form-select w-25">
+                <option value="">Filter by Staff</option>
+                {% for staff_member in all_staff %}
+                    <option value="{{ staff_member.name }}">{{ staff_member.name }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+
+        <!-- Students Table -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="studentsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Exercises Progress</th>
+                        <th>Test Progress</th>
+                        <th>Last Activity</th>
+                        {% if user.is_admin %}<th>Assigned Staff</th>{% endif %}
+                        <th>Flagged</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.student_email }}</td>
+                        <td>
+                            {% if student.exercises_completed|length == 0 %}
+                                <span class="badge bg-warning text-dark">Not Started</span>
+                            {% elif student.exercises_completed|length < Exercise.query.count() %}
+                                <span class="badge bg-info text-dark">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set all_results = student.test_results %}
+                            {% if all_results %}
+                                {% if all_results|selectattr("staff_views")|list|length == all_results|length %}
+                                    <span class="badge bg-success">Reviewed</span>
+                                {% else %}
+                                    <span class="badge bg-info text-dark">Pending Review</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Not Taken</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ student.created_at.strftime('%b %d, %Y') }}</td>
+                        {% if user.is_admin %}
+                        <td>
+                            {% if student.staff_links %}
+                                {% for link in student.staff_links %}
+                                    {{ link.staff.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td>
+                            {% if student.test_results|selectattr("disability_likelihood", "equalto", "high")|list %}
+                                <span class="badge bg-danger">Yes</span>
+                            {% else %}
+                                <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('main.manage_students', student_id=student.id) }}" class="btn btn-sm btn-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 {% endblock %}

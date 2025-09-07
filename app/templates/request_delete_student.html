@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm p-4">
+        <h3 class="mb-4">Request Deletion: {{ student.name }}</h3>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label for="reason" class="form-label fw-bold">Reason for deletion</label>
+                <textarea name="reason" id="reason" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-danger btn-lg">Submit Request</button>
+            </div>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{{ url_for('main.manage_students') }}" class="btn btn-outline-secondary">Back to Students</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

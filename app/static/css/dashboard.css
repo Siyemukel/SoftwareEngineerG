@@ -1,0 +1,59 @@
+/* Sidebar */
+nav.bg-dark {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+nav.bg-dark .nav-link {
+    color: #fff;
+    margin-bottom: 5px;
+    transition: background 0.2s;
+}
+
+nav.bg-dark .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+/* Main content adjusts for sidebar */
+.flex-grow-1 {
+    margin-left: 250px; /* width of sidebar */
+}
+
+/* Quick Stats Cards */
+.card.flex-fill {
+    min-width: 150px;
+    transition: transform 0.2s;
+}
+
+.card.flex-fill:hover {
+    transform: scale(1.03);
+}
+
+/* Table */
+#studentsTable th {
+    cursor: pointer;
+}
+
+#studentsTable th.sort-asc::after {
+    content: " ▲";
+}
+
+#studentsTable th.sort-desc::after {
+    content: " ▼";
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .flex-grow-1 {
+        margin-left: 0;
+    }
+    nav.bg-dark {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+}

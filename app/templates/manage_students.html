@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <h2>Manage Students</h2>
     <a href="{{ url_for('main.signup') }}" class="btn btn-success mb-3">Add New Student</a>
 
-    <table class="table table-bordered">
-        <thead>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
                 <th>Name</th>
@@ -29,9 +29,39 @@
                 <td>{{ student.year_of_study }}</td>
                 <td>{{ student.faculty }}</td>
                 <td>
-                    <a href="{{ url_for('main.edit_student', student_id=student.id) }}" class="btn btn-primary btn-sm">Edit</a>
-                    <a href="{{ url_for('main.delete_student', student_id=student.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this student?');">Delete</a>
+                    <div class="btn-group" role="group">
+                        <!-- Edit -->
+                        <a href="{{ url_for('main.edit_student', student_id=student.id) }}" 
+                           class="btn btn-primary btn-sm">Edit</a>
+
+                        <!-- Admin: Delete directly -->
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('main.delete_student', student_id=student.id) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this student?');">
+                               Delete
+                            </a>
+                        {% else %}
+                        <!-- Staff: Request Deletion -->
+                            <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
+                               class="btn btn-warning btn-sm">
+                               Request Deletion
+                            </a>
+                        {% endif %}
+
+                        <!-- View Results / Surveys / Exercises -->
+                        <a href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}" 
+                           class="btn btn-info btn-sm">Results</a>
+                        <a href="{{ url_for('main.staff_view_student_surveys', student_id=student.id) }}" 
+                           class="btn btn-secondary btn-sm">Surveys</a>
+                        <a href="{{ url_for('main.staff_view_student_exercises', student_id=student.id) }}" 
+                           class="btn btn-success btn-sm">Exercises</a>
+                    </div>
                 </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center">No students found.</td>
             </tr>
             {% endfor %}
         </tbody>

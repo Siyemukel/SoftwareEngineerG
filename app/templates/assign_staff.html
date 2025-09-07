@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+
+    <div class="card shadow-sm p-4">
+        <h3 class="mb-3 text-center">Assign Staff to Students</h3>
+        <p class="text-muted text-center mb-4">
+            Select a staff member and assign them to students who may need support.
+            <br>
+            <small>Students with no high-risk tests or surveys are excluded to keep focus on students needing help.</small>
+        </p>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <!-- Staff Selection -->
+            <div class="mb-3">
+                {{ form.staff.label(class="form-label fw-bold") }}
+                {{ form.staff(class="form-select") }}
+            </div>
+
+            <!-- Students Multi-Select -->
+            <div class="mb-3">
+                {{ form.students.label(class="form-label fw-bold") }}
+                {{ form.students(class="form-select", multiple=True, size=10) }}
+                <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple students.</small>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex justify-content-between mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+
+                {% if auto_assign_possible %}
+                <a href="{{ url_for('main.auto_assign_students') }}" class="btn btn-success btn-lg">
+                    Auto-Assign Students
+                </a>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Back to Dashboard -->
+        <div class="text-center mt-3">
+            <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-outline-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

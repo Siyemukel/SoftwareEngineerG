@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ student.name }}'s Exercises</h2>
+    <p class="text-muted">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
+
+    {% if exercises %}
+    <div class="list-group">
+        {% for exercise in exercises %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6>{{ exercise.title }} <small class="text-muted">({{ exercise.part }})</small></h6>
+                <p class="mb-1">{{ exercise.description }}</p>
+                {% if exercise.video_link %}
+                    <a href="{{ exercise.video_link }}" target="_blank">Watch Video</a>
+                {% endif %}
+            </div>
+            <div>
+                {% if exercise.id in completed_ex_ids %}
+                    <span class="badge bg-success">Completed</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Not Completed</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-muted">No exercises available.</p>
+    {% endif %}
+
+    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

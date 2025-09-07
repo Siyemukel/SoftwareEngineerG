@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ student.name }}'s Survey</h2>
+    <p class="text-muted">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
+
+    {% if surveys %}
+        {% for survey in surveys %}
+        <div class="card mb-3 shadow-sm p-3">
+            <h5>Survey taken on {{ survey.created_at.strftime('%b %d, %Y') }}</h5>
+            <table class="table table-bordered mt-2">
+                <thead class="table-light">
+                    <tr>
+                        <th>Question</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in survey.survey_data.items() %}
+                    <tr>
+                        <td>{{ key.replace('_', ' ').title() }}</td>
+                        <td>
+                            {% if value == 1 %}
+                                <span class="text-warning fw-semibold">Struggle</span>
+                            {% else %}
+                                <span class="text-secondary">No struggle</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No survey submitted by this student yet.</p>
+    {% endif %}
+
+    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-outline-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock %}

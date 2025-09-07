@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-5 text-center" style="max-width: 650px; border-radius: 20px;">
+
+
+        <div class="mb-4">
+            <i class="bi bi-stars text-primary" style="font-size: 3.5rem;"></i>
+        </div>
+
+
+        <h2 class="mb-3 fw-bold">Welcome, {{ student.name }} </h2>
+
+        
+        <p class="lead mb-4">
+            This platform is here to <strong>support your learning journey</strong>.
+        </p>
+
+       
+        <p class="mb-3">
+            This quick survey helps us see which areas feel easy and which ones might feel tricky, so we can give you the right support.
+        </p>
+
+        <p class="mb-3">
+            It's <strong>not a test you can pass or fail</strong> — it simply shows us where learning might feel harder, so we can guide you with the right tools and exercises.
+        </p>
+
+        <p class="mb-4">
+            Think of it like your <strong>personal setup</strong>: the better we understand you, the more helpful your dashboard will be. 
+        </p>
+
+      
+        <div class="mt-4">
+            <a href="{{ url_for('main.survey') }}" 
+               class="btn btn-lg px-5 py-3 fw-bold"
+               style="font-size: 1.1rem; border-radius: 40px; background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                   Start My Survey
+            </a>
+        </div>
+
+       
+        <p class="text-muted mt-4" style="font-size: 0.95rem;">
+             It only takes a few minutes and makes your experience smoother.
+        </p>
+    </div>
+</div>
+{% endblock %}

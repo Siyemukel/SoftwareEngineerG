@@ -1,35 +1,241 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ part }} Test - Question {{ q_num }}</h2>
-
-<form method="POST">
-    <div class="question-block">
-        {# The backend now passes a 'question' object with the full question text #}
-        <p><strong>{{ question }}</strong></p>
-
-        {% if part.lower() == "numbers" %}
-            {# For numbers, the question text from Gemini should include A, B, C, D #}
-            {# So we'll render it as is and provide radio buttons #}
-            <div class="options-group">
-                <label>
-                    <input type="radio" name="answer" value="A" required> A
-                </label><br>
-                <label>
-                    <input type="radio" name="answer" value="B" required> B
-                </label><br>
-                <label>
-                    <input type="radio" name="answer" value="C" required> C
-                </label><br>
-                <label>
-                    <input type="radio" name="answer" value="D" required> D
-                </label><br>
-            </div>
-        {% else %}
-            {# Open text answer for logic/shapes #}
-            <textarea name="answer" rows="3" cols="40" required></textarea>
-        {% endif %}
+<div class="test-container">
+    <h2>{{ part }} Test - Question {{ q_num }}/5</h2>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ (q_num / 5) * 100 }}%;"></div>
     </div>
-    <button type="submit">Submit Answer</button>
-</form>
+    
+    <form method="POST" class="test-form">
+        <div class="question-block">
+            <p class="question-text"><strong>{{ question }}</strong></p>
+            
+            {% if shape_image %}
+                <div class="shape-container">
+                    <img src="{{ shape_image }}" alt="Shape for question" class="shape-image">
+                </div>
+            {% endif %}
+            
+            {% if part.lower() == "numbers" %}
+                <div class="options-group">
+                    {% if options %}
+                        {# Use parsed options from backend #}
+                        {% for letter, option_text in options.items() %}
+                            <label class="option-label">
+                                <input type="radio" name="answer" value="{{ letter }}" required>
+                                <span class="option-text">{{ letter }}) {{ option_text }}</span>
+                            </label>
+                        {% endfor %}
+                    {% else %}
+                        {# Fallback radio buttons if options not parsed #}
+                        <label class="option-label">
+                            <input type="radio" name="answer" value="A" required>
+                            <span class="option-text">A</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="answer" value="B" required>
+                            <span class="option-text">B</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="answer" value="C" required>
+                            <span class="option-text">C</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="answer" value="D" required>
+                            <span class="option-text">D</span>
+                        </label>
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Open text answer for logic/shapes #}
+                <div class="text-answer-group">
+                    <label for="answer" class="answer-label">Your Answer:</label>
+                    <textarea name="answer" id="answer" rows="3" cols="50" 
+                              placeholder="Type your answer here..." required></textarea>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="button-group">
+            <button type="submit" class="submit-btn">Submit Answer</button>
+        </div>
+    </form>
+</div>
+
+<style>
+#progress-fill {
+    width: {{ (q_num / 5) * 100 }}%;
+}
+
+.test-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    transition: width 0.3s ease;
+}
+
+.test-form {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.question-block {
+    margin-bottom: 30px;
+}
+
+.question-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.shape-container {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+}
+
+.shape-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 5px;
+}
+
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-label:hover {
+    border-color: #4CAF50;
+    background-color: #f0f8f0;
+}
+
+.option-label input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.2);
+}
+
+.option-label input[type="radio"]:checked + .option-text {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.option-text {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.text-answer-group {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+}
+
+.answer-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.text-answer-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.text-answer-group textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.submit-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .test-container {
+        padding: 10px;
+    }
+    
+    .test-form {
+        padding: 20px;
+    }
+    
+    .question-text {
+        font-size: 16px;
+    }
+    
+    .submit-btn {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}
+</style>
 {% endblock %}

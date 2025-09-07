@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm p-4">
+        <h3 class="mb-4 text-center">Edit Staff Member</h3>
+
+        <form method="POST">
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label fw-bold">Username</label>
+                <input type="text" name="username" id="username" class="form-control" value="{{ staff.username }}" required>
+            </div>
+
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label fw-bold">First Name</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ staff.name }}" required>
+            </div>
+
+            <!-- Surname -->
+            <div class="mb-3">
+                <label for="surname" class="form-label fw-bold">Surname</label>
+                <input type="text" name="surname" id="surname" class="form-control" value="{{ staff.surname }}" required>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="password" class="form-label fw-bold">New Password <small class="text-muted">(Leave blank to keep current password)</small></label>
+                <input type="password" name="password" id="password" class="form-control">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Update Staff</button>
+            </div>
+        </form>
+
+        <!-- Back to Dashboard -->
+        <div class="text-center mt-3">
+            <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-outline-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

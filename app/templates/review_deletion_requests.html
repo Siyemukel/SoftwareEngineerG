@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Review Student Deletion Requests</h2>
+
+    {% if requests %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Requested By</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Requested At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>{{ req.id }}</td>
+                    <td>
+                        {% if req.student %}
+                            {{ req.student.name }} {{ req.student.surname }}
+                            <small class="d-block text-muted">{{ req.student.student_email }}</small>
+                        {% else %}
+                            <span class="text-muted">[Student Deleted]</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ req.requested_by.name if req.requested_by else 'Unknown' }}</td>
+                    <td>{{ req.reason }}</td>
+                    <td>
+                        <span class="badge bg-warning">{{ req.status }}</span>
+                    </td>
+                    <td>{{ req.created_at.strftime('%b %d, %Y %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='approve') }}"
+                           class="btn btn-success btn-sm"
+                           onclick="return confirm('Are you sure you want to approve and delete this student?');">
+                            Approve
+                        </a>
+                        <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='reject') }}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to reject this request?');">
+                            Reject
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-muted">No pending deletion requests at this time.</p>
+    {% endif %}
+</div>
+{% endblock %}

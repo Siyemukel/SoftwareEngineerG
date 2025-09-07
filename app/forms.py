@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField, SubmitField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField, SubmitField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, ValidationError, EqualTo
 import re
 
@@ -62,6 +62,14 @@ class StaffLoginForm(FlaskForm):
         validators=[DataRequired(message="Password is required"), Length(min=6)]
     )
     submit = SubmitField("Login")
+
+
+
+#----Assign Staff to Students Form----
+class AssignStaffForm(FlaskForm):
+    staff = SelectField('Select Staff', coerce=int)
+    students = SelectMultipleField('Select Students', coerce=int)
+    submit = SubmitField('Assign')
 
 
 
