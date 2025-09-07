@@ -26,19 +26,14 @@
         </div>
     </div>
 
-    <!-- Dyscalculia Test (Sequential) -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Dyscalculia Test</h5>
             {% if student_results %}
-                {% if student_results.numbers_score is none %}
-                    <a href="{{ url_for('main.test_part', part='numbers') }}" class="btn btn-primary">Start Numbers Test</a>
-                {% elif student_results.logic_score is none %}
-                    <a href="{{ url_for('main.test_part', part='logic') }}" class="btn btn-primary">Continue Logic Test</a>
-                {% elif student_results.shapes_score is none %}
-                    <a href="{{ url_for('main.test_part', part='shapes') }}" class="btn btn-primary">Continue Shapes Test</a>
+                {% if student_results.disability_likelihood != 'low' %}
+                    <a href="{{ url_for('main.exercises', part='numbers') }}" class="btn btn-primary">Recommended activities.</a>
                 {% else %}
-                    <span class="badge bg-success">All tests completed ✅</span>
+                    <span class="badge bg-success">All tests completed</span>
                 {% endif %}
             {% else %}
                 <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-primary">Start Test</a>

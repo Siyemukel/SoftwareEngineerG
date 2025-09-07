@@ -129,3 +129,48 @@ def ai_evaluate_answer(student_answer, correct_answer, part, question_text):
     except Exception as e:
         print("AI evaluation failed:", e)
         return False
+
+def get_activity(part):
+    """
+    Generates a creative, non-test-like activity based on a chosen skill area.
+    """
+    if part == "numbers":
+        prompt = """
+        Generate a single, fun, and practical activity for a student to practice number skills. 
+        The activity should involve a real-world scenario, like budgeting, cooking, or measuring.
+        The response should be a short paragraph describing the activity.
+        Format:
+        Activity: [Description of activity]
+        """
+    elif part == "logic":
+        prompt = """
+        Generate a single, hands-on activity to improve logical and sequential reasoning. 
+        The activity should involve a simple puzzle, a creative challenge, or a problem to solve in steps.
+        The response should be a short paragraph.
+        Format:
+        Activity: [Description of activity]
+        """
+    elif part == "shapes":
+        prompt = """
+        Generate a single, creative activity for a student to practice understanding and manipulating shapes. 
+        The activity should involve drawing, building, or identifying shapes in the real world.
+        The response should be a short paragraph.
+        Format:
+        Activity: [Description of activity]
+        """
+    else:
+        return {"error": "Invalid activity part"}
+
+    try:
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        
+        if "Activity:" in text:
+            # The prompt is set to return "Activity: " so we can parse it
+            activity_text = text.split("Activity:", 1)[1]
+            return {"activity": activity_text.strip()}
+        else:
+            return {"activity": "Error generating activity."}
+    except Exception as e:
+        print("Gemini activity generation failed:", e)
+        return {"activity": "Error generating activity."}

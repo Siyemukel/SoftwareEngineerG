@@ -211,13 +211,23 @@ def staff_dashboard():
 def start_test():
     # Check if student already has a test result
     existing_test = TestResult.query.filter_by(student_id=current_user.id).first()
-    if existing_test:
-        flash("You have already completed the test.", "info")
-        return redirect(url_for("main.student_dashboard"))
 
-    # Redirect to first test part: Numbers
+    if existing_test:
+        # Determine the area of weakness based on scores
+        # This is a simplified example; a more complex logic could be used
+        scores = {
+            "numbers": existing_test.numbers_score,
+            "logic": existing_test.logic_score,
+            "shapes": existing_test.shapes_score
+        }
+        
+        # Find the lowest score and redirect to exercises for that part
+        weakest_area = min(scores, key=scores.get)
+        flash(f"You have already completed the test. Here are some exercises to help with your {weakest_area} skills.", "info")
+        return redirect(url_for("main.exercises", part=weakest_area)) # Assuming an exercises route exists
+    
+    # If no test result exists, proceed to the test
     return redirect(url_for("main.test_part", part="numbers", difficulty="easy", q_num=1))
- 
 
         
 #--------------------Test Parts (students only)--------------------
@@ -326,6 +336,48 @@ def test_results():
         likelihood=likelihood,
         message=message
     )
+
+@main.route("/exercises/<string:part>", methods=["GET", "POST"])
+@login_required
+def exercises(part):
+    # Check if the part is a valid category
+    if part not in ["numbers", "logic", "shapes"]:
+        flash("Invalid exercise category.", "danger")
+        return redirect(url_for("main.student_dashboard"))
+    
+    # Generate the AI question
+    exercise_data = get_next_question(part)
+    
+    if not exercise_data:
+        flash("Could not generate an exercise. Please try again later.", "danger")
+        return redirect(url_for("main.student_dashboard"))
+
+    question_text = exercise_data.get("question")
+    correct_answer = exercise_data.get("answer")
+
+    # If the user is submitting an answer
+    if request.method == "POST":
+        student_answer = request.form.get("answer")
+        is_correct = ai_evaluate_answer(student_answer, correct_answer, part, question_text)
+
+        # Handle the answer (e.g., log completion, give feedback)
+        if is_correct:
+            flash("Correct! Great job!", "success")
+            # Log the completion
+            new_completion = ExerciseCompletion(
+                student_id=current_user.id,
+                exercise_id=None # Or link to a pre-generated exercise if you store them
+            )
+            db.session.add(new_completion)
+            db.session.commit()
+            
+            # Redirect to the same page for a new question
+            return redirect(url_for("main.exercises", part=part))
+        else:
+            flash(f"Incorrect. The correct answer was {correct_answer}.", "warning")
+            # Log the attempt, but not a completion
+
+    return render_template("exercise_page.html", question=question_text, part=part)
 
 
 #--------------------For managing staff accounts (admin only)------------------
