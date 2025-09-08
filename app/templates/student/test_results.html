@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-card">
+        <h2>Your Test Results</h2>
+        <h3>Disability Likelihood: {{ likelihood }}</h3>
+        <p>{{ message }}</p>
+        <a class="dashboard-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

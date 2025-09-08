@@ -1,0 +1,578 @@
+/* General container and card styling for a centered layout */
+.onboarding-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--color-light-grey, #f4f4f9);
+    font-family: var(--font-secondary);
+}
+
+.onboarding-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Header and icon styling */
+.onboarding-header h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.onboarding-header p {
+    font-size: 1.1rem;
+    color: var(--color-dark-grey);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+.onboarding-icon {
+    font-size: 3.5rem;
+    color: var(--color-red);
+    margin-bottom: 1.5rem;
+}
+
+/* Content paragraphs */
+.onboarding-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-black);
+    margin-bottom: 1.5rem;
+}
+
+/* Button styling */
+.onboarding-btn {
+    font-family: var(--font-secondary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 3rem;
+    border-radius: 40px;
+    text-decoration: none;
+    display: inline-block;
+    color: white;
+    background-color: var(--color-blue);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.onboarding-btn:hover {
+    background-color: #3f588c;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-btn:active {
+    transform: translateY(0);
+}
+
+/* Footer text */
+.onboarding-footer-text {
+    font-size: 0.95rem;
+    color: var(--color-metallic-silver);
+    margin-top: 1.5rem;
+}
+
+/* Container for the entire survey page to center and style it */
+.survey-container {
+    padding: 3rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: var(--color-light-grey, #f4f4f9);
+    font-family: var(--font-secondary);
+}
+
+/* Card for the survey form itself */
+.survey-card {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    max-width: 800px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Header and introductory text */
+.survey-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.survey-header h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.survey-header p {
+    font-size: 1rem;
+    color: var(--color-dark-grey);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Form section headers */
+.survey-form h4 {
+    font-family: var(--font-primary);
+    color: var(--color-deep-purple);
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--color-metallic-silver);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form labels and inputs */
+.form-label {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-select,
+.form-control,
+.form-check-input {
+    font-family: var(--font-secondary);
+    border-color: var(--color-metallic-silver);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.25rem rgba(75, 104, 165, 0.25);
+}
+
+.form-check-input {
+    border: 1px solid var(--color-metallic-silver);
+}
+
+.form-check-input:checked {
+    background-color: var(--color-blue);
+    border-color: var(--color-blue);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Submit button styling */
+.submit-btn {
+    background-color: var(--color-green);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: var(--font-secondary);
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: #166831;
+}
+
+/* Custom styles for form elements */
+.form-check-input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 0.5rem;
+}
+
+/* General layout of the dashboard page */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-light-grey, #f4f4f9);
+    font-family: var(--font-secondary);
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background-color: var(--color-black);
+    color: white;
+    padding: 1.5rem 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar a.logo {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sidebar hr {
+    border-color: rgba(255, 255, 255, 0.2);
+    margin: 1rem 0;
+}
+
+.sidebar .nav-link {
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+}
+
+/* Main content area */
+.main-content {
+    flex-grow: 1;
+    padding: 2.5rem;
+    box-sizing: border-box;
+}
+
+.main-content h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.main-content p {
+    color: var(--color-dark-grey);
+    margin-bottom: 1rem;
+}
+
+/* Card styling for sections */
+.dashboard-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card h4 {
+    font-family: var(--font-primary);
+    color: var(--color-deep-purple);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* Button styling within cards */
+.dashboard-btn {
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--color-blue);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #3f588c;
+}
+
+.btn-warning {
+    background-color: var(--color-red);
+    color: white;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #b81725;
+}
+
+.badge-success {
+    background-color: var(--color-green);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* List group for exercises */
+.list-group-item {
+    background-color: white;
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item a {
+    color: var(--color-blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.list-group-item a:hover {
+    text-decoration: underline;
+}
+
+/* Container for the test page to center and style it */
+.test-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    font-family: var(--font-secondary);
+}
+
+/* Header and progress bar */
+.test-container h2 {
+    font-family: var(--font-primary);
+    font-size: 2rem;
+    color: var(--color-blue);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: var(--color-metallic-silver);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--color-green);
+    transition: width 0.3s ease;
+}
+
+/* Main form and question block */
+.test-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.question-block {
+    margin-bottom: 2.5rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: var(--color-black);
+}
+
+.question-text strong {
+    font-weight: 600;
+}
+
+.shape-container {
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--color-light-grey, #f4f4f9);
+    border-radius: 8px;
+}
+
+.shape-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 5px;
+}
+
+/* Radio button options */
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--color-white, #fff);
+    border: 2px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-label:hover {
+    border-color: var(--color-blue);
+    background-color: rgba(75, 104, 165, 0.05);
+}
+
+.option-label input[type="radio"] {
+    margin-right: 1rem;
+    transform: scale(1.2);
+    accent-color: var(--color-blue); /* Sets color of radio button */
+}
+
+.option-label input[type="radio"]:checked + .option-text {
+    color: var(--color-blue);
+    font-weight: bold;
+}
+
+.option-text {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-dark-grey);
+}
+
+/* Text answer field */
+.text-answer-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: var(--font-secondary);
+    resize: vertical;
+    box-sizing: border-box;
+    min-height: 100px;
+    transition: all 0.3s ease;
+}
+
+.text-answer-group textarea:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.2rem rgba(75, 104, 165, 0.25);
+}
+
+/* Submit button */
+.button-group {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.submit-btn {
+    background-color: var(--color-blue);
+    color: white;
+    padding: 0.8rem 2.5rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-secondary);
+}
+
+.submit-btn:hover {
+    background-color: #3f588c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(75, 104, 165, 0.3);
+}
+
+/* General container for the results page */
+.results-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--color-light-grey, #f4f4f9);
+    font-family: var(--font-secondary);
+}
+
+/* Card for the test results */
+.results-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Header and title styling */
+.results-card h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.results-card h3 {
+    font-family: var(--font-secondary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-deep-purple);
+    margin-bottom: 1.5rem;
+}
+
+/* Message paragraph styling */
+.results-card p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-black);
+    margin-bottom: 2rem;
+}
+
+/* Button styling */
+.dashboard-btn {
+    background-color: var(--color-green);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.dashboard-btn:hover {
+    background-color: #166831;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .results-card {
+        padding: 2rem 1.5rem;
+    }
+    .results-card h2 {
+        font-size: 2rem;
+    }
+    .results-card h3 {
+        font-size: 1.2rem;
+    }
+}

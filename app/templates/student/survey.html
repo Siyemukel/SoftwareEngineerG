@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Dyscalculia Survey{% endblock %}
+{% block content %}
+<div class="survey-container">
+    <div class="survey-card">
+        <div class="survey-header">
+            <h2>Dyscalculia Survey</h2>
+            <p>
+                Your responses are confidential and will help us understand your learning needs so we can provide the best possible support and personalized tools.
+            </p>
+        </div>
+
+        <form method="POST" class="survey-form">
+            {{ form.hidden_tag() }}
+
+            <h4>Numbers & Math</h4>
+            <div class="form-group">
+                {{ form.math_difficulty.label(class="form-label") }}
+                {{ form.math_difficulty(class="form-select") }}
+            </div>
+            <div class="form-group form-check">
+                {{ form.reading_numbers(class="form-check-input") }}
+                {{ form.reading_numbers.label(class="form-check-label") }}
+            </div>
+            <div class="form-group form-check">
+                {{ form.math_anxiety(class="form-check-input") }}
+                {{ form.math_anxiety.label(class="form-check-label") }}
+            </div>
+            <div class="form-group form-check">
+                {{ form.time_management(class="form-check-input") }}
+                {{ form.time_management.label(class="form-check-label") }}
+            </div>
+            <div class="form-group form-check">
+                {{ form.previous_diagnosis(class="form-check-input") }}
+                {{ form.previous_diagnosis.label(class="form-check-label") }}
+            </div>
+
+            <h4>Reading, Writing & Memory</h4>
+            <div class="form-group form-check">{{ form.reading_difficulty(class="form-check-input") }}{{ form.reading_difficulty.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.writing_numbers(class="form-check-input") }}{{ form.writing_numbers.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.memory_issues(class="form-check-input") }}{{ form.memory_issues.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.attention_difficulty(class="form-check-input") }}{{ form.attention_difficulty.label(class="form-check-label") }}</div>
+
+            <h4>Daily Challenges</h4>
+            <div class="form-group">{{ form.daily_math_challenges.label(class="form-label") }}{{ form.daily_math_challenges(class="form-control") }}</div>
+            <div class="form-group">{{ form.daily_challenges.label(class="form-label") }}{{ form.daily_challenges(class="form-control") }}</div>
+
+            <h4>Support Needed</h4>
+            <div class="form-group">{{ form.support_needed.label(class="form-label") }}{{ form.support_needed(class="form-control") }}</div>
+
+            <h4>Other Areas</h4>
+            <div class="form-group form-check">{{ form.processing_speed(class="form-check-input") }}{{ form.processing_speed.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.problem_solving_difficulty(class="form-check-input") }}{{ form.problem_solving_difficulty.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.visual_confusion(class="form-check-input") }}{{ form.visual_confusion.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.anxiety_other_subjects(class="form-check-input") }}{{ form.anxiety_other_subjects.label(class="form-check-label") }}</div>
+            <div class="form-group form-check">{{ form.fatigue(class="form-check-input") }}{{ form.fatigue.label(class="form-check-label") }}</div>
+
+            <div class="text-center mt-4">
+                {{ form.submit(class="btn submit-btn") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

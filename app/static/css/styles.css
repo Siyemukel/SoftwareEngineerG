@@ -1,0 +1,317 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+:root {
+  --color-blue: #4B68A5;
+  --color-red: #D11F2D;
+  --color-light-purple: #A56EAE;
+  --color-green: #1C8441;
+  --color-teal: #7AB4B6;
+  --color-deep-purple: #812575;
+  --color-black: #231F20;
+  --color-dark-grey: #565759;
+  --color-metallic-silver: #959B9D;
+  --font-primary: 'Bebas Neue', sans-serif;
+  --font-secondary: 'Open Sans', sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-secondary);
+  color: var(--color-black);
+  background-color: #f8f9fa;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+p, a, li, span {
+  font-family: var(--font-secondary);
+}
+header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.logo a {
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  color: var(--color-blue);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+nav a {
+  color: var(--color-dark-grey);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+nav a:hover {
+  color: var(--color-blue);
+  background-color: rgba(75, 104, 165, 0.1);
+}
+main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.footer {
+  background-color: var(--color-black);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  margin-top: auto;
+}
+.footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('https://i.pinimg.com/1200x/d3/c5/08/d3c50833fb353e8142f203b62e875acd.jpg') no-repeat center center/cover;
+    min-height: 80vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(75, 104, 165, 0.1); /* Subtle color overlay */
+}
+
+.hero h1 {
+    font-size: 3rem;
+    color: var(--color-blue);
+    font-family: var(--font-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    font-family: var(--font-secondary);
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+    color: var(--color-dark-grey);
+}
+
+/* Hero Slider */
+.hero-slider {
+  margin: 2rem auto 0 auto;
+  width: 100%;
+  max-width: 1000px;
+  height: 400px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.hero-slider img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 1s, transform 1s;
+}
+
+.hero-slider img.active {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 1;
+}
+
+/* About Section */
+.about {
+  padding: 3rem 2rem;
+  background-color: #fff;
+  text-align: center;
+  z-index: 2;
+  position: relative;
+}
+
+.about h2 {
+  font-size: 2rem;
+  font-family: var(--font-primary);
+  margin-bottom: 1rem;
+  color: var(--color-blue);
+}
+
+.about p {
+  font-family: var(--font-secondary);
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+  color: var(--color-dark-grey);
+  background: rgba(255,255,255,0.7);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Services Section */
+.services {
+  padding: 3rem 2rem;
+  text-align: center;
+  z-index: 2;
+}
+
+.services h2 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-family: var(--font-primary);
+  color: var(--color-black);
+}
+
+.service-box {
+  display: inline-block;
+  width: 280px;
+  padding: 1.5rem;
+  margin: 1rem;
+  background: var(--color-white, #fff);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.service-box:hover,
+.service-box:focus-within {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.service-box h3 {
+  font-family: var(--font-primary);
+  color: var(--color-deep-purple);
+}
+
+.service-box p {
+  font-family: var(--font-secondary);
+  color: var(--color-dark-grey);
+}
+
+.service-box img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Decorative Section */
+.decor {
+  position: relative;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+  border-radius: 1rem;
+}
+
+.decor h2 {
+  font-size: 2rem;
+  font-family: var(--font-primary);
+  color: var(--color-black);
+  margin-bottom: 1rem;
+}
+
+.decor p {
+  font-size: 1.1rem;
+  font-family: var(--font-secondary);
+  color: var(--color-metallic-silver);
+}
+
+.circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  position: absolute;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.circle.small {
+  width: 40px;
+  height: 40px;
+  background: var(--color-light-purple);
+}
+
+.circle.purple {
+  background: var(--color-deep-purple);
+}
+
+.join-btn {
+  background: var(--color-red);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s, box-shadow 0.3s;
+  font-family: var(--font-secondary);
+}
+
+.join-btn:hover,
+.join-btn:focus {
+  background: var(--color-dark-grey);
+  box-shadow: 0 2px 8px rgba(209,31,45,0.15);
+}
+
+/* Contact Section */
+.contact {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.contact h2 {
+  font-family: var(--font-primary);
+  margin-bottom: 1rem;
+}
+
+.contact p {
+  font-family: var(--font-secondary);
+  margin: 0.5rem 0;
+  color: var(--color-metallic-silver);
+}

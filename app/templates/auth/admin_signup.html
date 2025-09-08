@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Sign Up{% endblock %}
+{% block content %}
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-branding">
+            <img src="/static/images/dut_logo.png" alt="Company Logo" class="logo-image">
+            <h2>Welcome to the Admin Portal</h2>
+            <p>
+                Manage your digital presence with ease. This portal is designed to provide you with a powerful and intuitive platform to control content, users, and settings.
+            </p>
+        </div>
+        <div class="signup-form-container">
+            <h2>Admin Sign Up</h2>
+            <p>Create your administrator account to get started.</p>
+            <form method="POST" action="{{ url_for('main.home') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group mb-3">
+                    {{ form.username(class="form-control", placeholder="Username") }}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.name(class="form-control", placeholder="Name") }}
+                    {% for error in form.name.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.surname(class="form-control", placeholder="Surname") }}
+                    {% for error in form.surname.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.password(class="form-control", placeholder="Password") }}
+                    {% for error in form.password.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                {{ form.submit(class="btn btn-primary submit-btn w-100") }}
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="/login">Log in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -44,7 +44,7 @@ def setup_admin_account():
             db.session.rollback()
             flash(f"An error occurred: {e}", "danger")
 
-    return render_template("admin_signup.html", form=form, title="Initial Admin Setup")
+    return render_template("/auth/admin_signup.html", form=form, title="Initial Admin Setup")
 
 def setup_student_account():
     form = SignupForm()  
@@ -76,9 +76,9 @@ def setup_student_account():
         db.session.commit()
 
         flash("Account created successfully!", "success")
-        return redirect(url_for("main.home"))
+        return redirect(url_for("main.student_dashboard"))
 
-    return render_template("student_signup.html", form=form)
+    return render_template("auth/signup.html", form=form)
 
 def login_user_account():
     username_or_email = request.form.get("username")
@@ -148,7 +148,7 @@ def login():
         if response:
             return response
 
-    return render_template("login.html")
+    return render_template("/auth/login.html")
 
 
 #--------------------Logout for both students and staff--------------------
@@ -159,7 +159,7 @@ def student_onboarding():
         flash("Access denied!", "danger")
         return redirect(url_for("main.home"))
 
-    return render_template("student_onboarding.html", student=current_user)
+    return render_template("/student/student_onboarding.html", student=current_user)
  
 
    
@@ -180,7 +180,7 @@ def student_dashboard():
     shapes_done = student_results.shapes_score if student_results else None
     
     return render_template(
-        "student_dashboard.html",
+        "/student/student_dashboard.html",
         student=student,
         student_results=student_results,
         numbers_done=numbers_done,
@@ -239,7 +239,7 @@ def survey():
         flash("Survey submitted successfully!", "success")
         return redirect(url_for("main.student_dashboard"))
 
-    return render_template("survey.html", form=form)
+    return render_template("/student/survey.html", form=form)
 
 
  
@@ -322,10 +322,10 @@ def test_part(part, q_num, difficulty):
     session[f"question_data_{part}_{q_num}"] = question_data
 
     return render_template(
-        "test_part.html",
+        "/student/test_part.html",
         part=part.capitalize(),
         q_num=q_num,
-        question=question_data.get("question", "Question not available.")
+        **question_data
     )
 
 
@@ -405,7 +405,7 @@ def test_results():
     session.pop("shapes_score", None)
 
     return render_template(
-        "test_results.html",
+        "/student/test_results.html",
         numbers_score=numbers_score,
         logic_score=logic_score,
         shapes_score=shapes_score,
@@ -416,15 +416,48 @@ def test_results():
         message=message
     )
 
+@main.route("/exercises", methods=["GET", "POST"])
+@login_required
+def exercises():
+    part = request.args.get("part")
+    # Check if the part is a valid category
+    if part not in ["numbers", "logic", "shapes"]:
+        flash("Invalid exercise category.", "danger")
+        return redirect(url_for("main.student_dashboard"))
+    
+    # Generate the AI question
+    exercise_data = get_next_question(part)
+    
+    if not exercise_data:
+        flash("Could not generate an exercise. Please try again later.", "danger")
+        return redirect(url_for("main.student_dashboard"))
 
+    question_text = exercise_data.get("question")
+    correct_answer = exercise_data.get("answer")
 
+    # If the user is submitting an answer
+    if request.method == "POST":
+        student_answer = request.form.get("answer")
+        is_correct = ai_evaluate_answer(student_answer, correct_answer, part, question_text)
 
+        # Handle the answer (e.g., log completion, give feedback)
+        if is_correct:
+            flash("Correct! Great job!", "success")
+            # Log the completion
+            new_completion = ExerciseCompletion(
+                student_id=current_user.id,
+                exercise_id=None # Or link to a pre-generated exercise if you store them
+            )
+            db.session.add(new_completion)
+            db.session.commit()
+            
+            # Redirect to the same page for a new question
+            return redirect(url_for("main.exercises", part=part))
+        else:
+            flash(f"Incorrect. The correct answer was {correct_answer}.", "warning")
+            # Log the attempt, but not a completion
 
-
-
-
-
-
+    return render_template("exercises.html", question=question_text, part=part)
 
 
 #--------------------Staff Dashboard--------------------
@@ -494,7 +527,7 @@ def staff_dashboard():
     flagged_students = sum(1 for s in students if s["flagged"])
 
     return render_template(
-        "staff_dashboard.html",
+        "/staff/staff_dashboard.html",
         user=user,
         students=students,
         total_students=total_students,
@@ -516,7 +549,7 @@ def manage_staff():
         return redirect(url_for("main.staff_dashboard"))
 
     staff_list = Staff.query.all()  # Fetch all staff members
-    return render_template("manage_staff.html", staff_list=staff_list)
+    return render_template("/staff/manage_staff.html", staff_list=staff_list)
 
 
 
@@ -551,7 +584,7 @@ def add_staff():
         flash("Staff member added successfully!", "success")
         return redirect(url_for("main.manage_staff"))
 
-    return render_template("add_staff.html", form=form)
+    return render_template("/staff/add_staff.html", form=form)
  
 
    
@@ -584,7 +617,7 @@ def edit_staff(staff_id):
 
         return redirect(url_for("main.staff_dashboard"))
 
-    return render_template("edit_staff.html", staff=staff_member)
+    return render_template("/staff/edit_staff.html", staff=staff_member)
 
 
 
@@ -655,7 +688,7 @@ def assign_staff():
         flash(f"Assigned {len(selected_student_ids)} student(s) to {staff.name}", "success")
         return redirect(url_for('main.staff_dashboard'))
 
-    return render_template('assign_staff.html', form=form)
+    return render_template('/staff/assign_staff.html', form=form)
 
 
 
@@ -668,7 +701,7 @@ def review_deletion_requests():
         return redirect(url_for("main.staff_dashboard"))
 
     requests = DeletionRequest.query.filter_by(status="Pending").all()
-    return render_template("review_deletion_requests.html", requests=requests)
+    return render_template("/staff/review_deletion_requests.html", requests=requests)
 
 
 
@@ -724,7 +757,7 @@ def manage_students():
     # Optional: show all students (admins) or assigned students (if you implement assignments)
     students = Student.query.all()
 
-    return render_template("manage_students.html", students=students)
+    return render_template("/staff/manage_students.html", students=students)
  
  
 
@@ -745,7 +778,7 @@ def edit_student(student_id):
         flash("Student updated successfully!", "success")
         return redirect(url_for("main.manage_students"))
 
-    return render_template("edit_student.html", student=student)
+    return render_template("/staff/edit_student.html", student=student)
 
 
 
@@ -781,7 +814,7 @@ def staff_view_student_results(student_id):
             db.session.add(view)
     db.session.commit()
 
-    return render_template("staff_view_results.html", student=student, results=results)
+    return render_template("/staff/staff_view_results.html", student=student, results=results)
 
  
 
@@ -813,7 +846,7 @@ def request_delete_student(student_id):
         flash("Deletion request submitted to admin for approval.", "success")
         return redirect(url_for("main.manage_students"))
 
-    return render_template("request_delete_student.html", student=student)
+    return render_template("/staff/request_delete_student.html", student=student)
 
  
 
@@ -849,7 +882,7 @@ def staff_view_student_surveys(student_id):
             db.session.add(view)
 
     db.session.commit()
-    return render_template("staff_view_surveys.html", student=student, surveys=surveys)
+    return render_template("/staff/staff_view_surveys.html", student=student, surveys=surveys)
 
  
  
@@ -863,7 +896,7 @@ def staff_view_student_exercises(student_id):
     completed_ex_ids = [ex.exercise_id for ex in student.exercises_completed]
 
     return render_template(
-        "staff_view_student_exercises.html",
+        "/staff/staff_view_student_exercises.html",
         student=student,
         exercises=exercises,
         completed_ex_ids=completed_ex_ids

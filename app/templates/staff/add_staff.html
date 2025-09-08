@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Add Staff{% endblock %}
+{% block content %}
+<div class="login">
+    <div class="bubble orange"></div>
+    <div class="bubble purple"></div>
+
+    <div class="login-container">
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Numeraid</h1>
+                <p>Add New Staff Member</p>
+            </div>
+
+            <div class="divider">
+                <span>Staff Details</span>
+            </div>
+
+            <form method="POST" class="staff-add-form">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group mb-3">
+                    {{ form.username(class="form-control", placeholder="Username") }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.name(class="form-control", placeholder="Name") }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.surname(class="form-control", placeholder="Surname") }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.password(class="form-control", placeholder="Password") }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                </div>
+                
+                <div class="form-checkbox-group">
+                    {{ form.is_admin(class="form-checkbox") }}
+                    {{ form.is_admin.label(class="form-label") }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn w-100">Add Staff</button>
+            </form>
+        </div>
+
+        <div class="image-section"></div>
+    </div>
+</div>
+{% endblock %}

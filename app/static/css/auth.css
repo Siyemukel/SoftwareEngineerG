@@ -1,0 +1,462 @@
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2rem;
+}
+
+.signup-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.signup-branding {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-blue);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.signup-branding h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.signup-branding p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.signup-branding .logo-image {
+    width: 150px;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+/* Right side of the signup card (form) */
+.signup-form-container {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.signup-form-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-black);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.signup-form-container p {
+    color: var(--color-dark-grey);
+    margin-bottom: 2rem;
+}
+
+/* Form input styling */
+.form-control {
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.2rem rgba(75, 104, 165, 0.25);
+    outline: none;
+}
+
+.form-group {
+    margin-bottom: 0.75rem;
+}
+
+.form-group .text-danger {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Submit button styling */
+.submit-btn {
+    background-color: var(--color-blue);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: var(--font-secondary);
+}
+
+.submit-btn:hover {
+    background-color: #3f588c;
+}
+
+/* Link styling */
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-dark-grey);
+}
+
+.login-link a {
+    color: var(--color-blue);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: var(--color-deep-purple);
+}
+
+/* General layout and container */
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-light-grey, #f4f4f9);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Login card and layout */
+.login-container {
+    display: flex;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+/* Form section styling */
+.form-section {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-header h1 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    font-size: 1rem;
+    color: var(--color-dark-grey);
+}
+
+/* Form input styling */
+.form-control {
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.2rem rgba(75, 104, 165, 0.25);
+    outline: none;
+}
+
+/* Submit button styling */
+.submit-btn {
+    background-color: var(--color-blue);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: var(--font-secondary);
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background-color: #3f588c;
+}
+
+/* Divider styling */
+.divider {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.divider span {
+    background: white;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-primary);
+    color: var(--color-dark-grey);
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-metallic-silver);
+}
+
+/* Signup link */
+.signup-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-dark-grey);
+}
+
+.signup-link a {
+    color: var(--color-blue);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+    color: var(--color-deep-purple);
+}
+
+/* Image section for visual appeal */
+.image-section {
+    flex: 1;
+    background-image: url('https://i.pinimg.com/1200x/d3/c5/08/d3c50833fb353e8142f203b62e875acd.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 0 12px 12px 0;
+}
+
+/* Background bubble animations */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: move-bubbles 10s infinite ease-in-out;
+    z-index: 0;
+}
+
+.bubble.orange {
+    background-color: var(--color-red);
+    width: 150px;
+    height: 150px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.bubble.purple {
+    background-color: var(--color-deep-purple);
+    width: 200px;
+    height: 200px;
+    bottom: 5%;
+    right: 5%;
+    animation-delay: 3s;
+}
+
+/* General page container for centering content */
+.signup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-light-grey, #f4f4f9);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background bubble animations (reusing the same styles from the login page) */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: move-bubbles 10s infinite ease-in-out;
+    z-index: 0;
+}
+
+.bubble.orange {
+    background-color: var(--color-red);
+    width: 150px;
+    height: 150px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.bubble.purple {
+    background-color: var(--color-deep-purple);
+    width: 200px;
+    height: 200px;
+    bottom: 5%;
+    right: 5%;
+    animation-delay: 3s;
+}
+
+@keyframes move-bubbles {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -20px) scale(1.1); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Main authentication container for the form */
+.auth-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    padding: 3rem;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+/* Header styling */
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form-header h1 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-blue);
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    font-size: 1rem;
+    color: var(--color-dark-grey);
+}
+
+/* Divider styling (reusing from login page) */
+.divider {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.divider span {
+    background: white;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-primary);
+    color: var(--color-dark-grey);
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--color-metallic-silver);
+}
+
+/* Form input styling */
+.form-control {
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-secondary);
+}
+
+.form-control:focus {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.2rem rgba(75, 104, 165, 0.25);
+    outline: none;
+}
+
+.form-group .text-danger {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    color: var(--color-red);
+}
+
+/* Submit button styling */
+.submit-btn {
+    background-color: var(--color-blue);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: var(--font-secondary);
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background-color: #3f588c;
+}
+
+/* Login link */
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-dark-grey);
+}
+
+.login-link a {
+    color: var(--color-blue);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: var(--color-deep-purple);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .auth-container {
+        padding: 2rem 1.5rem;
+    }
+}

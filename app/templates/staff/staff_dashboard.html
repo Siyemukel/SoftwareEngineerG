@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="staff-dashboard-container">
+    <aside class="staff-sidebar">
+        <nav>
+            <div class="side-links">
+                <div class="logo"><a href="{{ url_for('main.staff_dashboard') }}">Numeraid</a></div>
+                <hr>
+                <a href="{{ url_for('main.manage_students') }}">Manage Students</a>
+                {% if user.is_admin %}
+                <a href="{{ url_for('main.add_staff') }}">Add Staff</a>
+                <a href="{{ url_for('main.assign_staff') }}">Assign Students</a>
+                <a href="{{ url_for('main.review_deletion_requests') }}">Review Deletion Requests</a>
+                {% endif %}
+                <hr>
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="staff-content">
+        <main>
+            <div class="staff-header">
+                <h2>Welcome, {{ user.name }}!</h2>
+                <span class="status-badge">
+                    {% if user.is_admin %} Admin Dashboard {% else %} Staff Dashboard {% endif %}
+                </span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <h6>Total Students</h6>
+                    <h3>{{ total_students }}</h3>
+                </div>
+                <div class="stats-card">
+                    <h6>Exercises In Progress</h6>
+                    <h3>{{ exercises_in_progress }}</h3>
+                </div>
+                <div class="stats-card">
+                    <h6>Tests Pending Review</h6>
+                    <h3>{{ tests_pending_review }}</h3>
+                </div>
+                <div class="stats-card">
+                    <h6>Flagged Students</h6>
+                    <h3>{{ flagged_students }}</h3>
+                </div>
+                {% if user.is_admin %}
+                <div class="stats-card">
+                    <h6>Total Staff</h6>
+                    <h3>{{ total_staff }}</h3>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="search-filter-group">
+                <input type="text" id="studentSearch" class="form-control" placeholder="Search by name or email..." style="flex-grow: 1;">
+                {% if user.is_admin %}
+                <select id="staffFilter" class="form-select" style="flex-grow: 0; width: auto;">
+                    <option value="">Filter by Staff</option>
+                    {% for staff_member in all_staff %}
+                        <option value="{{ staff_member.name }}">{{ staff_member.name }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </div>
+
+            <div class="students-table-container">
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Exercises Progress</th>
+                            <th>Test Progress</th>
+                            <th>Last Activity</th>
+                            {% if user.is_admin %}<th>Assigned Staff</th>{% endif %}
+                            <th>Flagged</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.name }}</td>
+                            <td>{{ student.student_email }}</td>
+                            <td>
+                                {% if student.exercises_completed|length == 0 %}
+                                    <span class="badge badge-warning">Not Started</span>
+                                {% elif student.exercises_completed|length < Exercise.query.count() %}
+                                    <span class="badge badge-info">In Progress</span>
+                                {% else %}
+                                    <span class="badge badge-success">Completed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% set all_results = student.test_results %}
+                                {% if all_results %}
+                                    {% if all_results|selectattr("staff_views")|list|length == all_results|length %}
+                                        <span class="badge badge-success">Reviewed</span>
+                                    {% else %}
+                                        <span class="badge badge-info">Pending Review</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge badge-warning">Not Taken</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ student.created_at.strftime('%b %d, %Y') }}</td>
+                            {% if user.is_admin %}
+                            <td>
+                                {% if student.staff_links %}
+                                    {% for link in student.staff_links %}
+                                        {{ link.staff.name }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                            <td>
+                                {% if student.test_results|selectattr("disability_likelihood", "equalto", "high")|list %}
+                                    <span class="badge badge-danger">Yes</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('main.manage_students', student_id=student.id) }}" class="btn">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,967 @@
+/* General page container for the two-column layout */
+.staff-dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-light-grey, #f4f4f9);
+    font-family: var(--font-secondary);
+}
+
+/* Sidebar styling */
+.staff-sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background-color: var(--color-black);
+    color: white;
+    padding: 1.5rem 0rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+}
+
+.staff-sidebar .logo a {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.staff-sidebar .side-links a,
+.staff-sidebar .login-link a {
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    display: block;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+}
+
+.staff-sidebar .side-links a:hover,
+.staff-sidebar .side-links a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.staff-sidebar hr {
+    border-color: rgba(255, 255, 255, 0.2);
+    margin: 1.5rem 0;
+}
+
+/* Main content area */
+.staff-content {
+    flex-grow: 1;
+    padding: 2.5rem;
+    box-sizing: border-box;
+}
+
+.staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.staff-header h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin: 0;
+}
+
+.staff-header .status-badge {
+    background-color: var(--color-blue);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Quick stats cards */
+.stats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stats-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    flex-grow: 1;
+    min-width: 180px;
+}
+
+.stats-card h6 {
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    color: var(--color-dark-grey);
+    margin-bottom: 0.5rem;
+}
+
+.stats-card h3 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    color: var(--color-deep-purple);
+    margin: 0;
+}
+
+/* Search and filter inputs */
+.search-filter-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.search-filter-group .form-control,
+.search-filter-group .form-select {
+    border-color: var(--color-metallic-silver);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-secondary);
+}
+
+/* Students table */
+.students-table-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.students-table thead {
+    background-color: var(--color-light-grey);
+}
+
+.students-table th,
+.students-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-metallic-silver);
+}
+
+.students-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+.students-table .badge {
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.badge-warning { background-color: var(--color-red); color: white; }
+.badge-info { background-color: var(--color-blue); color: white; }
+.badge-success { background-color: var(--color-green); color: white; }
+.badge-danger { background-color: var(--color-red); color: white; }
+.badge-secondary { background-color: var(--color-dark-grey); color: white; }
+
+.students-table .btn {
+    background-color: var(--color-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.students-table .btn:hover {
+    background-color: #3f588c;
+}
+
+/* General container for the page content */
+.manage-students-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.manage-students-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Button for adding a new student */
+.add-student-btn {
+    background-color: var(--color-green);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.add-student-btn:hover {
+    background-color: #166831;
+}
+
+/* Table styling */
+.students-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.students-table thead {
+    background-color: var(--color-black);
+    color: white;
+}
+
+.students-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-family: var(--font-primary);
+}
+
+.students-table tbody tr {
+    background-color: white;
+    transition: background-color 0.3s ease;
+}
+
+.students-table tbody tr:nth-child(even) {
+    background-color: var(--color-light-grey);
+}
+
+.students-table tbody tr:hover {
+    background-color: #f0f0f5;
+}
+
+.students-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-metallic-silver);
+}
+
+/* Status badges within the table */
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.bg-success { background-color: var(--color-green); color: white; }
+.bg-warning { background-color: var(--color-red); color: white; }
+.bg-info { background-color: var(--color-blue); color: white; }
+.bg-danger { background-color: var(--color-red); color: white; }
+.bg-secondary { background-color: var(--color-dark-grey); color: white; }
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-buttons .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.action-buttons .btn-primary { background-color: var(--color-blue); color: white; }
+.action-buttons .btn-primary:hover { background-color: #3f588c; }
+
+.action-buttons .btn-danger { background-color: var(--color-red); color: white; }
+.action-buttons .btn-danger:hover { background-color: #b81725; }
+
+.action-buttons .btn-warning { background-color: var(--color-red); color: white; }
+.action-buttons .btn-warning:hover { background-color: #b81725; }
+
+.action-buttons .btn-info { background-color: var(--color-deep-purple); color: white; }
+.action-buttons .btn-info:hover { background-color: #8058b7; }
+
+.action-buttons .btn-secondary { background-color: var(--color-metallic-silver); color: white; }
+.action-buttons .btn-secondary:hover { background-color: #909090; }
+
+.action-buttons .btn-success { background-color: var(--color-green); color: white; }
+.action-buttons .btn-success:hover { background-color: #166831; }
+
+/* General container for the page */
+.student-results-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.student-results-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.student-results-container .student-details {
+    color: var(--color-dark-grey);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Table styling for results */
+.results-table-container {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.results-table thead {
+    background-color: var(--color-light-grey);
+}
+
+.results-table th,
+.results-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-metallic-silver);
+}
+
+.results-table th {
+    font-weight: 600;
+    font-family: var(--font-primary);
+    color: var(--color-black);
+}
+
+.results-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+/* Badges for likelihood */
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.badge.bg-success {
+    background-color: var(--color-green);
+    color: white;
+}
+
+.badge.bg-danger {
+    background-color: var(--color-red);
+    color: white;
+}
+
+/* Back button */
+.back-btn {
+    background-color: var(--color-metallic-silver);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-top: 2rem;
+}
+
+.back-btn:hover {
+    background-color: #909090;
+}
+
+/* General container for the survey page */
+.student-survey-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.student-survey-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.student-survey-container .student-details {
+    color: var(--color-dark-grey);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Card for each survey submission */
+.survey-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.survey-card h5 {
+    font-family: var(--font-primary);
+    color: var(--color-deep-purple);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Table styling within the card */
+.survey-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.survey-table thead {
+    background-color: var(--color-light-grey);
+}
+
+.survey-table th,
+.survey-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-metallic-silver);
+}
+
+.survey-table th {
+    font-weight: 600;
+    font-family: var(--font-secondary);
+    color: var(--color-black);
+}
+
+.survey-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Styling for the response text */
+.response-struggle {
+    color: var(--color-red);
+    font-weight: 600;
+}
+
+.response-no-struggle {
+    color: var(--color-dark-grey);
+    font-weight: 600;
+}
+
+/* Back button */
+.back-btn {
+    background-color: var(--color-metallic-silver);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-top: 2rem;
+}
+
+.back-btn:hover {
+    background-color: #909090;
+}
+
+/* General container for the exercises page */
+.student-exercises-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.student-exercises-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.student-exercises-container .student-details {
+    color: var(--color-dark-grey);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* List group for exercises */
+.exercise-list-group {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.exercise-list-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-metallic-silver);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.exercise-list-item:last-child {
+    border-bottom: none;
+}
+
+.exercise-list-item h6 {
+    font-family: var(--font-primary);
+    font-size: 1.1rem;
+    color: var(--color-black);
+    margin-bottom: 0.25rem;
+}
+
+.exercise-list-item p {
+    color: var(--color-dark-grey);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.exercise-list-item a {
+    color: var(--color-blue);
+    font-weight: 600;
+}
+
+/* Badges for status */
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8em;
+}
+
+.badge.bg-success {
+    background-color: var(--color-green);
+    color: white;
+}
+
+.badge.bg-warning {
+    background-color: var(--color-red);
+    color: white;
+}
+
+/* Back button */
+.back-btn {
+    background-color: var(--color-metallic-silver);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-top: 2rem;
+}
+
+.back-btn:hover {
+    background-color: #909090;
+}
+
+/* General container for the form page */
+.add-staff-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.add-staff-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form styling */
+.add-staff-form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.add-staff-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.add-staff-form .form-label {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.add-staff-form .form-input,
+.add-staff-form .form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.add-staff-form .form-input:focus,
+.add-staff-form .form-select:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.25rem rgba(75, 104, 165, 0.25);
+}
+
+.add-staff-form .form-checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.add-staff-form .form-checkbox {
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+    accent-color: var(--color-blue);
+}
+
+/* Submit button */
+.add-staff-form .submit-btn {
+    background-color: var(--color-green);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+.add-staff-form .submit-btn:hover {
+    background-color: #166831;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.add-staff-form .submit-btn:active {
+    transform: translateY(0);
+}
+
+/* General container for the page content */
+.manage-staff-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.manage-staff-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Button for adding a new staff member */
+.add-staff-btn {
+    background-color: var(--color-green);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.add-staff-btn:hover {
+    background-color: #166831;
+}
+
+/* Table styling */
+.staff-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.staff-table thead {
+    background-color: var(--color-black);
+    color: white;
+}
+
+.staff-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-family: var(--font-primary);
+}
+
+.staff-table tbody tr {
+    background-color: white;
+    transition: background-color 0.3s ease;
+}
+
+.staff-table tbody tr:nth-child(even) {
+    background-color: var(--color-light-grey);
+}
+
+.staff-table tbody tr:hover {
+    background-color: #f0f0f5;
+}
+
+.staff-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-metallic-silver);
+}
+
+/* Action buttons */
+.staff-table .action-links a {
+    color: var(--color-blue);
+    font-weight: 600;
+    margin: 0 0.5rem;
+}
+
+.staff-table .action-links a:hover {
+    text-decoration: underline;
+}
+
+.staff-table .action-links a.delete-link {
+    color: var(--color-red);
+}
+
+/* General container for the form page */
+.edit-staff-container {
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+.edit-staff-container h2 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form styling */
+.edit-staff-form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.edit-staff-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.edit-staff-form .form-label {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.edit-staff-form .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.edit-staff-form .form-input:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.25rem rgba(75, 104, 165, 0.25);
+}
+
+/* Button group */
+.edit-staff-form .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.edit-staff-form .submit-btn,
+.edit-staff-form .cancel-btn {
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.edit-staff-form .submit-btn {
+    background-color: var(--color-green);
+    color: white;
+}
+
+.edit-staff-form .submit-btn:hover {
+    background-color: #166831;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.edit-staff-form .submit-btn:active {
+    transform: translateY(0);
+}
+
+.edit-staff-form .cancel-btn {
+    background-color: var(--color-metallic-silver);
+    color: white;
+}
+
+.edit-staff-form .cancel-btn:hover {
+    background-color: #909090;
+}
+
+/* General container for the page */
+.assign-container {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem;
+    font-family: var(--font-secondary);
+}
+
+/* Card for the main form content */
+.assign-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Header and descriptive text */
+.assign-card h3 {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.assign-card .page-description {
+    color: var(--color-dark-grey);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Form element styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-metallic-silver);
+    border-radius: 8px;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 0.25rem rgba(75, 104, 165, 0.25);
+}
+
+.form-select[multiple] {
+    height: auto;
+}
+
+/* Buttons and actions */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.submit-btn,
+.auto-assign-btn {
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.submit-btn {
+    background-color: var(--color-blue);
+    color: white;
+}
+
+.submit-btn:hover {
+    background-color: #3f588c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.auto-assign-btn {
+    background-color: var(--color-green);
+    color: white;
+}
+
+.auto-assign-btn:hover {
+    background-color: #166831;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn {
+    background-color: var(--color-metallic-silver);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    margin-top: 1.5rem;
+}
+
+.back-btn:hover {
+    background-color: #909090;
+}
+

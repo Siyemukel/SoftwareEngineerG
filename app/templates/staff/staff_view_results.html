@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="student-results-container">
     <h2>{{ student.name }}'s Test Results</h2>
-    <p class="text-muted">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
+    <p class="student-details">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
 
     {% if results %}
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
+    <div class="results-table-container">
+        <table class="results-table">
+            <thead>
                 <tr>
                     <th>Numbers Score</th>
                     <th>Logic Score</th>
@@ -21,27 +21,27 @@
             <tbody>
                 {% for result in results %}
                 <tr>
-                    <td>{{ result.numbers_score }}</td>
-                    <td>{{ result.logic_score }}</td>
-                    <td>{{ result.shapes_score }}</td>
-                    <td>
+                    <td data-label="Numbers Score">{{ result.numbers_score }}</td>
+                    <td data-label="Logic Score">{{ result.logic_score }}</td>
+                    <td data-label="Shapes Score">{{ result.shapes_score }}</td>
+                    <td data-label="Likelihood">
                         {% if result.disability_likelihood == 'high' %}
                             <span class="badge bg-danger">High</span>
                         {% else %}
                             <span class="badge bg-success">Low</span>
                         {% endif %}
                     </td>
-                    <td>{{ result.outcome_message }}</td>
-                    <td>{{ result.created_at.strftime('%b %d, %Y') }}</td>
+                    <td data-label="Outcome">{{ result.outcome_message }}</td>
+                    <td data-label="Date Taken">{{ result.created_at.strftime('%b %d, %Y') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-        <p class="text-muted">No test results found for this student.</p>
+        <p class="student-details">No test results found for this student.</p>
     {% endif %}
 
-    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    <a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
 </div>
 {% endblock %}

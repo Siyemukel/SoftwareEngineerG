@@ -6,40 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+    {% if not current_user.is_authenticated %}
     <header>
-        <nav class="navbar">
+        <nav>
             <div class="logo"><a href="{{ url_for('main.home') }}">Numeraid</a></div>
-            <ul class="nav-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="{{ url_for('main.login') }}">Login</a></li>
-            </ul>
+            <div>
+                <a href="{{ url_for('main.login') }}">Login</a>
+            </div>
         </nav>
     </header>
+    {% endif %}
 
     <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
         {% block content %}{% endblock %}
     </main>
-
-   <footer class="footer">
-        <p>© 2025 Numeraid | All Rights Reserved</p>
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script> -->
 </body>
 </html>

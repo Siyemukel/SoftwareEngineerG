@@ -1,81 +1,76 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="d-flex">
+{% block title %}Student Dashboard{% endblock %}
 
-    <!-- Sidebar -->
-    <nav class="bg-dark text-white flex-shrink-0 p-3" style="width: 250px; min-height: 100vh;">
-        <a href="{{ url_for('main.student_dashboard') }}" class="d-flex align-items-center mb-3 text-white text-decoration-none">
-            <span class="fs-4">Student Dashboard</span>
+{% block content %}
+<div class="dashboard-container">
+
+    <!-- <nav class="sidebar">
+        <a href="{{ url_for('main.student_dashboard') }}" class="logo">
+            <span class="fs-4">Numeraid</span>
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="{{ url_for('main.student_dashboard') }}" class="nav-link text-white">
+                <a href="{{ url_for('main.student_dashboard') }}" class="nav-link">
                     <i class="bi bi-house-door"></i> Home
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('main.survey') }}" class="nav-link text-white">
+                <a href="{{ url_for('main.survey') }}" class="nav-link">
                     <i class="bi bi-list-check"></i> Survey
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="nav-link text-white">
-
+                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="nav-link">
                     <i class="bi bi-pencil-square"></i> Write Test
                 </a>
             </li>
             <li>
-                <a href="#" class="nav-link text-white">
+                <a href="#" class="nav-link">
                     <i class="bi bi-journal-bookmark"></i> Exercises
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('main.logout') }}" class="nav-link text-white">
+                <a href="{{ url_for('main.logout') }}" class="nav-link">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
             </li>
         </ul>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="flex-grow-1 p-4">
+    </nav> -->
+    <div class="main-content">
         <h2>Welcome, {{ student.name }} {{ student.surname }}!</h2>
         <p>Course: {{ student.course }} (Year {{ student.year_of_study }})</p>
         <p>Faculty: {{ student.faculty }}</p>
 
-        <!-- Survey Status -->
-        <div class="card mb-4 shadow-sm p-3">
+        <div class="dashboard-card">
             <h4>Survey</h4>
             {% if student.survey %}
-                <p class="text-success">Survey completed </p>
+                <p class="text-success badge-success">Survey completed</p>
             {% else %}
-                <a href="{{ url_for('main.survey') }}" class="btn btn-warning btn-lg">Complete Survey</a>
+                <a href="{{ url_for('main.survey') }}" class="dashboard-btn btn-warning">Complete Survey</a>
             {% endif %}
         </div>
 
-        <!-- Test Section -->
-        <div class="card mb-4 shadow-sm p-3">
+        <div class="dashboard-card">
             <h4>Dyscalculia Test</h4>
             {% if student_results %}
                 {% if student_results.numbers_score is none %}
-                    <a href="{{ url_for('main.test_part', part='numbers') }}" class="btn btn-primary">Start Numbers Test</a>
+                    <a href="{{ url_for('main.test_part', part='numbers') }}" class="dashboard-btn btn-primary">Start Numbers Test</a>
                 {% elif student_results.logic_score is none %}
-                    <a href="{{ url_for('main.test_part', part='logic') }}" class="btn btn-primary">Continue Logic Test</a>
+                    <a href="{{ url_for('main.test_part', part='logic') }}" class="dashboard-btn btn-primary">Continue Logic Test</a>
                 {% elif student_results.shapes_score is none %}
-                    <a href="{{ url_for('main.test_part', part='shapes') }}" class="btn btn-primary">Continue Shapes Test</a>
+                    <a href="{{ url_for('main.test_part', part='shapes') }}" class="dashboard-btn btn-primary">Continue Shapes Test</a>
                 {% else %}
-                    <span class="badge bg-success">All tests completed </span>
+                    <span class="badge badge-success">All tests completed</span>
                 {% endif %}
             {% else %}
-                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-primary">Start Test</a>
+                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="dashboard-btn btn-primary">Start Test</a>
             {% endif %}
         </div>
 
-        <!-- Recommended Exercises -->
         {% if recommended_exercises %}
-        <div class="card mb-4 shadow-sm p-3">
+        <div class="dashboard-card">
             <h4>Recommended Exercises</h4>
             <ul class="list-group">
                 {% for ex in recommended_exercises %}

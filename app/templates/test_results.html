@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h2>Your Test Results</h2>
-<h3>Disability Likelihood: {{ likelihood }}</h3>
-<p>{{ message }}</p>
-
-<a class="btn btn-primary" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard</a>
-{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="onboarding-container">
+    <div class="onboarding-card">
+        <div class="onboarding-icon">
+            <i class="bi bi-stars"></i>
+        </div>
+        
+        <div class="onboarding-header">
+            <h2>Welcome, {{ student.name }}!</h2>
+            <p>Your journey to numerical confidence begins here. This quick setup helps us personalize your experience.</p>
+        </div>
+        
+        <div class="onboarding-content">
+            <p>
+                We'll ask you a few simple questions to understand which areas of math feel easy and which might be tricky for you. This is **not a test** you can pass or fail. It's just a way for us to tailor the right tools and exercises for you.
+            </p>
+
+            <p>
+                Think of it as creating your **personal learning profile**. The more we know, the better we can support you.
+            </p>
+        </div>
+        
+        <div class="onboarding-action">
+            <a href="{{ url_for('main.survey') }}" class="onboarding-btn">
+                Start My Personal Setup
+            </a>
+        </div>
+        
+        <p class="onboarding-footer-text">
+            It only takes a few minutes and makes your experience smoother.
+        </p>
+    </div>
+</div>
+{% endblock %}
