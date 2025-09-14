@@ -1,28 +1,20 @@
+import json
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request,session
-from .forms import SignupForm, StudentLoginForm, StaffLoginForm,StaffSignupForm, DiscalculiaSurveyForm, AssignStaffForm
-from .models import *
+from flask import Blueprint, render_template, redirect, url_for, request,session
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.exc import IntegrityError
+
+from .models import *
 from .extensions import db 
-import json
-import os
-
-import mimetypes
-import google.generativeai as genai
 from .services import get_next_question, ai_evaluate_answer
-
+from .forms import SignupForm, StaffSignupForm, DiscalculiaSurveyForm, AssignStaffForm
 
 main = Blueprint("main", __name__)
-
-
-
 
 def setup_admin_account():
     form = StaffSignupForm()
     if form.validate_on_submit():
         try:
-            # Create the first user and assign them the 'admin' role.
             new_admin = Staff(
                 username=form.username.data,
                 name=form.name.data,
@@ -34,15 +26,15 @@ def setup_admin_account():
             db.session.add(new_admin)
             db.session.commit()
 
-            flash("Admin account created successfully! Please log in.", "success")
+            print("Admin account created successfully! Please log in.", "success")
             return redirect(url_for("main.home"))
 
         except IntegrityError:
             db.session.rollback()
-            flash("That username is already taken. Please choose another.", "danger")
+            print("That username is already taken. Please choose another.", "danger")
         except Exception as e:
             db.session.rollback()
-            flash(f"An error occurred: {e}", "danger")
+            print(f"An error occurred: {e}", "danger")
 
     return render_template("/auth/admin_signup.html", form=form, title="Initial Admin Setup")
 
@@ -59,7 +51,7 @@ def setup_student_account():
 
         existing_student = Student.query.filter_by(student_email=email).first()
         if existing_student:
-            flash("Email already registered!", "danger")
+            print("Email already registered!", "danger")
             return redirect(url_for("main.signup"))
    
         new_student = Student(
@@ -75,7 +67,20 @@ def setup_student_account():
         db.session.add(new_student)
         db.session.commit()
 
-        flash("Account created successfully!", "success")
+        print("Account created successfully!", "success")
+
+        student = Student.query.filter_by(student_email=email).first()
+        if student and student.check_password(password):
+            login_user(student)
+
+            survey_exists = StudentSurvey.query.filter_by(student_id=student.id).first()
+
+            if not survey_exists:
+                return redirect(url_for("main.student_onboarding"))
+
+            print("Signed in as student!", "success")
+            return redirect(url_for("main.student_dashboard"))
+        
         return redirect(url_for("main.student_dashboard"))
 
     return render_template("auth/signup.html", form=form)
@@ -84,50 +89,43 @@ def login_user_account():
     username_or_email = request.form.get("username")
     password = request.form.get("password")
 
-    # ----------- STUDENT LOGIN -----------
     student = Student.query.filter_by(student_email=username_or_email).first()
     if student and student.check_password(password):
         login_user(student)
 
-        # Check if survey exists
         survey_exists = StudentSurvey.query.filter_by(student_id=student.id).first()
 
         if not survey_exists:
-            flash("Welcome! Let’s get started with a quick setup, shall we? ", "info")
-            return redirect(url_for("main.student_onboarding"))  # send to onboarding page
+            print("Welcome! Let’s get started with a quick setup, shall we? ", "info")
+            return redirect(url_for("main.student_onboarding"))
 
-        flash("Logged in as student!", "success")
+        print("Logged in as student!", "success")
         return redirect(url_for("main.student_dashboard"))
 
-    # ----------- STAFF LOGIN -----------
     staff = Staff.query.filter_by(username=username_or_email).first()
     if staff and staff.check_password(password):
         login_user(staff)
-        flash("Logged in as staff!", "success")
+        print("Logged in as staff!", "success")
         return redirect(url_for("main.staff_dashboard"))
 
-    # ----------- INVALID CREDENTIALS -----------
-    flash("Invalid credentials, please try again.", "danger")
+    print("Invalid credentials, please try again.", "danger")
     return redirect(url_for("main.login"))
 
-
-
-
-#--------------------Home Page--------------------
 @main.route("/", methods=["GET", "POST"]) 
 def home():
     if not Staff.query.first():
         return setup_admin_account()
 
-    student_count = Student.query.count()
-    staff_count = Staff.query.count()
-    print("Student count:", student_count)
-    
-    return render_template("home.html", student_count=student_count, staff_count=staff_count)
+    if current_user.is_authenticated:
+        if isinstance(current_user, Student):
+            return redirect(url_for("main.student_dashboard"))
+        elif isinstance(current_user, Staff):
+            return redirect(url_for("main.staff_dashboard"))
+
+    return render_template("home.html")
 
 
-
-#--------------------Student Signup--------------------
+# ------------  Authentication  ------------ #
 @main.route("/signup", methods=["GET", "POST"])
 def signup():
     if not Staff.query.first():
@@ -135,9 +133,6 @@ def signup():
     
     return setup_student_account()
 
-
-
-#--------------------Login for both students and staff--------------------
 @main.route("/login", methods=["GET", "POST"])
 def login():
     if not Staff.query.first():
@@ -151,12 +146,11 @@ def login():
     return render_template("/auth/login.html")
 
 
-#--------------------Logout for both students and staff--------------------
 @main.route("/student/onboarding")
 @login_required
 def student_onboarding():
     if not isinstance(current_user, Student):
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.home"))
 
     return render_template("/student/student_onboarding.html", student=current_user)
@@ -196,12 +190,12 @@ def student_dashboard():
 def survey():
     # Ensure only students access
     if not hasattr(current_user, "student_email"):
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.home"))
 
     # Check if survey already submitted
     if StudentSurvey.query.filter_by(student_id=current_user.id).first():
-        flash("You have already submitted the survey.", "info")
+        print("You have already submitted the survey.", "info")
         return redirect(url_for("main.student_dashboard"))
 
     form = DiscalculiaSurveyForm()
@@ -236,7 +230,7 @@ def survey():
         db.session.add(new_survey)
         db.session.commit()
 
-        flash("Survey submitted successfully!", "success")
+        print("Survey submitted successfully!", "success")
         return redirect(url_for("main.student_dashboard"))
 
     return render_template("/student/survey.html", form=form)
@@ -250,7 +244,7 @@ def start_test():
     # Check if student already has a test result
     existing_test = TestResult.query.filter_by(student_id=current_user.id).first()
     if existing_test:
-        flash("You have already completed the test.", "info")
+        print("You have already completed the test.", "info")
         return redirect(url_for("main.student_dashboard"))
 
     # Redirect to first test part: Numbers
@@ -263,7 +257,7 @@ def start_test():
 @login_required
 def test_part(part, q_num, difficulty):
     if part not in ["numbers", "logic", "shapes"]:
-        flash("Invalid test part.", "danger")
+        print("Invalid test part.", "danger")
         return redirect(url_for("main.student_dashboard"))
 
     # POST: process student's answer
@@ -274,7 +268,7 @@ def test_part(part, q_num, difficulty):
 
         # Safety check for missing question data
         if not question_data or "answer" not in question_data or "question" not in question_data:
-            flash("Error: Question data not found or is incomplete.", "danger")
+            print("Error: Question data not found or is incomplete.", "danger")
             return redirect(url_for("main.student_dashboard"))
 
         correct_answer = question_data.get("answer", "")
@@ -315,7 +309,7 @@ def test_part(part, q_num, difficulty):
 
     # Check if there was an error generating the question
     if not question_data or "error" in question_data:
-        flash(question_data.get("error", "Failed to generate question."), "danger")
+        print(question_data.get("error", "Failed to generate question."), "danger")
         return redirect(url_for("main.student_dashboard"))
 
     # Store the question and its answer in the session
@@ -416,49 +410,77 @@ def test_results():
         message=message
     )
 
-@main.route("/exercises", methods=["GET", "POST"])
+@main.route("/exercises/<string:part>", methods=["GET", "POST"])
 @login_required
-def exercises():
-    part = request.args.get("part")
-    # Check if the part is a valid category
-    if part not in ["numbers", "logic", "shapes"]:
-        flash("Invalid exercise category.", "danger")
-        return redirect(url_for("main.student_dashboard"))
-    
-    # Generate the AI question
-    exercise_data = get_next_question(part)
-    
-    if not exercise_data:
-        flash("Could not generate an exercise. Please try again later.", "danger")
-        return redirect(url_for("main.student_dashboard"))
-
-    question_text = exercise_data.get("question")
-    correct_answer = exercise_data.get("answer")
+def exercises(part):
+    # Retrieve current difficulty and question number from session, or set defaults
+    difficulty = session.get("exercise_difficulty", "easy")
+    q_num = session.get("exercise_q_num", 1)
 
     # If the user is submitting an answer
     if request.method == "POST":
         student_answer = request.form.get("answer")
+        # Retrieve the correct answer from the session to evaluate
+        correct_answer = session.get("correct_answer")
+        question_text = session.get("question_text")
+        
+        if not correct_answer:
+            flash("Error: No question data found. Please restart the exercise.", "danger")
+            return redirect(url_for("main.student_dashboard"))
+
         is_correct = ai_evaluate_answer(student_answer, correct_answer, part, question_text)
 
-        # Handle the answer (e.g., log completion, give feedback)
         if is_correct:
             flash("Correct! Great job!", "success")
-            # Log the completion
+            
+            # 1. Log the dynamically generated exercise to the database
+            # You'll need to create a new Exercise instance
+            new_exercise = Exercise(
+                title=f"AI-generated {part} exercise",
+                description=question_text,
+                video_link=None, # You can add a link if your AI generates one
+                part=part.capitalize(),
+                approved=False # Since it's AI-generated, it's not pre-approved
+            )
+            db.session.add(new_exercise)
+            db.session.commit()
+
+            # 2. Now log the ExerciseCompletion with the new exercise ID
             new_completion = ExerciseCompletion(
                 student_id=current_user.id,
-                exercise_id=None # Or link to a pre-generated exercise if you store them
+                exercise_id=new_exercise.id
             )
             db.session.add(new_completion)
+            
+            # Increment the question number and commit the session
+            session["exercise_q_num"] = q_num + 1
             db.session.commit()
             
-            # Redirect to the same page for a new question
             return redirect(url_for("main.exercises", part=part))
         else:
-            flash(f"Incorrect. The correct answer was {correct_answer}.", "warning")
-            # Log the attempt, but not a completion
+            flash(f"Incorrect. The correct answer was: {correct_answer}.", "warning")
+            # For incorrect answers, don't increment q_num, allow a retry
+            return redirect(url_for("main.exercises", part=part))
 
-    return render_template("exercises.html", question=question_text, part=part)
+    # For a GET request, generate a new question
+    exercise_data = get_next_question(part, difficulty=difficulty, q_num=q_num)
+    
+    if "error" in exercise_data:
+        flash(f"Could not generate an exercise: {exercise_data['error']}", "danger")
+        return redirect(url_for("main.student_dashboard"))
 
+    # Store question data in the session for later evaluation
+    session["question_text"] = exercise_data["question"]
+    session["correct_answer"] = exercise_data["answer"]
+
+    # Render the exercises template
+    return render_template(
+        "exercises.html",
+        part=part,
+        question=exercise_data["question"],
+        options=exercise_data.get("options"),
+        shape_image=exercise_data.get("shape_image")
+    )
 
 #--------------------Staff Dashboard--------------------
 @main.route("/staff_dashboard")
@@ -545,7 +567,7 @@ def staff_dashboard():
 def manage_staff():
     # Only allow admins
     if not getattr(current_user, "is_admin", False):
-        flash("You are not authorized to view this page.", "danger")
+        print("You are not authorized to view this page.", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     staff_list = Staff.query.all()  # Fetch all staff members
@@ -559,7 +581,7 @@ def manage_staff():
 def add_staff():
     # Only allow admins
     if not getattr(current_user, "is_admin", False):
-        flash("You are not authorized to add staff.", "danger")
+        print("You are not authorized to add staff.", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     form = StaffSignupForm()
@@ -567,7 +589,7 @@ def add_staff():
         # Check if username already exists
         existing_staff = Staff.query.filter_by(username=form.username.data).first()
         if existing_staff:
-            flash("Username already taken. Please choose another.", "danger")
+            print("Username already taken. Please choose another.", "danger")
             return redirect(url_for("main.add_staff"))
 
         new_staff = Staff(
@@ -581,7 +603,7 @@ def add_staff():
         db.session.add(new_staff)
         db.session.commit()
 
-        flash("Staff member added successfully!", "success")
+        print("Staff member added successfully!", "success")
         return redirect(url_for("main.manage_staff"))
 
     return render_template("/staff/add_staff.html", form=form)
@@ -594,7 +616,7 @@ def add_staff():
 def edit_staff(staff_id):
     # Only admin should edit staff
     if not getattr(current_user, "is_admin", False):
-        flash("You do not have permission to edit staff!", "danger")
+        print("You do not have permission to edit staff!", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     staff_member = Staff.query.get_or_404(staff_id)
@@ -610,10 +632,10 @@ def edit_staff(staff_id):
 
         try:
             db.session.commit()
-            flash("Staff updated successfully!", "success")
+            print("Staff updated successfully!", "success")
         except Exception as e:
             db.session.rollback()
-            flash(f"Error updating staff: {e}", "danger")
+            print(f"Error updating staff: {e}", "danger")
 
         return redirect(url_for("main.staff_dashboard"))
 
@@ -626,7 +648,7 @@ def edit_staff(staff_id):
 @login_required
 def delete_staff(staff_id):
     if not getattr(current_user, "is_admin", False):
-        flash("You do not have permission to delete staff!", "danger")
+        print("You do not have permission to delete staff!", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     staff_member = Staff.query.get_or_404(staff_id)
@@ -634,10 +656,10 @@ def delete_staff(staff_id):
     try:
         db.session.delete(staff_member)
         db.session.commit()
-        flash("Staff deleted successfully!", "success")
+        print("Staff deleted successfully!", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Error deleting staff: {e}", "danger")
+        print(f"Error deleting staff: {e}", "danger")
 
     return redirect(url_for("main.staff_dashboard"))
 
@@ -648,7 +670,7 @@ def delete_staff(staff_id):
 @login_required
 def assign_staff():
     if not current_user.is_admin:
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for('main.staff_dashboard'))
 
     form = AssignStaffForm()
@@ -685,7 +707,7 @@ def assign_staff():
             db.session.add(link)
 
         db.session.commit()
-        flash(f"Assigned {len(selected_student_ids)} student(s) to {staff.name}", "success")
+        print(f"Assigned {len(selected_student_ids)} student(s) to {staff.name}", "success")
         return redirect(url_for('main.staff_dashboard'))
 
     return render_template('/staff/assign_staff.html', form=form)
@@ -697,7 +719,7 @@ def assign_staff():
 @login_required 
 def review_deletion_requests(): 
     if not getattr(current_user, "is_admin", False):
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     requests = DeletionRequest.query.filter_by(status="Pending").all()
@@ -710,7 +732,7 @@ def review_deletion_requests():
 @login_required
 def handle_deletion_request(request_id, action):
     if not getattr(current_user, "is_admin", False):
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
     deletion_request = DeletionRequest.query.get_or_404(request_id)
@@ -730,12 +752,12 @@ def handle_deletion_request(request_id, action):
         deletion_request.reviewed_by_id = current_user.id
         deletion_request.reviewed_at = datetime.utcnow()
     else:
-        flash("Invalid action.", "danger")
+        print("Invalid action.", "danger")
         return redirect(url_for("main.review_deletion_requests"))
 
     db.session.commit()
 
-    flash(f"Request {action}d successfully.", "success")
+    print(f"Request {action}d successfully.", "success")
     return redirect(url_for("main.review_deletion_requests"))
 
 
@@ -751,7 +773,7 @@ def handle_deletion_request(request_id, action):
 def manage_students():
     # Only logged-in staff/admin can access
     if not hasattr(current_user, "id"):
-        flash("Access denied!", "danger") 
+        print("Access denied!", "danger") 
         return redirect(url_for("main.login"))
 
     # Optional: show all students (admins) or assigned students (if you implement assignments)
@@ -775,7 +797,7 @@ def edit_student(student_id):
         student.year_of_study = request.form["year_of_study"]
         student.faculty = request.form["faculty"]
         db.session.commit()
-        flash("Student updated successfully!", "success")
+        print("Student updated successfully!", "success")
         return redirect(url_for("main.manage_students"))
 
     return render_template("/staff/edit_student.html", student=student)
@@ -789,7 +811,7 @@ def delete_student(student_id):
     student = Student.query.get_or_404(student_id)
     db.session.delete(student)
     db.session.commit()
-    flash("Student deleted successfully!", "success")
+    print("Student deleted successfully!", "success")
     return redirect(url_for("main.manage_students"))
 
 
@@ -799,7 +821,7 @@ def delete_student(student_id):
 @login_required
 def staff_view_student_results(student_id):
     if not isinstance(current_user, Staff):
-        flash("Unauthorized access", "danger")
+        print("Unauthorized access", "danger")
         return redirect(url_for("main.index"))
 
     student = Student.query.get_or_404(student_id)
@@ -823,7 +845,7 @@ def staff_view_student_results(student_id):
 @login_required
 def request_delete_student(student_id):
     if not isinstance(current_user, Staff) or current_user.is_admin:
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.manage_students"))
 
     student = Student.query.get_or_404(student_id)
@@ -831,7 +853,7 @@ def request_delete_student(student_id):
     if request.method == "POST":
         reason = request.form.get("reason")
         if not reason:
-            flash("You must provide a reason for deletion.", "warning")
+            print("You must provide a reason for deletion.", "warning")
             return redirect(request.url)
 
         # Create deletion request
@@ -843,7 +865,7 @@ def request_delete_student(student_id):
         db.session.add(new_request)
         db.session.commit()
 
-        flash("Deletion request submitted to admin for approval.", "success")
+        print("Deletion request submitted to admin for approval.", "success")
         return redirect(url_for("main.manage_students"))
 
     return render_template("/staff/request_delete_student.html", student=student)
@@ -855,7 +877,7 @@ def request_delete_student(student_id):
 @login_required
 def staff_view_student_surveys(student_id):
     if not isinstance(current_user, Staff):
-        flash("Unauthorized access", "danger")
+        print("Unauthorized access", "danger")
         return redirect(url_for("main.index"))
 
     student = Student.query.get_or_404(student_id)
@@ -910,5 +932,5 @@ def staff_view_student_exercises(student_id):
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out.", "success")
+    print("You have been logged out.", "success")
     return redirect(url_for("main.home"))
