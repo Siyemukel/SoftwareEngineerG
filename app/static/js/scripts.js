@@ -1,14 +1,25 @@
-// ---------------- Home
-(function(){
-  const heroSlider = document.querySelector('.hero-slider');
-  const slides = heroSlider.querySelectorAll('img');
-  let index = 0;
-  setInterval(() => {
-    slides.forEach(s => s.classList.remove('active'));
-    index = (index + 1) % slides.length;
-    slides[index].classList.add('active');
-  }, 4000); // change every 4s
-})();
+// ----------------  Home  ----------------  //
+document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.hero-slider img');
+    let currentIndex = 0;
+    const intervalTime = 3000;
+
+    function showImage(index) {
+        images.forEach((img, i) => {
+            img.classList.remove('active');
+            if (i === index) {
+                img.classList.add('active');
+            }
+        });
+    }
+
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        showImage(currentIndex);
+    }
+
+    setInterval(nextImage, intervalTime);
+});
 
 // ---------------- Authentication
 document.addEventListener('DOMContentLoaded', function() {

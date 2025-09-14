@@ -1,12 +1,141 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="results-container">
-    <div class="results-card">
-        <h2>Your Test Results</h2>
-        <h3>Disability Likelihood: {{ likelihood }}</h3>
-        <p>{{ message }}</p>
-        <a class="dashboard-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard</a>
+<div class="results-container fun-results">
+    <div class="results-card fun-card" id="resultsCard">
+        <div class="results-emoji" id="resultsEmoji">🎉</div>
+        <h2 class="results-title">Your Test Results</h2>
+        <h3 class="results-likelihood">Disability Likelihood: <span id="likelihoodText">{{ likelihood }}</span></h3>
+        <p class="results-message" id="resultsMessage">{{ message }}</p>
+        <a class="dashboard-btn fun-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard 🚀</a>
     </div>
 </div>
+<style>
+.fun-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+}
+.fun-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(129,37,117,0.10);
+    padding: 2.5rem 2rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    animation: pop-in 0.8s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes pop-in {
+    0% { transform: scale(0.7) rotate(-8deg); opacity: 0; }
+    60% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); }
+}
+.results-emoji {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes emoji-bounce {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-18px) scale(1.2); }
+    50% { transform: translateY(0) scale(1.1); }
+    70% { transform: translateY(-8px) scale(1.15); }
+}
+.results-title {
+    font-family: var(--font-primary);
+    color: var(--color-blue);
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+.results-likelihood {
+    font-size: 1.2rem;
+    color: var(--color-deep-purple);
+    margin-bottom: 1rem;
+}
+#likelihoodText {
+    font-weight: bold;
+    text-transform: capitalize;
+    padding: 0.2em 0.7em;
+    border-radius: 1em;
+    background: #f3e8ff;
+    color: var(--color-red);
+    margin-left: 0.3em;
+}
+.results-message {
+    font-size: 1.1rem;
+    color: var(--color-black);
+    margin-bottom: 1.5rem;
+    min-height: 2.5em;
+}
+.fun-btn {
+    background: var(--color-blue);
+    color: #fff;
+    border-radius: 30px;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(75,104,165,0.10);
+}
+.fun-btn:hover {
+    background: var(--color-deep-purple);
+    transform: scale(1.07) rotate(-2deg);
+}
+.confetti {
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: confetti 1.2s ease-out forwards;
+    z-index: 10;
+}
+@keyframes confetti {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(60px) scale(0.5); }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fun emoji and confetti based on likelihood
+    var likelihood = document.getElementById('likelihoodText').textContent.trim().toLowerCase();
+    var emoji = '🎉';
+    var msg = document.getElementById('resultsMessage');
+    if (likelihood === 'high') {
+        emoji = '🧠';
+        msg.textContent = 'You may have a high likelihood of dyscalculia. That’s okay! Numeraid is here to help you every step of the way. Remember, you’re not alone and you can always improve with practice!';
+        document.getElementById('likelihoodText').style.background = '#ffe4e6';
+        document.getElementById('likelihoodText').style.color = 'var(--color-red)';
+    } else if (likelihood === 'moderate') {
+        emoji = '✨';
+        msg.textContent = 'You show some signs of dyscalculia. Keep practicing and use the tools and exercises on Numeraid to build your confidence!';
+        document.getElementById('likelihoodText').style.background = '#fef9c3';
+        document.getElementById('likelihoodText').style.color = '#b45309';
+    } else {
+        emoji = '🚀';
+        msg.textContent = 'Great job! You show a low likelihood of dyscalculia. Keep challenging yourself and enjoy learning with Numeraid!';
+        document.getElementById('likelihoodText').style.background = '#d1fae5';
+        document.getElementById('likelihoodText').style.color = 'var(--color-green)';
+    }
+    document.getElementById('resultsEmoji').textContent = emoji;
+    // Confetti burst
+    function launchConfetti() {
+        var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩'];
+        for (let i=0; i<8; i++) {
+            let conf = document.createElement('span');
+            conf.className = 'confetti';
+            conf.textContent = confettiEmojis[Math.floor(Math.random()*confettiEmojis.length)];
+            conf.style.left = (40 + Math.random()*20) + '%';
+            conf.style.top = (30 + Math.random()*10) + 'px';
+            conf.style.fontSize = (1.5 + Math.random()) + 'rem';
+            conf.style.animationDelay = (i*0.1)+'s';
+            document.getElementById('resultsCard').appendChild(conf);
+            setTimeout(()=>conf.remove(), 1400);
+        }
+    }
+    launchConfetti();
+});
+</script>
 {% endblock %}

@@ -5,12 +5,13 @@
 {% block content %}
 <div class="test-container">
     <div class="test-header">
+        <div class="emoji-animate" id="fun-emoji" style="font-size:2.5rem;">🎲</div>
         <h2 class="test-title">{{ part }} Test</h2>
-        <p class="test-subtitle">Question {{ q_num }}/5</p>
+        <p class="test-subtitle playful-qnum">Question {{ q_num }}/5</p>
     </div>
     
     <div class="progress-bar">
-        <div class="progress-fill" style="width: {{ (q_num / 5) * 100 }}%;"></div>
+        <div class="progress-fill" id="progress-fill"></div>
     </div>
     
     <form method="POST" class="test-form">
@@ -54,6 +55,49 @@
 </div>
 
 <style>
+@keyframes emoji-bounce {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-18px) scale(1.2); }
+    50% { transform: translateY(0) scale(1.1); }
+    70% { transform: translateY(-8px) scale(1.15); }
+}
+
+@keyframes confetti {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(60px) scale(0.5); }
+}
+
+.emoji-animate {
+    display: inline-block;
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.confetti {
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: confetti 1.2s ease-out forwards;
+    z-index: 10;
+}
+
+.playful-qnum {
+    font-size: 1.1rem;
+    color: var(--color-light-purple);
+    font-family: var(--font-primary);
+    letter-spacing: 1px;
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+    display: inline-block;
+}
+
+.question-text {
+    animation: emoji-bounce 0.9s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.shape-image {
+    animation: emoji-bounce 1.1s cubic-bezier(.36,.07,.19,.97) both;
+}
 /* General test container */
 .test-container {
     max-width: 800px;
@@ -152,6 +196,9 @@
 .option-label:hover {
     border-color: var(--color-blue);
     background-color: #e6e9f0;
+    transform: scale(1.04) rotate(-2deg);
+    box-shadow: 0 4px 16px rgba(165,110,174,0.10);
+    transition: all 0.2s cubic-bezier(.36,.07,.19,.97);
 }
 
 .option-label input[type="radio"] {
@@ -188,20 +235,25 @@
 
 .text-answer-group textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-metallic-silver);
-    border-radius: 5px;
-    font-size: 1rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.08rem;
     font-family: inherit;
     resize: vertical;
     box-sizing: border-box;
-    min-height: 100px;
+    min-height: 110px;
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+    box-shadow: 0 2px 12px rgba(129,37,117,0.07);
+    transition: box-shadow 0.3s, background 0.3s;
+    color: var(--color-black);
 }
 
 .text-answer-group textarea:focus {
     outline: none;
-    border-color: var(--color-blue);
-    box-shadow: 0 0 0 0.25rem rgba(75, 104, 165, 0.25);
+    background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+    box-shadow: 0 0 0 3px var(--color-light-purple), 0 2px 16px rgba(129,37,117,0.13);
+    border: none;
 }
 
 /* Submit button */
@@ -222,25 +274,28 @@
     transition: all 0.3s ease;
 }
 
+.submit-btn {
+    background: var(--color-blue);
+    color: white;
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(75,104,165,0.10);
+    position: relative;
+    overflow: hidden;
+}
 .submit-btn:hover {
-    background: #3f588c;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: var(--color-deep-purple);
+    transform: scale(1.07) rotate(1deg);
+    box-shadow: 0 6px 18px rgba(129,37,117,0.13);
 }
-
 .submit-btn:active {
-    transform: translateY(0);
+    transform: scale(0.98);
 }
-
-/* Responsive design */
-@media (max-width: 600px) {
-    .test-container {
-        padding: 1rem;
-    }
-    .test-form {
-        padding: 1.5rem;
-    }
-    .test-title {
         font-size: 1.5rem;
     }
     .question-text {
@@ -251,5 +306,46 @@
         font-size: 0.9rem;
     }
 }
+/* Fun confetti emoji for correct answer or on load */
 </style>
+
+<script>
+// Animate progress bar on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bar
+    var fill = document.getElementById('progress-fill');
+    if (fill) {
+        fill.style.width = '0%';
+        setTimeout(function() {
+            fill.style.transition = 'width 0.7s cubic-bezier(.36,.07,.19,.97)';
+            fill.style.width = '{{ (q_num / 5) * 100 }}%';
+        }, 100);
+    }
+    // Fun emoji randomizer
+    var emojis = ['🎲','🧩','🎉','🦄','✨','🤩','🧠','🔢','🎯','🎈','🍀','🚀'];
+    var funEmoji = document.getElementById('fun-emoji');
+    if (funEmoji) {
+        funEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        funEmoji.classList.remove('emoji-animate');
+        void funEmoji.offsetWidth; // trigger reflow
+        funEmoji.classList.add('emoji-animate');
+    }
+    // Confetti burst on load
+    function launchConfetti() {
+        var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩'];
+        for (let i=0; i<6; i++) {
+            let conf = document.createElement('span');
+            conf.className = 'confetti';
+            conf.textContent = confettiEmojis[Math.floor(Math.random()*confettiEmojis.length)];
+            conf.style.left = (40 + Math.random()*20) + '%';
+            conf.style.top = (30 + Math.random()*10) + 'px';
+            conf.style.fontSize = (1.5 + Math.random()) + 'rem';
+            conf.style.animationDelay = (i*0.1)+'s';
+            document.body.appendChild(conf);
+            setTimeout(()=>conf.remove(), 1400);
+        }
+    }
+    launchConfetti();
+});
+</script>
 {% endblock %}
