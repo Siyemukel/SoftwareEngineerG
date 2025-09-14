@@ -1,23 +1,55 @@
 {% extends "base.html" %}
 
+{% block title %}Exercises - {{ part|capitalize }}{% endblock %}
+
 {% block content %}
-<h2>Recommended Exercises</h2>
-{% if exercises %}
-    <ul>
-    {% for ex in exercises %}
-        <li>
-            <strong>{{ ex.title }}</strong> ({{ ex.part }})<br>
-            {{ ex.description }}<br>
-            {% if ex.video_link %}
-                <a href="{{ ex.video_link }}" target="_blank">Watch Video</a><br>
+<div class="container mt-5">
+    <h2>{{ part|capitalize }} Exercise</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card my-4">
+        <div class="card-body">
+            <h5 class="card-title">Question:</h5>
+            <p class="card-text">{{ question }}</p>
+
+            {% if shape_image %}
+            <div class="text-center my-3">
+                <img src="{{ shape_image }}" class="img-fluid" alt="Shape for the question" style="max-height: 250px;">
+                <p class="text-muted mt-2">Look at the shape above to answer the question.</p>
+            </div>
             {% endif %}
-            <a href="{{ url_for('main.complete_exercise', exercise_id=ex.id) }}" class="btn btn-success btn-sm mt-1">
-                Mark as Completed
-            </a>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No exercises available at the moment.</p>
-{% endif %}
+
+            <form method="POST">
+                {% if options %}
+                <div class="form-group">
+                    <label for="answer">Select the correct option:</label>
+                    {% for key, value in options.items() %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" id="option-{{ key }}" value="{{ key }}">
+                        <label class="form-check-label" for="option-{{ key }}">
+                            {{ key }}) {{ value }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="form-group">
+                    <label for="answer">Your Answer:</label>
+                    <input type="text" class="form-control" id="answer" name="answer" required>
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary mt-3">Submit Answer</button>
+            </form>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
 {% endblock %}
