@@ -416,6 +416,7 @@ def test_results():
         message=message
     )
 
+
 @main.route("/exercises", methods=["GET", "POST"])
 @login_required
 def exercises():
@@ -690,7 +691,7 @@ def assign_staff():
 
     return render_template('/staff/assign_staff.html', form=form)
 
-
+ 
 
 #--------------------Review Deletion Requests (admin only)--------------------
 @main.route("/review_deletion_requests")
@@ -757,9 +758,9 @@ def manage_students():
     # Optional: show all students (admins) or assigned students (if you implement assignments)
     students = Student.query.all()
 
-    return render_template("/staff/manage_students.html", students=students)
+    return render_template("/staff/manage_students.html", students=students, user=current_user)
  
- 
+  
 
 #--------------------Edit Student (staff only)--------------------
 @main.route("/edit_student/<int:student_id>", methods=["GET", "POST"])
