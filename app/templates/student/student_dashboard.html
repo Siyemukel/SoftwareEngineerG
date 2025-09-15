@@ -4,84 +4,61 @@
 
 {% block content %}
 <div class="dashboard-container">
-
-    <!-- <nav class="sidebar">
-        <a href="{{ url_for('main.student_dashboard') }}" class="logo">
-            <span class="fs-4">Numeraid</span>
-        </a>
-        <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a href="{{ url_for('main.student_dashboard') }}" class="nav-link">
-                    <i class="bi bi-house-door"></i> Home
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('main.survey') }}" class="nav-link">
-                    <i class="bi bi-list-check"></i> Survey
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="nav-link">
-                    <i class="bi bi-pencil-square"></i> Write Test
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link">
-                    <i class="bi bi-journal-bookmark"></i> Exercises
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('main.logout') }}" class="nav-link">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </li>
-        </ul>
-    </nav> -->
     <div class="main-content">
         <h2>Welcome, {{ student.name }} {{ student.surname }}!</h2>
         <p>Course: {{ student.course }} (Year {{ student.year_of_study }})</p>
         <p>Faculty: {{ student.faculty }}</p>
 
+        {% if student_results %}
         <div class="dashboard-card">
-            <h4>Survey</h4>
-            {% if student.survey %}
-                <p class="text-success badge-success">Survey completed</p>
-            {% else %}
-                <a href="{{ url_for('main.survey') }}" class="dashboard-btn btn-warning">Complete Survey</a>
-            {% endif %}
+            <h4>Your Latest Test Scores 📊</h4>
+            <p><strong>Numbers:</strong> {{ student_results.numbers_score }} / 5</p>
+            <p><strong>Logic:</strong> {{ student_results.logic_score }} / 5</p>
+            <p><strong>Shapes:</strong> {{ student_results.shapes_score }} / 5</p>
+            <p><strong>Likelihood of Dyscalculia:</strong> <span class="badge {{ 'badge-danger' if student_results.disability_likelihood == 'high' else 'badge-info' }}">{{ student_results.disability_likelihood }}</span></p>
         </div>
-
+        {% endif %}
+        
         <div class="dashboard-card">
             <h4>Dyscalculia Test</h4>
             {% if student_results %}
-                {% if student_results.numbers_score is none %}
+                {% if numbers_done is none %}
                     <a href="{{ url_for('main.test_part', part='numbers') }}" class="dashboard-btn btn-primary">Start Numbers Test</a>
-                {% elif student_results.logic_score is none %}
+                {% elif logic_done is none %}
                     <a href="{{ url_for('main.test_part', part='logic') }}" class="dashboard-btn btn-primary">Continue Logic Test</a>
-                {% elif student_results.shapes_score is none %}
+                {% elif shapes_done is none %}
                     <a href="{{ url_for('main.test_part', part='shapes') }}" class="dashboard-btn btn-primary">Continue Shapes Test</a>
                 {% else %}
-                    <span class="badge badge-success">All tests completed</span>
+                    <span class="badge badge-success">✅ All tests completed</span>
+                    <a href="{{ url_for('main.exercises', part='numbers') }}" class="dashboard-btn btn-success">View All Exercises</a>
                 {% endif %}
             {% else %}
                 <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="dashboard-btn btn-primary">Start Test</a>
             {% endif %}
         </div>
-
+        
         {% if recommended_exercises %}
         <div class="dashboard-card">
-            <h4>Recommended Exercises</h4>
+            <h4>Recommended Exercises for You 🧠</h4>
             <ul class="list-group">
                 {% for ex in recommended_exercises %}
                 <li class="list-group-item">
-                    {{ ex.title }} - <a href="{{ url_for('main.exercise_detail', exercise_id=ex.id) }}">Start</a>
+                    <strong>{{ ex.title }}</strong> ({{ ex.part }}) - <a href="{{ url_for('main.exercise_detail', exercise_id=ex.id) }}">Start</a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
-    </div>
 
+        <div class="dashboard-card">
+            <h4>Survey</h4>
+            {% if student.survey %}
+                <p class="text-success badge-success">✅ Survey completed</p>
+            {% else %}
+                <a href="{{ url_for('main.survey') }}" class="dashboard-btn btn-warning">Complete Survey</a>
+            {% endif %}
+        </div>
+
+    </div>
 </div>
 {% endblock %}
