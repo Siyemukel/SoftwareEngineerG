@@ -7,81 +7,83 @@
     <div class="bubble orange"></div>
     <div class="bubble purple"></div>
 
-    <div class="auth-container">
-        <div class="form-header">
-            <h1>Numeraid</h1>
-            <p>Academic Assistance & Disability Support</p>
+    <div class="signup-container">
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Numeraid</h1>
+                <p>Academic Assistance & Disability Support</p>
+            </div>
+
+            <div class="divider">
+                <span>Sign Up</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('main.signup') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group mb-3">
+                    {{ form.name(class="form-control", placeholder="Name") }}
+                    {% for error in form.name.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.surname(class="form-control", placeholder="Surname") }}
+                    {% for error in form.surname.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.email(class="form-control", placeholder="Email") }}
+                    {% for error in form.email.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.course(class="form-control", placeholder="Course") }}
+                    {% for error in form.course.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.year_of_study(class="form-control", placeholder="Year of Study") }}
+                    {% for error in form.year_of_study.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.faculty(class="form-control", placeholder="Faculty") }}
+                    {% for error in form.faculty.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.password(class="form-control", placeholder="Password") }}
+                    {% for error in form.password.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                {{ form.submit(class="btn btn-primary submit-btn w-100") }}
+                
+                <div class="login-link">
+                    Already have an account? <a href="/login">Log in</a>
+                </div>
+            </form>
         </div>
-
-        <div class="divider">
-            <span>Sign Up</span>
-        </div>
-
-        <form method="POST" action="{{ url_for('main.signup') }}">
-            {{ form.hidden_tag() }}
-
-            <div class="form-group mb-3">
-                {{ form.name(class="form-control", placeholder="Name") }}
-                {% for error in form.name.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.surname(class="form-control", placeholder="Surname") }}
-                {% for error in form.surname.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.email(class="form-control", placeholder="Email") }}
-                {% for error in form.email.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.course(class="form-control", placeholder="Course") }}
-                {% for error in form.course.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.year_of_study(class="form-control", placeholder="Year of Study") }}
-                {% for error in form.year_of_study.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.faculty(class="form-control", placeholder="Faculty") }}
-                {% for error in form.faculty.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.password(class="form-control", placeholder="Password") }}
-                {% for error in form.password.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
-                {% for error in form.confirm_password.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            {{ form.submit(class="btn btn-primary submit-btn w-100") }}
-            
-            <div class="login-link">
-                Already have an account? <a href="/login">Log in</a>
-            </div>
-        </form>
     </div>
 </div>
 {% endblock %}

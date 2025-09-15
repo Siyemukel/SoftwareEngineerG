@@ -3,53 +3,260 @@
 {% block title %}Exercises - {{ part|capitalize }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>{{ part|capitalize }} Exercise</h2>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <div class="card my-4">
-        <div class="card-body">
-            <h5 class="card-title">Question:</h5>
-            <p class="card-text">{{ question }}</p>
-
+<div class="exercise-fun-container">
+    <div class="exercise-header">
+        <span class="emoji-animate" id="exercise-emoji">🧩</span>
+        <h2>{{ part|capitalize }} Exercise</h2>
+        <p class="exercise-intro">Let's solve this together! Every answer gets you closer to being a math master. 🎉</p>
+    </div>
+    <div class="exercise-card">
+        <div class="exercise-question-block">
+            <div class="exercise-q-label">Question:</div>
+            <div class="exercise-q-text">{{ question }}</div>
             {% if shape_image %}
-            <div class="text-center my-3">
-                <img src="{{ shape_image }}" class="img-fluid" alt="Shape for the question" style="max-height: 250px;">
-                <p class="text-muted mt-2">Look at the shape above to answer the question.</p>
+            <div class="exercise-shape-img">
+                <img src="{{ shape_image }}" alt="Shape for the question">
+                <div class="exercise-shape-caption">Look at the shape above to answer the question.</div>
             </div>
             {% endif %}
-
-            <form method="POST">
+            <form method="POST" class="exercise-form">
                 {% if options %}
-                <div class="form-group">
-                    <label for="answer">Select the correct option:</label>
+                <div class="exercise-options-group">
+                    <div class="exercise-options-label">Pick the right answer:</div>
                     {% for key, value in options.items() %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="answer" id="option-{{ key }}" value="{{ key }}">
-                        <label class="form-check-label" for="option-{{ key }}">
-                            {{ key }}) {{ value }}
-                        </label>
-                    </div>
+                    <label class="exercise-option-label">
+                        <input type="radio" name="answer" value="{{ key }}" required>
+                        <span class="exercise-option-emoji">{{ ['🟣','🟢','🟡','🔴','🔵','🟠','🟤','⚫','⚪','🟩','🟦','🟧','🟥','🟨','🟪','🟫'][loop.index0 % 16] }}</span>
+                        <span class="exercise-option-text">{{ key }}) {{ value }}</span>
+                    </label>
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="form-group">
-                    <label for="answer">Your Answer:</label>
-                    <input type="text" class="form-control" id="answer" name="answer" required>
+                <div class="exercise-open-answer">
+                    <label for="answer">Type your answer:</label>
+                    <input type="text" id="answer" name="answer" required autocomplete="off">
                 </div>
                 {% endif %}
-                <button type="submit" class="btn btn-primary mt-3">Submit Answer</button>
+                <div class="exercise-btn-group">
+                    <button type="submit" class="exercise-submit-btn">🚀 Submit Answer</button>
+                </div>
             </form>
         </div>
     </div>
-    
-    <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
 </div>
+<style>
+.exercise-fun-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: linear-gradient(135deg, #a56eae 0%, #7ab4b6 100%);
+    padding: 2.5rem 1rem 3rem 1rem;
+}
+.exercise-header {
+    text-align: center;
+    margin-bottom: 2.2rem;
+}
+.emoji-animate {
+    display: inline-block;
+    font-size: 2.5rem;
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes emoji-bounce {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-18px) scale(1.2); }
+    50% { transform: translateY(0) scale(1.1); }
+    70% { transform: translateY(-8px) scale(1.15); }
+}
+.exercise-intro {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-secondary);
+}
+.exercise-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+    padding: 2.2rem 1.5rem;
+    max-width: 600px;
+    width: 100%;
+    margin-bottom: 2.5rem;
+}
+.exercise-question-block {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.exercise-q-label {
+    font-family: var(--font-primary);
+    color: var(--color-deep-purple,#812575);
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+}
+.exercise-q-text {
+    font-size: 1.25rem;
+    color: var(--color-black);
+    margin-bottom: 1.2rem;
+    font-family: var(--font-secondary);
+}
+.exercise-shape-img {
+    text-align: center;
+    margin: 1.5rem 0 1.2rem 0;
+}
+.exercise-shape-img img {
+    max-height: 220px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(129,37,117,0.07);
+}
+.exercise-shape-caption {
+    color: #7a7a7a;
+    font-size: 0.98rem;
+    margin-top: 0.5rem;
+}
+.exercise-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-bottom: 1.2rem;
+}
+.exercise-options-label {
+    font-weight: 600;
+    color: var(--color-blue,#4B68A5);
+    margin-bottom: 0.5rem;
+}
+.exercise-option-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #f3e8ff;
+    border-radius: 10px;
+    padding: 1.1rem 1rem;
+    cursor: pointer;
+    font-size: 1.08rem;
+    border: 1.5px solid #e0e0e0;
+    transition: all 0.2s cubic-bezier(.36,.07,.19,.97);
+    box-shadow: 0 2px 8px rgba(129,37,117,0.07);
+}
+.exercise-option-label:hover {
+    border-color: var(--color-blue,#4B68A5);
+    background: #e0e7ff;
+    transform: scale(1.04) rotate(-2deg);
+    box-shadow: 0 4px 16px rgba(165,110,174,0.10);
+}
+.exercise-option-label input[type="radio"] {
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+    accent-color: var(--color-blue,#4B68A5);
+}
+.exercise-option-label input[type="radio"]:checked + .exercise-option-emoji {
+    animation: emoji-pop 0.3s forwards;
+    transform-origin: bottom;
+}
+@keyframes emoji-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1.3); }
+}
+.exercise-option-emoji {
+    font-size: 1.5rem;
+    transition: font-size 0.2s ease;
+}
+.exercise-option-text {
+    font-size: 1.08rem;
+    color: var(--color-black);
+}
+.exercise-open-answer {
+    margin-bottom: 1.2rem;
+}
+.exercise-open-answer label {
+    font-weight: 600;
+    color: var(--color-blue,#4B68A5);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+.exercise-open-answer input[type="text"] {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 10px;
+    border: 1.5px solid #e0e0e0;
+    font-size: 1.08rem;
+    font-family: var(--font-secondary);
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+    box-shadow: 0 2px 12px rgba(129,37,117,0.07);
+    transition: box-shadow 0.3s, background 0.3s;
+    color: var(--color-black);
+}
+.exercise-open-answer input[type="text"]:focus {
+    outline: none;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+    box-shadow: 0 0 0 3px var(--color-light-purple,#a56eae), 0 2px 16px rgba(129,37,117,0.13);
+    border: none;
+}
+.exercise-btn-group {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+.exercise-submit-btn {
+    background: linear-gradient(45deg, var(--color-deep-purple,#812575), var(--color-blue,#4B68A5));
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(129, 37, 117, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+.exercise-submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(129, 37, 117, 0.4);
+}
+.exercise-back-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    background: #fff;
+    color: var(--color-blue,#4B68A5);
+    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(75,104,165,0.07);
+    border: 1.5px solid #e0e0e0;
+    transition: background 0.2s, color 0.2s;
+}
+.exercise-back-btn:hover {
+    background: var(--color-blue,#4B68A5);
+    color: #fff;
+}
+.exercise-alert {
+    margin-bottom: 1.2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(209,31,45,0.07);
+}
+.alert-success { background: #e0f7fa; color: #1C8441; }
+.alert-danger { background: #ffeaea; color: #D11F2D; }
+.alert-warning { background: #fff3e0; color: #ff9800; }
+</style>
+<script>
+// Fun emoji randomizer for header
+document.addEventListener('DOMContentLoaded', function() {
+    var emojis = ['🧩','🎲','🎉','🦄','✨','🤩','🧠','🔢','🎯','🎈','🍀','🚀','🏆','🟣','🟢','🟡','🔴','🔵','🟠','🟤','⚫','⚪'];
+    var exEmoji = document.getElementById('exercise-emoji');
+    if (exEmoji) {
+        exEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        exEmoji.classList.remove('emoji-animate');
+        void exEmoji.offsetWidth;
+        exEmoji.classList.add('emoji-animate');
+    }
+});
+</script>
 {% endblock %}

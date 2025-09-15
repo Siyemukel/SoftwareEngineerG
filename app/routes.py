@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, render_template, redirect, url_for, request,session
+from flask import Blueprint, render_template, redirect, url_for, request, session, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.exc import IntegrityError
 

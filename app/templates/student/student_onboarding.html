@@ -1,36 +1,311 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="onboarding-container">
-    <div class="onboarding-card">
-        <div class="onboarding-icon">
-            <i class="bi bi-stars"></i>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Step Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background: var(--color-light-grey, #f4f4f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 2rem;
+        }
+        .onboard-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            background: var(--color-metallic-silver);
+            height: 4px;
+        }
+        #progress-bar {
+            background: var(--color-blue);
+            height: 4px;
+            transition: width 0.3s ease-in-out;
+        }
+        .onboard-flex {
+            display: flex;
+            flex-direction: column;
+        }
+        @media (min-width: 768px) {
+            .onboard-flex {
+                flex-direction: row;
+            }
+        }
+        .sidebar {
+            background: var(--color-blue);
+            color: #fff;
+            padding: 2rem;
+            width: 100%;
+            max-width: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .sidebar h2 {
+            font-size: 2.5rem;
+            font-family: var(--font-primary);
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+        }
+        .step-number {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            margin-top: 0.125rem;
+            font-size: 1rem;
+            background: #fff;
+            color: var(--color-blue);
+            font-weight: bold;
+        }
+        .step-number.completed {
+            background: var(--color-teal);
+            color: #fff;
+        }
+        .step-number.inactive {
+            background: var(--color-metallic-silver);
+            color: #fff;
+        }
+        .step-text {
+            opacity: 0.7;
+            color: #fff;
+        }
+        .step-text.active {
+            opacity: 1;
+        }
+        .form-content {
+            padding: 3rem;
+            width: 100%;
+        }
+        .onboard-btn {
+            background: var(--color-blue);
+            color: #fff;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.2s;
+            font-family: var(--font-secondary);
+        }
+        .onboard-btn:hover {
+            background: var(--color-deep-purple);
+        }
+        .onboard-btn.secondary {
+            background: #fff;
+            color: var(--color-blue);
+            border: 1px solid var(--color-metallic-silver);
+        }
+        .onboard-btn.secondary:hover {
+            background: var(--color-light-purple);
+            color: #fff;
+        }
+        .onboard-checkbox {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--color-blue);
+        }
+        .onboard-img {
+            width: 80%;
+            height: auto;
+            margin: 0 auto 2rem auto;
+            border-radius: 0.5rem;
+            display: block;
+        }
+        .onboard-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .onboard-success {
+            width: 4rem;
+            height: 4rem;
+            background: var(--color-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboard-container">
+        <div class="progress-bar-bg">
+            <div id="progress-bar" style="width: 0%;"></div>
         </div>
-        
-        <div class="onboarding-header">
-            <h2>Welcome, {{ student.name }}!</h2>
-            <p>Your journey to numerical confidence begins here. This quick setup helps us personalize your experience.</p>
+        <div class="onboard-flex">
+            <div class="sidebar">
+                <h2>Get Started</h2>
+                <div id="sidebar-steps" class="step-list"></div>
+            </div>
+            <div id="form-content" class="form-content"></div>
         </div>
-        
-        <div class="onboarding-content">
-            <p>
-                We'll ask you a few simple questions to understand which areas of math feel easy and which might be tricky for you. This is **not a test** you can pass or fail. It's just a way for us to tailor the right tools and exercises for you.
-            </p>
-
-            <p>
-                Think of it as creating your **personal learning profile**. The more we know, the better we can support you.
-            </p>
-        </div>
-        
-        <div class="onboarding-action">
-            <a href="{{ url_for('main.survey') }}" class="onboarding-btn">
-                Start Survay
-            </a>
-        </div>
-        
-        <p class="onboarding-footer-text">
-            It only takes a few minutes and makes your experience smoother.
-        </p>
     </div>
-</div>
-{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentStep = 0;
+            const steps = [
+                { title: 'Welcome', description: "Let's get you started with our platform" },
+                { title: 'Privacy Concern', description: 'Your data, your choice' },
+                { title: 'All Done', description: "You're all set to begin!" },
+            ];
+
+            const formContent = document.getElementById('form-content');
+            const progressBar = document.getElementById('progress-bar');
+            const sidebarSteps = document.getElementById('sidebar-steps');
+            
+            let consent = false;
+
+            const updateUI = () => {
+                // Update progress bar
+                progressBar.style.width = `${(currentStep / (steps.length - 1)) * 100}%`;
+
+                // Update sidebar steps
+                sidebarSteps.innerHTML = '';
+                steps.forEach((step, index) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'step-item';
+                    const stepNumberDiv = document.createElement('div');
+                    const stepTextDiv = document.createElement('div');
+                    if (currentStep === index) {
+                        stepNumberDiv.className = 'step-number';
+                    } else if (currentStep > index) {
+                        stepNumberDiv.className = 'step-number completed';
+                    } else {
+                        stepNumberDiv.className = 'step-number inactive';
+                    }
+                    stepNumberDiv.innerText = currentStep > index ? '✓' : index + 1;
+                    stepTextDiv.className = 'step-text' + (currentStep === index ? ' active' : '');
+                    stepTextDiv.innerHTML = `<p style="font-weight: 500;">${step.title}</p><p style="font-size: 0.9em; color: #dbeafe;">${step.description}</p>`;
+                    stepDiv.appendChild(stepNumberDiv);
+                    stepDiv.appendChild(stepTextDiv);
+                    sidebarSteps.appendChild(stepDiv);
+                });
+
+                // Render current step content
+                formContent.innerHTML = '';
+                let stepContent = '';
+
+                if (currentStep === 0) {
+                    stepContent = `
+                        <div>
+                            <h1 style="font-size:2rem;font-weight:bold;color:var(--color-blue);margin-bottom:1rem;font-family:var(--font-primary);text-transform:uppercase;">Welcome to Numeraid</h1>
+                            <p style="color:var(--color-dark-grey);margin-bottom:1.5rem;font-size:1.15rem;">Numeraid is your digital companion for overcoming dyscalculia and building confidence with numbers. We offer step-by-step help, personalized practice, and a supportive space to make math less stressful and more accessible for everyone.</p>
+                            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Welcome illustration" class="onboard-img" />
+                            <button id="next-step" class="onboard-btn">Get Started</button>
+                        </div>
+                    `;
+                } else if (currentStep === 1) {
+                    stepContent = `
+                        <div>
+                            <h1 style="font-size:2rem;font-weight:bold;color:#1e293b;margin-bottom:1rem;">Privacy Concern</h1>
+                            <p style="color:#475569;margin-bottom:1rem;">We care about your privacy. Your assessment results and progress are yours.</p>
+                            <p style="color:#475569;margin-bottom:2rem;">By checking this box, you <b>consent</b> to securely share your assessment results with academic staff for personalized support and analytics. You can revoke this consent at any time.</p>
+                            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2rem;">
+                                <input type="checkbox" id="consent-checkbox" class="onboard-checkbox">
+                                <label for="consent-checkbox" style="color:#334155;">I consent to share my information with academic staff.</label>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;">
+                                <button id="prev-step" class="onboard-btn secondary">Back</button>
+                                <button id="next-step" class="onboard-btn">Continue</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentStep === 2) {
+                    stepContent = `
+                        <div class="onboard-center">
+                            <div class="onboard-success">
+                                <svg width="32" height="32" fill="none" stroke="#16a34a" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <h1 style="font-size:2rem;font-weight:bold;color:#1e293b;margin-bottom:1rem;">All Set!</h1>
+                            <p style="color:#475569;margin-bottom:2rem;">You're all ready to start your assessment. Good luck!</p>
+                            <div style="display:flex;gap:1rem;">
+                                <button id="prev-step" class="onboard-btn secondary">Back</button>
+                                <button id="go-dashboard" class="onboard-btn">Go to Dashboard</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                formContent.innerHTML = stepContent;
+                addEventListeners();
+            };
+
+            const addEventListeners = () => {
+                const nextButton = formContent.querySelector('#next-step');
+                if (nextButton) {
+                    nextButton.addEventListener('click', handleNextStep);
+                }
+                const prevButton = formContent.querySelector('#prev-step');
+                if (prevButton) {
+                    prevButton.addEventListener('click', handlePrevStep);
+                }
+                if (currentStep === 1) {
+                    const consentCheckbox = formContent.querySelector('#consent-checkbox');
+                    consentCheckbox.addEventListener('change', (e) => {
+                        consent = e.target.checked;
+                        // You can now store 'consent' status in your backend or session
+                        console.log('Consent status:', consent);
+                    });
+                }
+                if (currentStep === 2) {
+                    const goDashboardBtn = formContent.querySelector('#go-dashboard');
+                    if (goDashboardBtn) {
+                        goDashboardBtn.addEventListener('click', () => {
+                            window.location.href = '/student_dashboard';
+                        });
+                    }
+                }
+            };
+
+            const handleNextStep = () => {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    updateUI();
+                }
+            };
+
+            const handlePrevStep = () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    updateUI();
+                }
+            };
+
+            updateUI();
+        });
+    </script>
+</body>
+</html>
