@@ -1,0 +1,118 @@
+/* -------------------- General Container -------------------- */
+.container {
+    background-color: #f8f9fa; /* light grey background */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* -------------------- Table Styles -------------------- */
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.students-table th,
+.students-table td {
+    padding: 12px 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.students-table thead {
+    background-color: #0d6efd; /* Bootstrap primary blue */
+    color: white;
+    font-weight: 600;
+}
+
+.students-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.students-table tbody tr:hover {
+    background-color: #e9ecef;
+    transform: scale(1.01);
+}
+
+/* -------------------- Buttons -------------------- */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    color: #212529;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-dark {
+    background-color: #343a40;
+}
+
+.btn-dark:hover {
+    background-color: #23272b;
+}
+
+/* -------------------- Action Buttons Container -------------------- */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* -------------------- Add Student Button -------------------- */
+.add-student-btn {
+    margin-left: 10px;
+}
+
+/* -------------------- Responsive Table -------------------- */
+@media (max-width: 768px) {
+    .students-table th, .students-table td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .action-buttons a {
+        font-size: 12px;
+        min-width: 70px;
+    }
+}

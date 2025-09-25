@@ -1,86 +1,91 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="manage-students-container">
-    <aside class="staff-sidebar">
-        <nav>
-            <div class="side-links">
-                <div class="logo"><a href="{{ url_for('main.staff_dashboard') }}">Numeraid</a></div>
-                <hr>
-                <a href="{{ url_for('main.manage_students') }}">Manage Students</a>
-                {% if user.is_admin %}
-                <a href="{{ url_for('main.add_staff') }}">Add Staff</a>
-                <a href="{{ url_for('main.assign_staff') }}">Assign Students</a>
-                <a href="{{ url_for('main.review_deletion_requests') }}">Review Deletion Requests</a>
-                {% endif %}
-                <hr>
-                <a href="{{ url_for('main.logout') }}">Logout</a>
-            </div>
-        </nav>
-    </aside>
-    <div class="staff-content">
-            <h2>Manage Students</h2>
-        <a href="{{ url_for('main.signup') }}" class="add-student-btn">Add New Student</a>
+<div class="container mt-4">
+    <h2 class="mb-4">Manage Students</h2>
 
-        <div class="table-responsive">
-            <table class="students-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Surname</th>
-                        <th>Email</th>
-                        <th>Course</th>
-                        <th>Year</th>
-                        <th>Faculty</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td data-label="ID">{{ student.id }}</td>
-                        <td data-label="Name">{{ student.name }}</td>
-                        <td data-label="Surname">{{ student.surname }}</td>
-                        <td data-label="Email">{{ student.student_email }}</td>
-                        <td data-label="Course">{{ student.course }}</td>
-                        <td data-label="Year">{{ student.year_of_study }}</td>
-                        <td data-label="Faculty">{{ student.faculty }}</td>
-                        <td data-label="Actions">
-                            <div class="action-buttons">
-                                <a href="{{ url_for('main.edit_student', student_id=student.id) }}" 
-                                class="btn btn-primary btn-sm">Edit</a>
 
-                                {% if current_user.is_admin %}
-                                    <a href="{{ url_for('main.delete_student', student_id=student.id) }}" 
-                                    class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure you want to delete this student?');">
-                                    Delete
-                                    </a>
-                                {% else %}
-                                <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
-                                    class="btn btn-warning btn-sm">
-                                    Request Deletion
-                                    </a>
-                                {% endif %}
+{% block head %}
+<!-- Add Manage Students CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_students.css') }}">
+{% endblock %}
 
-                                <a href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}" 
-                                class="btn btn-info btn-sm">Results</a>
-                                <a href="{{ url_for('main.staff_view_student_surveys', student_id=student.id) }}" 
-                                class="btn btn-secondary btn-sm">Surveys</a>
-                                <a href="{{ url_for('main.staff_view_student_exercises', student_id=student.id) }}" 
-                                class="btn btn-success btn-sm">Exercises</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="8" class="text-center">No students found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!-- Back to Dashboard Button -->
+    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover students-table">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Faculty</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.surname }}</td>
+                    <td>{{ student.student_email }}</td>
+                    <td>{{ student.course }}</td>
+                    <td>{{ student.year_of_study }}</td>
+                    <td>{{ student.faculty }}</td>
+                    <td>
+                        {% if student.referrals %}
+                            {% for referral in student.referrals %}
+                                {{ referral.department }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons d-flex flex-wrap gap-2">
+
+                            {% if current_user.is_admin %}
+                            <a href="#" class="btn btn-danger btn-sm"
+                               data-bs-toggle="modal" 
+                               data-bs-target="#confirmDeleteModal" 
+                               data-student-id="{{ student.id }}">
+                               Delete
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
+                               class="btn btn-warning btn-sm">Request Deletion</a>
+                            {% endif %}
+                          
+                            <!-- Single View Progress Button -->
+                            <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}" 
+                               class="btn btn-info btn-sm">View Student Progress</a>
+
+                            <!-- Quick Feedback Button -->
+                            <a href="{{ url_for('main.refer_student_department', student_id=student.id) }}" 
+                               class="btn btn-success btn-sm">Refer Student</a>
+
+                            <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
+                               class="btn btn-primary btn-sm">Generate Report</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">No students found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+
+
+<script src="{{ url_for('static', filename='js/manage_students.js') }}"></script>
 {% endblock %}

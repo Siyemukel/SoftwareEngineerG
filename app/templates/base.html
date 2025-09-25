@@ -26,8 +26,22 @@
     {% endif %}
 
     <main>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mt-2" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
+
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
     <!-- <script src="{{ url_for('static', filename='dashboard.js') }}"></script> -->
 </body>

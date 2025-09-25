@@ -2,7 +2,9 @@ import re
 
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired, Length, ValidationError, EqualTo
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField, SubmitField, SelectField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField, SubmitField, SelectField, SelectMultipleField,FileField
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+
 
 def dut_email_check(form, field):
     pattern = r"^\d{8}@dut4life\.ac\.za$" 
@@ -35,6 +37,7 @@ class StaffSignupForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=3, max=80)])
     name = StringField("First Name", validators=[DataRequired(), Length(min=2, max=100)])
     surname = StringField("Surname", validators=[DataRequired(), Length(min=2, max=100)])
+    is_admin = BooleanField("Admin")  # Add this field if missing
     password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField(
         "Confirm Password", 
@@ -155,5 +158,31 @@ class DiscalculiaSurveyForm(FlaskForm):
     submit = SubmitField("Submit Survey")
 
 
+class ReportSettingsForm(FlaskForm):
+
+    include_student_email = BooleanField("Include Student Email")
+    include_name = BooleanField("Include Name")
+    include_surname = BooleanField("Include Surname")
+    include_course = BooleanField("Include Course")
+    include_year = BooleanField("Include Year")
+    include_faculty = BooleanField("Include Faculty")
+    include_test_results = BooleanField("Include Test Results")
+    include_exercises_progress = BooleanField("Include Exercises Progress")
+
+    report_format = SelectField("Report Format", choices=[("pdf", "PDF"), ("excel", "Excel")])
+    submit = SubmitField("Save Settings")
 
 
+class MedicalProofForm(FlaskForm):
+    medical_file = FileField("Upload Medical Proof (PDF)", validators=[
+        FileRequired(),
+        FileAllowed(["pdf"], "PDF files only!")
+    ])
+    submit = SubmitField("Submit")
+
+
+
+class StaffFeedbackForm(FlaskForm):
+    feedback_text = TextAreaField("Feedback", validators=[DataRequired()])
+    progress_notes = TextAreaField("Progress Notes (optional)")
+    submit = SubmitField("Submit Feedback")

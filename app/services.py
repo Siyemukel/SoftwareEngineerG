@@ -1,9 +1,15 @@
-import os
+import os, json
 import random
 import base64
 from io import BytesIO
 import google.generativeai as genai
 from google.generativeai import types
+from .models import *
+from sqlalchemy import func
+from flask_mail import Message
+from flask_login import current_user
+from .extensions import mail
+
 
 # For generating fallback shape images
 try:
@@ -16,9 +22,9 @@ except ImportError:
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# ==============================================================
+
 # IMAGE GENERATION (AI + FALLBACK)
-# ==============================================================
+
 
 def generate_shape_image_ai(shape_type, question_data):
     """
@@ -106,9 +112,9 @@ def generate_shape_image(shape_type, question_data):
     return generate_shape_image_pil(shape_type, question_data)
 
 
-# ==============================================================
+
 # QUESTION GENERATION
-# ==============================================================
+
 
 def get_varied_question_seed(part, q_num, difficulty):
     seeds = {
@@ -218,9 +224,9 @@ def get_next_question(part, difficulty="easy", q_num=1):
     return get_fallback_question(part, difficulty, q_num)
 
 
-# ==============================================================
+
 # PARSING & FALLBACKS
-# ==============================================================
+
 
 def parse_question_response(text, part):
     try:
@@ -284,9 +290,9 @@ def get_fallback_question(part, difficulty, q_num):
         return {"error": "No fallback question available"}
 
 
-# ==============================================================
+
 # ANSWER EVALUATION
-# ==============================================================
+
 
 def ai_evaluate_answer(student_answer, correct_answer, part, question_text):
     if not student_answer or not correct_answer:
@@ -336,3 +342,126 @@ def basic_answer_similarity(student, correct):
     overlap = len(student_words.intersection(correct_words))
     similarity = overlap / len(correct_words)
     return similarity >= 0.6
+
+
+
+#system to assign students to staff with least load
+def assign_student_to_staff(student):
+    # Check if student is already assigned to avoid duplicates
+    existing_assignment = StaffStudentLink.query.filter_by(student_id=student.id).first()
+    if existing_assignment:
+        return Staff.query.get(existing_assignment.staff_id)
+    
+    # This single query efficiently finds all NON-ADMIN staff, counts their current
+    # students, and sorts them by that count in ascending order.
+    # This avoids the "N+1" query problem.
+    staff_with_counts = db.session.query(
+        Staff,
+        func.count(StaffStudentLink.student_id)
+    ).outerjoin(StaffStudentLink, Staff.id == StaffStudentLink.staff_id) \
+     .filter(Staff.is_admin == False) \
+     .group_by(Staff.id) \
+     .order_by(func.count(StaffStudentLink.student_id).asc()) \
+     .all()
+    
+    # The result is a list of tuples: [(staff_member_1, count_1), (staff_member_2, count_2), ...]
+    for staff_member, student_count in staff_with_counts:
+        # The max_students value from the database record is used.
+        # The model's default=5 handles cases where it's not explicitly set.
+        if student_count < staff_member.max_students:
+            # Create the link object
+            link = StaffStudentLink(staff_id=staff_member.id, student_id=student.id)
+            
+            # Add the link to the session, but DO NOT commit here
+            db.session.add(link)
+            
+            return staff_member  # Return the assigned staff member
+    
+    # If the loop finishes, no non-admin staff with available slots were found
+    return None
+
+
+#email function to send student referral details to departments
+def send_department_email(student, department, referral=None):
+    """
+    Send an email to the department with all details of the student referral:
+    - Basic info
+    - Survey results
+    - Test results
+    - Exercises completed
+    """
+    # Map department to email addresses
+    department_emails = {
+        "Finance": "finance@university.com",
+        "Academics": "academics@university.com",
+        "Counselling": "counselling@university.com"
+    }
+
+    recipient = department_emails.get(department)
+    if not recipient:
+        return
+
+    # --- Basic info ---
+    student_info = f"""
+Name: {student.name} {student.surname}
+Email: {student.student_email}
+Course: {student.course}
+Year: {student.year_of_study}
+Faculty: {student.faculty}
+Joined On: {student.created_at.strftime('%b %d, %Y')}
+"""
+
+    # --- Referral reason ---
+    reason_text = f"\nReason for referral: {referral.reason}" if referral and referral.reason else "\nReason for referral: Not specified"
+
+    # --- Test results ---
+    test_results_text = "\nTest Results:\n"
+    for result in student.test_results:
+        test_results_text += f"- {result.created_at.strftime('%b %d, %Y')}: Numbers={result.numbers_score}, Logic={result.logic_score}, Shapes={result.shapes_score}, Outcome={result.outcome_message}\n"
+
+    # --- Surveys ---
+    surveys_text = "\nSurveys:\n"
+    for survey in student.survey if student.survey else []:
+        # if JSON stored as string
+        survey_data = survey.survey_data
+        if isinstance(survey_data, str):
+            survey_data = json.loads(survey_data)
+        readable_data = {k: ("Struggle" if v==1 else "No struggle") for k, v in survey_data.items()}
+        surveys_text += f"- Survey {survey.id} ({survey.created_at.strftime('%b %d, %Y')}): {readable_data}\n"
+
+    # --- Exercises completed ---
+    exercises_text = "\nExercises Completed:\n"
+    for completion in student.exercises_completed:
+        ex = completion.exercise
+        exercises_text += f"- {ex.title} ({ex.part}): Completed on {completion.completed_at.strftime('%b %d, %Y')}\n"
+
+    # --- Compose email ---
+    msg = Message(
+        subject=f"Student Referral: {student.name} {student.surname}",
+        recipients=[recipient],
+        body=f"""
+Dear {department} Team,
+
+The following student has been referred for your attention:
+
+{student_info}
+{reason_text}
+{test_results_text}
+{surveys_text}
+{exercises_text}
+
+Please review and take the necessary actions.
+
+Regards,
+{current_user.name}
+"""
+    )
+
+    mail.send(msg)
+
+
+
+
+
+
+

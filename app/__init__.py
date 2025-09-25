@@ -1,12 +1,15 @@
 from flask import Flask
+from .extensions import db, socketio
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
 
-    from .extensions import db, login_manager
+    from .extensions import db, login_manager,socketio,mail
     db.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
+    socketio.init_app(app)
 
     from .models import Student, Staff
     @login_manager.user_loader
@@ -21,5 +24,8 @@ def create_app():
     
     from .routes import main
     app.register_blueprint(main)
+     
+    from . import sockets 
 
+    
     return app

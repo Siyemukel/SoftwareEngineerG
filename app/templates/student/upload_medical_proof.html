@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Upload Medical Proof</h2>
+    <p>Please upload your official medical document to request assistance. 
+       Make sure the file is correct and legible before submitting. Once submitted, 
+       the staff will review your application.</p>
+    
+    <div class="alert alert-info" role="alert">
+        Reassurance: Your uploaded document will be securely stored and only accessible 
+        by authorized staff for review.
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" 
+          onsubmit="return confirm('Are you sure you want to submit this medical proof?');">
+        {{ form.hidden_tag() }}
+        
+        <div class="mb-3">
+            {{ form.medical_file.label(class="form-label") }}
+            {{ form.medical_file(class="form-control") }}
+            {% if form.medical_file.errors %}
+                <div class="text-danger mt-2">
+                    {% for error in form.medical_file.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+    </form>
+</div>
+{% endblock %}

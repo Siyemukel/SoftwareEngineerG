@@ -13,14 +13,23 @@
                 <div class="sidebar-meta">{{ student.faculty }}</div>
             </div>
         </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}">Start Test</a></li>
-                <li><a href="{{ url_for('main.exercises', part='numbers') }}">Exercises</a></li>
-                <li><a href="{{ url_for('main.survey') }}">Complete Survey</a></li>
-                <li><a href="{{ url_for('main.logout') }}" class="sidebar-logout">Logout</a></li>
-            </ul>
-        </nav>
+          <nav class="sidebar-nav">
+    <ul>
+        <li><a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}">Start Test</a></li>
+        <li><a href="{{ url_for('main.exercises', part='numbers') }}">Exercises</a></li>
+        {% if assigned_staff_id %}
+        <li>
+            <a href="{{ url_for('main.conversation', student_id=student.id, staff_id=assigned_staff_id) }}">
+                Chat with Staff
+            </a>
+        </li>
+        {% else %}
+        <li><span style="color: #888;">Chat with Staff (No staff assigned yet)</span></li>
+        {% endif %}
+        <li><a href="{{ url_for('main.upload_medical_proof') }}">Extra Help</a></li>
+        <li><a href="{{ url_for('main.logout') }}" class="sidebar-logout">Logout</a></li>
+    </ul>
+</nav>
     </aside>
     <div class="main-content">
         <h2>Welcome, {{ student.name }} {{ student.surname }}! 👋</h2>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Notification Settings</h2>
+<form method="POST">
+    <table>
+        <thead>
+            <tr>
+                <th>Notification Type</th>
+                <th>Enabled</th>
+                <th>Email</th>
+                <th>Dashboard</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notif in notifications %}
+            <tr>
+                <td>{{ notif.notification_type }}</td>
+                <td><input type="checkbox" name="enabled_{{ notif.id }}" {% if notif.enabled %}checked{% endif %}></td>
+                <td><input type="checkbox" name="email_{{ notif.id }}" {% if notif.method_email %}checked{% endif %}></td>
+                <td><input type="checkbox" name="dashboard_{{ notif.id }}" {% if notif.method_dashboard %}checked{% endif %}></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Save Settings</button>
+</form>
+{% endblock %}

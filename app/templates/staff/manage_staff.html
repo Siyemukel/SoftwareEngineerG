@@ -1,39 +1,99 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="manage-staff-container">
-    <h2>Manage Staff</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Manage Students</h2>
 
-    <table class="staff-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Admin</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for staff in staff_list %}
-            <tr>
-                <td data-label="ID">{{ staff.id }}</td>
-                <td data-label="Username">{{ staff.username }}</td>
-                <td data-label="Name">{{ staff.name }}</td>
-                <td data-label="Surname">{{ staff.surname }}</td>
-                <td data-label="Admin">{{ 'Yes' if staff.is_admin else 'No' }}</td>
-                <td data-label="Actions">
-                    <div class="action-links">
-                        <a href="{{ url_for('main.edit_staff', staff_id=staff.id) }}">Edit</a> |
-                        <a href="{{ url_for('main.delete_staff', staff_id=staff.id) }}" class="delete-link">Delete</a>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Back to Dashboard Button -->
+    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary mb-3">Back to Dashboard</a>
 
-    <a href="{{ url_for('main.add_staff') }}" class="add-staff-btn">Add New Staff</a>
+    <!-- Add New Student Button -->
+    <a href="{{ url_for('main.signup') }}" class="btn btn-primary add-student-btn mb-3">Add New Student</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover students-table">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Faculty</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.surname }}</td>
+                    <td>{{ student.student_email }}</td>
+                    <td>{{ student.course }}</td>
+                    <td>{{ student.year_of_study }}</td>
+                    <td>{{ student.faculty }}</td>
+                    <td>
+                        {% if student.referrals %}
+                            {% for referral in student.referrals %}
+                                {{ referral.department }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons d-flex flex-wrap gap-2">
+                            <a href="{{ url_for('main.edit_student', student_id=student.id) }}" 
+                               class="btn btn-primary btn-sm">Edit</a>
+
+                            {% if current_user.is_admin %}
+                            <a href="#" class="btn btn-danger btn-sm"
+                               data-bs-toggle="modal" 
+                               data-bs-target="#confirmDeleteModal" 
+                               data-student-id="{{ student.id }}">
+                               Delete
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
+                               class="btn btn-warning btn-sm">Request Deletion</a>
+                            {% endif %}
+                            <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}" 
+                               class="btn btn-info btn-sm">Student Progres</a>
+                            <a href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}" 
+                               class="btn btn-info btn-sm">Results</a>
+                            <a href="{{ url_for('main.staff_view_student_surveys', student_id=student.id) }}" 
+                               class="btn btn-secondary btn-sm">Surveys</a>
+                            <a href="{{ url_for('main.staff_view_student_exercises', student_id=student.id) }}" 
+                               class="btn btn-success btn-sm">Exercises</a>
+                            <a href="{{ url_for('main.refer_student_department', student_id=student.id) }}" 
+                               class="btn btn-dark btn-sm">Refer to Department</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">No students found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const studentId = button.getAttribute('data-student-id');
+            const confirmBtn = confirmDeleteModal.querySelector('#confirmDeleteBtn');
+            confirmBtn.href = `{{ url_for('main.delete_student', student_id=0) }}`.replace('/0', `/${studentId}`);
+        });
+    });
+</script>
 {% endblock %}

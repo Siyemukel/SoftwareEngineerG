@@ -43,24 +43,34 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    {{ form.course(class="form-control", placeholder="Course") }}
-                    {% for error in form.course.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    <label for="faculty">Faculty</label>
+                    <select id="faculty" name="faculty" class="form-control" required>
+                        <option value="" disabled selected>Select Faculty</option>
+                        <option value="Applied Sciences">Applied Sciences</option>
+                        <option value="Arts and Design">Arts and Design</option>
+                        <option value="Engineering and the Built Environment">Engineering and the Built Environment</option>
+                        <option value="Health Sciences">Health Sciences</option>
+                        <option value="Management Sciences">Management Sciences</option>
+                        <option value="Accounting and Informatics">Accounting and Infomatics</option>
+                    </select>
                 </div>
 
                 <div class="form-group mb-3">
-                    {{ form.year_of_study(class="form-control", placeholder="Year of Study") }}
-                    {% for error in form.year_of_study.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    <label for="course">Course</label>
+                    <select id="course" name="course" class="form-control" required>
+                        <option value="" disabled selected>Select Course</option>
+                    </select>
                 </div>
 
                 <div class="form-group mb-3">
-                    {{ form.faculty(class="form-control", placeholder="Faculty") }}
-                    {% for error in form.faculty.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                    <label for="year_of_study">Year of Study</label>
+                    <select id="year_of_study" name="year_of_study" class="form-control" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
                 </div>
 
                 <div class="form-group mb-3">
@@ -78,12 +88,46 @@
                 </div>
 
                 {{ form.submit(class="btn btn-primary submit-btn w-100") }}
-                
-                <div class="login-link">
+
+                <div class="login-link mt-2">
                     Already have an account? <a href="/login">Log in</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+const coursesByFaculty = {
+    "Applied Sciences": ["Biotechnology", "Chemistry", "Textile Science", "Consumer Sciences"],
+    "Arts and Design": ["Fashion Design", "Graphic Design", "Interior Design", "Photography"],
+    "Engineering and the Built Environment": ["Civil Engineering", "Mechanical Engineering", "Electrical Engineering", "Architecture"],
+    "Health Sciences": ["Nursing", "Radiography", "Dental Sciences", "Emergency Medical Care"],
+    "Management Sciences": ["Business Administration", "Human Resources", "Marketing", "Supply Chain Management", "Accounting"],
+    "Accounting and Informatics": ["Accounting", "Information Technology", "Information Systems"]
+};
+
+
+document.getElementById('faculty').addEventListener('change', function() {
+    const faculty = this.value;
+    const courseSelect = document.getElementById('course');
+    courseSelect.innerHTML = '<option value="" disabled selected>Select Course</option>';
+
+    if (coursesByFaculty[faculty]) {
+        coursesByFaculty[faculty].forEach(course => {
+            const option = document.createElement('option');
+            option.value = course;
+            option.textContent = course;
+            courseSelect.appendChild(option);
+        });
+    }
+});
+</script>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => alert.remove());
+    }, 5000); // removes messages after 5 seconds
+</script>
+
 {% endblock %}

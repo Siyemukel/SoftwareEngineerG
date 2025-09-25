@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Review Application</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Student:</strong> {{ proof.student.name }} {{ proof.student.surname }}</p>
+            <p>
+                <strong>Medical Proof:</strong>  
+                <a href="{{ url_for('main.uploaded_file', filename=proof.file_name) }}"  
+                   target="_blank"  
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-file-medical"></i> {{ proof.file_name }}
+                </a>
+            </p>
+            <p><strong>Uploaded At:</strong> {{ proof.uploaded_at.strftime('%d %B %Y, %H:%M') }}</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="reason" class="form-label">Rejection Reason (if rejecting):</label>
+            <textarea name="reason" id="reason" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" name="action" value="approve" class="btn btn-success">
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button type="submit" name="action" value="reject" class="btn btn-danger">
+                <i class="fas fa-times"></i> Reject
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

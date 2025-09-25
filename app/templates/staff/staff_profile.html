@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>My Profile</h2>
+
+    <form method="POST" class="profile-form">
+        <div class="form-group">
+            <label for="name">First Name:</label>
+            <input type="text" id="name" name="name" value="{{ user.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="surname">Surname:</label>
+            <input type="text" id="surname" name="surname" value="{{ user.surname }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">New Password (leave blank to keep current):</label>
+            <input type="password" id="password" name="password">
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm New Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password">
+        </div>
+
+        {% if user.is_admin %}
+        <div class="form-group">
+            <label>Role:</label>
+            <span class="role-label">Admin</span>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label>Role:</label>
+            <span class="role-label">Staff</span>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+
+    {% if not user.is_admin %}
+    <form method="POST" action="{{ url_for('main.delete_staff', staff_id=user.id) }}" class="delete-form">
+        <button type="submit" class="btn btn-danger"
+            onclick="return confirm('Are you sure you want to delete your account? This cannot be undone.')">
+            Delete My Account
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

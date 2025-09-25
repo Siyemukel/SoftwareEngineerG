@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Student Progress: {{ student.name }} {{ student.surname }}</h2>
+
+    <!-- Back to Student List -->
+    <a href="{{ url_for('main.manage_students') }}" class="btn btn-secondary mb-3">Back to Students</a>
+
+    <!-- Tabs for different sections -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('main.staff_view_student_exercises', student_id=student.id) }}">Exercises</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}">Tests</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('main.staff_view_student_surveys', student_id=student.id) }}">Surveys</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('main.refer_student_department', student_id=student.id) }}">Referrals</a>
+    </li>
+</ul>
+
+
+    <div class="tab-content" id="studentProgressTabsContent">
+
+        <!-- Exercises Tab -->
+        <div class="tab-pane fade show active" id="exercises" role="tabpanel">
+            <h4>Exercises Completed</h4>
+            {% if exercises %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Part</th>
+                        <th>Completed At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ex in exercises %}
+                    <tr>
+                        <td>{{ ex.exercise.title }}</td>
+                        <td>{{ ex.exercise.part }}</td>
+                        <td>{{ ex.completed_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No exercises completed yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Tests Tab -->
+        <div class="tab-pane fade" id="tests" role="tabpanel">
+            <h4>Test Results</h4>
+            {% if tests %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Numbers Score</th>
+                        <th>Logic Score</th>
+                        <th>Shapes Score</th>
+                        <th>Disability Likelihood</th>
+                        <th>Outcome</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test in tests %}
+                    <tr>
+                        <td>{{ test.numbers_score }}</td>
+                        <td>{{ test.logic_score }}</td>
+                        <td>{{ test.shapes_score }}</td>
+                        <td>{{ test.disability_likelihood }}</td>
+                        <td>{{ test.outcome_message }}</td>
+                        <td>{{ test.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No test results yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Surveys Tab -->
+        <div class="tab-pane fade" id="surveys" role="tabpanel">
+            <h4>Surveys</h4>
+            {% if surveys %}
+                {% for survey in surveys %}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            Survey taken at {{ survey.created_at.strftime("%Y-%m-%d %H:%M") }}
+                        </div>
+                        <div class="card-body">
+                            <pre>{{ survey.survey_data | tojson(indent=2) }}</pre>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No survey responses yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Medical Proofs Tab -->
+        <div class="tab-pane fade" id="medical" role="tabpanel">
+            <h4>Medical Proofs</h4>
+            {% if medical_proofs %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Status</th>
+                        <th>Reviewed By</th>
+                        <th>Reviewed At</th>
+                        <th>Rejection Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for proof in medical_proofs %}
+                    <tr>
+                        <td><a href="{{ url_for('static', filename='uploads/' ~ proof.file_name) }}" target="_blank">{{ proof.file_name }}</a></td>
+                        <td>{{ proof.status }}</td>
+                        <td>{{ proof.reviewed_by.name if proof.reviewed_by else '-' }}</td>
+                        <td>{{ proof.reviewed_at.strftime("%Y-%m-%d %H:%M") if proof.reviewed_at else '-' }}</td>
+                        <td>{{ proof.rejection_reason or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No medical proofs uploaded yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Referrals Tab -->
+        <div class="tab-pane fade" id="referrals" role="tabpanel">
+            <h4>Referrals</h4>
+            {% if referrals %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Referred By</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ref in referrals %}
+                    <tr>
+                        <td>{{ ref.department or '-' }}</td>
+                        <td>{{ ref.referred_by.name }} {{ ref.referred_by.surname }}</td>
+                        <td>{{ ref.status }}</td>
+                        <td>{{ ref.reason or '-' }}</td>
+                        <td>{{ ref.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>No referrals yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Feedback Tab -->
+        <div class="tab-pane fade" id="feedback" role="tabpanel">
+            <h4>Give Feedback</h4>
+            <form action="{{ url_for('main.staff_feedback', student_id=student.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="feedback_content" class="form-label">Feedback</label>
+                    <textarea class="form-control" id="feedback_content" name="feedback_content" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </form>
+
+            <hr>
+
+            <h5>Previous Feedback</h5>
+            {% if student.feedbacks %}
+                <ul class="list-group">
+                    {% for fb in student.feedbacks %}
+                        <li class="list-group-item">
+                            <strong>{{ fb.staff.name }} {{ fb.staff.surname }}</strong> ({{ fb.created_at.strftime("%Y-%m-%d %H:%M") }}):
+                            <br>{{ fb.content }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No feedback yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+ 
+    const firstTabEl = document.querySelector('#studentProgressTabs a.nav-link');
+    const tab = new bootstrap.Tab(firstTabEl);
+    tab.show();
+</script>
+{% endblock %}

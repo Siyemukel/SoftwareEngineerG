@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Customize Report Settings</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div>
+        {{ form.include_student_email.label }} {{ form.include_student_email() }}
+    </div>
+    <div>
+        {{ form.include_name.label }} {{ form.include_name() }}
+    </div>
+    <div>
+        {{ form.include_surname.label }} {{ form.include_surname() }}
+    </div>
+    <div>
+        {{ form.include_course.label }} {{ form.include_course() }}
+    </div>
+    <div>
+        {{ form.include_year.label }} {{ form.include_year() }}
+    </div>
+    <div>
+        {{ form.include_faculty.label }} {{ form.include_faculty() }}
+    </div>
+    <div>
+        {{ form.include_test_results.label }} {{ form.include_test_results() }}
+    </div>
+    <div>
+        {{ form.include_exercises_progress.label }} {{ form.include_exercises_progress() }}
+    </div>
+
+    <div>
+        {{ form.report_format.label }} {{ form.report_format() }}
+    </div>
+
+    <button type="submit">{{ form.submit.label }}</button>
+</form>
+{% endblock %}
