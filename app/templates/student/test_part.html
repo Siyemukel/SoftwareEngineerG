@@ -3,58 +3,235 @@
 {% block title %}Dyscalculia Test{% endblock %}
 
 {% block content %}
-<div class="test-container">
-    <div class="test-header">
-        <div class="emoji-animate" id="fun-emoji" style="font-size:2.5rem;">🎲</div>
-        <h2 class="test-title">{{ part }} Test</h2>
-        <p class="test-subtitle playful-qnum">Question {{ q_num }}/5</p>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-exercise">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <span class="brand-icon">🔢</span>
+            <span class="brand-text">Numeraid</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/about" class="nav-link">ℹ️ About</a>
+            <a href="/contact" class="nav-link">📞 Contact Us</a>
+            <a href="/support" class="nav-link">🛟 Support</a>
+            <a href="/logout" class="nav-link logout-link">🚪 Logout</a>
+        </div>
     </div>
-    
-    <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-    </div>
-    
-    <form method="POST" class="test-form">
-        <div class="question-block">
-            <p class="question-text"><strong>{{ question }}</strong></p>
-            
-            {% if shape_image %}
-                <div class="shape-container">
-                    <img src="{{ shape_image }}" alt="Shape for question" class="shape-image">
-                </div>
-            {% endif %}
-            
-            {% if part.lower() == "numbers" %}
-                <div class="options-group">
-                    {% if options %}
-                        {% for letter, option_text in options.items() %}
-                            <label class="option-label">
-                                <input type="radio" name="answer" value="{{ letter }}" required>
-                                <span class="option-text">{{ letter }}) {{ option_text }}</span>
-                            </label>
-                        {% endfor %}
-                    {% else %}
-                        {# This is a fallback in case the options variable is empty. #}
-                        <p class="text-danger">Options not available. Please try again.</p>
-                    {% endif %}
-                </div>
-            {% else %}
-                {# Open text answer for logic/shapes #}
-                <div class="text-answer-group">
-                    <label for="answer" class="answer-label">Your Answer:</label>
-                    <textarea name="answer" id="answer" rows="3" 
-                              placeholder="Type your answer here..." required></textarea>
-                </div>
-            {% endif %}
+</nav>
+
+<div class="test-full-container">
+    <!-- Main Test Content -->
+    <div class="test-main-content">
+        <div class="test-header">
+            <div class="emoji-animate" id="fun-emoji">🎲</div>
+            <h2 class="test-title">{{ part }} Test</h2>
+            <p class="test-subtitle playful-qnum">Question {{ q_num }}/5</p>
         </div>
         
-        <div class="button-group">
-            <button type="submit" class="submit-btn">Submit Answer</button>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
         </div>
-    </form>
+        
+        <div class="test-card">
+            <form method="POST" class="test-form">
+                <div class="question-block">
+                    <p class="question-text"><strong>{{ question }}</strong></p>
+                    
+                    {% if shape_image %}
+                        <div class="shape-container">
+                            <img src="{{ shape_image }}" alt="Shape for question" class="shape-image">
+                        </div>
+                    {% endif %}
+                    
+                    {% if part.lower() == "numbers" %}
+                        <div class="options-group">
+                            {% if options %}
+                                {% for letter, option_text in options.items() %}
+                                    <label class="option-label">
+                                        <input type="radio" name="answer" value="{{ letter }}" required>
+                                        <span class="option-emoji">{{ ['🟣','🟢','🟡','🔴','🔵','🟠','🟤','⚫'][loop.index0 % 8] }}</span>
+                                        <span class="option-text">{{ letter }}) {{ option_text }}</span>
+                                    </label>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-danger">Options not available. Please try again.</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="text-answer-group">
+                            <label for="answer" class="answer-label">Your Answer:</label>
+                            <textarea name="answer" id="answer" rows="3" 
+                                      placeholder="Type your answer here..." required></textarea>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">🚀 Submit Answer</button>
+                    <a href="/" class="quit-btn">🚪 Quit Test</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <style>
+/* Reset and base styles for test page */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: var(--font-secondary, Arial, sans-serif);
+    overflow-x: hidden;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #a56eae 0%, #7ab4b6 100%);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Override base nav styles for test page specifically */
+.navbar-exercise {
+    background: linear-gradient(135deg, #812575 0%, #4B68A5 100%) !important;
+    padding: 1rem 2rem !important;
+    box-shadow: 0 4px 20px rgba(129, 37, 117, 0.2) !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100 !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    max-width: none !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.navbar-exercise .nav-container {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+.navbar-exercise .nav-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+    text-decoration: none !important;
+}
+
+.navbar-exercise .nav-brand a {
+    color: white !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.brand-icon {
+    font-size: 1.8rem;
+    animation: brand-pulse 2s ease-in-out infinite;
+}
+
+@keyframes brand-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.brand-text {
+    font-family: var(--font-primary, Arial, sans-serif);
+}
+
+.navbar-exercise .nav-links {
+    display: flex !important;
+    gap: 1.5rem !important;
+    align-items: center !important;
+}
+
+.navbar-exercise .nav-link {
+    color: white !important;
+    text-decoration: none !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 25px !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.navbar-exercise .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+}
+
+.navbar-exercise .logout-link {
+    background: rgba(211, 31, 45, 0.2) !important;
+    border: 1px solid rgba(211, 31, 45, 0.3) !important;
+}
+
+.navbar-exercise .logout-link:hover {
+    background: rgba(211, 31, 45, 0.3) !important;
+    border-color: rgba(211, 31, 45, 0.5) !important;
+}
+
+/* Full container covering entire viewport */
+.test-full-container {
+    min-height: 100vh;
+    position: relative;
+    padding-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+}
+
+/* Main Test Content */
+.test-main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+.test-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.test-title {
+    color: white;
+    font-size: 2.5rem;
+    margin: 0.5rem 0;
+    font-family: var(--font-primary, Arial, sans-serif);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.emoji-animate {
+    display: inline-block;
+    font-size: 3rem;
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+}
+
 @keyframes emoji-bounce {
     0%, 100% { transform: translateY(0); }
     30% { transform: translateY(-18px) scale(1.2); }
@@ -62,14 +239,238 @@
     70% { transform: translateY(-8px) scale(1.15); }
 }
 
+.playful-qnum {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    font-family: var(--font-secondary, Arial, sans-serif);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+    display: inline-block;
+}
+
+/* Progress bar */
+.progress-bar {
+    width: 100%;
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    max-width: 500px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(45deg, var(--color-deep-purple, #812575), var(--color-blue, #4B68A5));
+    transition: width 0.7s cubic-bezier(.36,.07,.19,.97);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(129, 37, 117, 0.3);
+}
+
+.test-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 700px;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.test-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.question-block {
+    margin-bottom: 2rem;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: var(--color-black, #333);
+    font-family: var(--font-secondary, Arial, sans-serif);
+    animation: emoji-bounce 0.9s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.shape-container {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(165, 110, 174, 0.2);
+}
+
+.shape-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(129,37,117,0.15);
+    animation: emoji-bounce 1.1s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Multiple choice options */
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #f8f4ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border: 2px solid #e8e8e8;
+    transition: all 0.3s cubic-bezier(.36,.07,.19,.97);
+    box-shadow: 0 3px 10px rgba(129,37,117,0.08);
+}
+
+.option-label:hover {
+    border-color: var(--color-blue, #4B68A5);
+    background: linear-gradient(135deg, #e8f0ff 0%, #f0f8ff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(165,110,174,0.12);
+}
+
+.option-label input[type="radio"] {
+    margin-right: 0.5rem;
+    transform: scale(1.3);
+    accent-color: var(--color-blue, #4B68A5);
+}
+
+.option-label input[type="radio"]:checked + .option-emoji {
+    animation: emoji-pop 0.3s forwards;
+    transform-origin: bottom;
+}
+
+@keyframes emoji-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1.3); }
+}
+
+.option-emoji {
+    font-size: 1.6rem;
+    transition: all 0.2s ease;
+}
+
+.option-text {
+    font-size: 1.1rem;
+    color: var(--color-black, #333);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.option-label input[type="radio"]:checked + .option-emoji + .option-text {
+    color: var(--color-deep-purple, #812575);
+    font-weight: bold;
+}
+
+/* Open answer text area */
+.text-answer-group {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+    padding: 1.5rem;
+    border-radius: 15px;
+    border: 1px solid rgba(165, 110, 174, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.answer-label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    color: var(--color-deep-purple, #812575);
+    font-size: 1.1rem;
+}
+
+.text-answer-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-family: var(--font-secondary, Arial, sans-serif);
+    resize: vertical;
+    box-sizing: border-box;
+    min-height: 110px;
+    background: linear-gradient(135deg, #f8f4ff 0%, #f0f4ff 100%);
+    box-shadow: 0 3px 12px rgba(129,37,117,0.08);
+    transition: all 0.3s;
+    color: var(--color-black, #333);
+}
+
+.text-answer-group textarea:focus {
+    outline: none;
+    background: linear-gradient(135deg, #f0f8ff 0%, #f8f4ff 100%);
+    box-shadow: 0 0 0 3px rgba(165, 110, 174, 0.3), 0 4px 20px rgba(129,37,117,0.15);
+    border-color: var(--color-deep-purple, #812575);
+}
+
+/* Submit button */
+.button-group {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.submit-btn {
+    background: linear-gradient(45deg, var(--color-deep-purple, #812575), var(--color-blue, #4B68A5));
+    color: white;
+    border: none;
+    padding: 1.2rem 3rem;
+    border-radius: 50px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1.2rem;
+    box-shadow: 0 6px 20px rgba(129, 37, 117, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(129, 37, 117, 0.4);
+}
+
+.quit-btn {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-blue, #4B68A5);
+    border-radius: 30px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(75,104,165,0.15);
+    border: 2px solid rgba(255,255,255,0.5);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.quit-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(75,104,165,0.25);
+}
+
 @keyframes confetti {
     0% { opacity: 1; transform: translateY(0) scale(1); }
     100% { opacity: 0; transform: translateY(60px) scale(0.5); }
-}
-
-.emoji-animate {
-    display: inline-block;
-    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 .confetti {
@@ -82,231 +483,78 @@
     z-index: 10;
 }
 
-.playful-qnum {
-    font-size: 1.1rem;
-    color: var(--color-light-purple);
-    font-family: var(--font-primary);
-    letter-spacing: 1px;
-    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
-    display: inline-block;
-}
-
-.question-text {
-    animation: emoji-bounce 0.9s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-.shape-image {
-    animation: emoji-bounce 1.1s cubic-bezier(.36,.07,.19,.97) both;
-}
-/* General test container */
-.test-container {
-    max-width: 800px;
-    margin: 3rem auto;
-    padding: 1.5rem;
-    font-family: var(--font-secondary);
-}
-
-.test-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.test-title {
-    font-family: var(--font-primary);
-    font-size: 2rem;
-    color: var(--color-blue);
-    margin-bottom: 0.5rem;
-}
-
-.test-subtitle {
-    font-size: 1rem;
-    color: var(--color-dark-grey);
-}
-
-/* Progress bar */
-.progress-bar {
-    width: 100%;
-    height: 15px;
-    background-color: var(--color-light-grey);
-    border-radius: 10px;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--color-blue);
-    transition: width 0.3s ease;
-    border-radius: 10px;
-}
-
-/* Form and content */
-.test-form {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-
-.question-block {
-    margin-bottom: 2rem;
-}
-
-.question-text {
-    font-size: 1.25rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    color: var(--color-black);
-}
-
-.shape-container {
-    text-align: center;
-    margin: 2rem 0;
-    padding: 1.5rem;
-    background: var(--color-light-grey);
-    border-radius: 8px;
-    border: 1px solid var(--color-metallic-silver);
-}
-
-.shape-image {
-    max-width: 100%;
-    max-height: 300px;
-    border-radius: 5px;
-}
-
-/* Multiple choice options */
-.options-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.option-label {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem;
-    background: var(--color-light-grey);
-    border: 1px solid var(--color-metallic-silver);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.option-label:hover {
-    border-color: var(--color-blue);
-    background-color: #e6e9f0;
-    transform: scale(1.04) rotate(-2deg);
-    box-shadow: 0 4px 16px rgba(165,110,174,0.10);
-    transition: all 0.2s cubic-bezier(.36,.07,.19,.97);
-}
-
-.option-label input[type="radio"] {
-    margin-right: 1rem;
-    transform: scale(1.2);
-    accent-color: var(--color-blue);
-}
-
-.option-label input[type="radio"]:checked + .option-text {
-    color: var(--color-deep-purple);
-    font-weight: bold;
-}
-
-.option-text {
-    font-size: 1rem;
-    line-height: 1.4;
-    color: var(--color-black);
-}
-
-/* Open answer text area */
-.text-answer-group {
-    background: var(--color-light-grey);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--color-metallic-silver);
-}
-
-.answer-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: var(--color-black);
-}
-
-.text-answer-group textarea {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.08rem;
-    font-family: inherit;
-    resize: vertical;
-    box-sizing: border-box;
-    min-height: 110px;
-    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
-    box-shadow: 0 2px 12px rgba(129,37,117,0.07);
-    transition: box-shadow 0.3s, background 0.3s;
-    color: var(--color-black);
-}
-
-.text-answer-group textarea:focus {
-    outline: none;
-    background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-    box-shadow: 0 0 0 3px var(--color-light-purple), 0 2px 16px rgba(129,37,117,0.13);
-    border: none;
-}
-
-/* Submit button */
-.button-group {
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.submit-btn {
-    background: var(--color-blue);
-    color: white;
-    padding: 1rem 2.5rem;
-    border: none;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.submit-btn {
-    background: var(--color-blue);
-    color: white;
-    padding: 1rem 2.5rem;
-    border: none;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(75,104,165,0.10);
-    position: relative;
-    overflow: hidden;
-}
-.submit-btn:hover {
-    background: var(--color-deep-purple);
-    transform: scale(1.07) rotate(1deg);
-    box-shadow: 0 6px 18px rgba(129,37,117,0.13);
-}
-.submit-btn:active {
-    transform: scale(0.98);
-}
-        font-size: 1.5rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-exercise {
+        padding: 1rem 0 !important;
     }
-    .question-text {
-        font-size: 1rem;
+    
+    .navbar-exercise .nav-container {
+        flex-direction: column !important;
+        gap: 1rem !important;
+        padding: 0 1rem !important;
     }
-    .submit-btn {
-        padding: 0.75rem 2rem;
-        font-size: 0.9rem;
+    
+    .navbar-exercise .nav-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 0.8rem !important;
+    }
+    
+    .navbar-exercise .nav-link {
+        font-size: 0.8rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .test-full-container {
+        padding: 120px 1rem 2rem 1rem;
+        min-height: auto;
+    }
+    
+    .test-title {
+        font-size: 2rem;
+    }
+    
+    .emoji-animate {
+        font-size: 2.5rem;
+    }
+    
+    .test-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .submit-btn,
+    .quit-btn {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
     }
 }
-/* Fun confetti emoji for correct answer or on load */
+
+@media (max-width: 480px) {
+    .test-main-content {
+        padding: 1rem;
+    }
+    
+    .test-title {
+        font-size: 1.8rem;
+    }
+    
+    .test-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .option-label {
+        padding: 1rem 0.8rem;
+        gap: 0.8rem;
+    }
+}
 </style>
 
 <script>
@@ -321,8 +569,9 @@ document.addEventListener('DOMContentLoaded', function() {
             fill.style.width = '{{ (q_num / 5) * 100 }}%';
         }, 100);
     }
+    
     // Fun emoji randomizer
-    var emojis = ['🎲','🧩','🎉','🦄','✨','🤩','🧠','🔢','🎯','🎈','🍀','🚀'];
+    var emojis = ['🎲','🧩','🎉','🦄','✨','🤩','🧠','🔢','🎯','🎈','🍀','🚀','🏆','🟣','🟢','🟡','🔴','🔵','🟠'];
     var funEmoji = document.getElementById('fun-emoji');
     if (funEmoji) {
         funEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
@@ -330,9 +579,10 @@ document.addEventListener('DOMContentLoaded', function() {
         void funEmoji.offsetWidth; // trigger reflow
         funEmoji.classList.add('emoji-animate');
     }
+    
     // Confetti burst on load
     function launchConfetti() {
-        var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩'];
+        var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩','⭐','🌟'];
         for (let i=0; i<6; i++) {
             let conf = document.createElement('span');
             conf.className = 'confetti';
