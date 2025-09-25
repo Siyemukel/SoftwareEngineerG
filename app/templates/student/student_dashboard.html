@@ -26,6 +26,7 @@
         {% else %}
         <li><span style="color: #888;">Chat with Staff (No staff assigned yet)</span></li>
         {% endif %}
+        <li><a href="{{ url_for('main.survey')}}">Survey</a></li>
         <li><a href="{{ url_for('main.upload_medical_proof') }}">Extra Help</a></li>
         <li><a href="{{ url_for('main.logout') }}" class="sidebar-logout">Logout</a></li>
     </ul>
