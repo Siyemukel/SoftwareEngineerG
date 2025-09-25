@@ -96,27 +96,35 @@ def login_user_account():
     username_or_email = request.form.get("username")
     password = request.form.get("password")
 
+    # --- Check student login ---
     student = Student.query.filter_by(student_email=username_or_email).first()
     if student and student.check_password(password):
         login_user(student)
 
+        # Check if the student has done the survey
         survey_exists = StudentSurvey.query.filter_by(student_id=student.id).first()
 
         if not survey_exists:
-            print("Welcome! Let’s get started with a quick setup, shall we? ", "info")
+            # New student: force onboarding -> survey
+            flash("Welcome! Let's get started with onboarding.", "info")
             return redirect(url_for("main.student_onboarding"))
 
-        print("Logged in as student!", "success")
+        # Survey exists: straight to dashboard
+        flash(f"Welcome back, {student.name}!", "success")
         return redirect(url_for("main.student_dashboard"))
 
+    # --- Check staff login ---
     staff = Staff.query.filter_by(username=username_or_email).first()
     if staff and staff.check_password(password):
         login_user(staff)
-        print("Logged in as staff!", "success")
+        flash(f"Logged in as {staff.name}!", "success")
         return redirect(url_for("main.staff_dashboard"))
 
-    print("Invalid credentials, please try again.", "danger")
+    # Invalid credentials
+    flash("Invalid credentials, please try again.", "danger")
     return redirect(url_for("main.login"))
+
+
 
 
 @main.route('/uploads/<filename>')
@@ -277,15 +285,17 @@ def login():
 @login_required
 def student_onboarding():
     if not isinstance(current_user, Student):
-        print("Access denied!", "danger")
+        flash("Access denied!", "danger")
         return redirect(url_for("main.home"))
 
-    # If onboarding is done (e.g., submitted a form), redirect to survey
     if request.method == "POST":
-        # handle any onboarding form data here if needed
+        # After onboarding, redirect student to survey
         return redirect(url_for("main.survey"))
 
+    # Render onboarding page for new students
     return render_template("/student/student_onboarding.html", student=current_user)
+
+
 
    
 
@@ -349,7 +359,7 @@ def student_dashboard():
         testTimes=test_times                  # Data for the chart script
     )
 
-
+ 
 #--------------------Student Survey--------------------
 @main.route("/survey", methods=["GET", "POST"])
 @login_required

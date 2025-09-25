@@ -11,6 +11,7 @@ class Student(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_email = db.Column(db.String(120), unique=True, nullable=False)
+    onboarding_completed = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
     course = db.Column(db.String(100), nullable=False)

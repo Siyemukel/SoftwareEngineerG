@@ -5,11 +5,32 @@
     <div class="results-card fun-card" id="resultsCard">
         <div class="results-emoji" id="resultsEmoji">🎉</div>
         <h2 class="results-title">Your Test Results</h2>
-        <h3 class="results-likelihood">Disability Likelihood: <span id="likelihoodText">{{ likelihood }}</span></h3>
+        <h3 class="results-likelihood">
+            Disability Likelihood: <span id="likelihoodText">{{ likelihood }}</span>
+        </h3>
         <p class="results-message" id="resultsMessage">{{ message }}</p>
-        <a class="dashboard-btn fun-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard 🚀</a>
+
+        <!-- Personalized Recommendations -->
+        {% if recommended_resources %}
+        <div class="recommendations">
+            <h4>Recommended Resources</h4>
+            <ul>
+                {% for resource in recommended_resources %}
+                <li><a href="{{ resource.link }}" target="_blank">{{ resource.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="results-actions" style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:1.5rem;">
+            <a class="dashboard-btn fun-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard 🚀</a>
+            <a class="pdf-btn fun-btn" href="#">Download PDF 📄</a>
+            <a class="apply-btn fun-btn" href="{{ url_for('main.upload_medical_proof') }}">Apply for Assistance 📝</a>
+        </div>
     </div>
 </div>
+
 <style>
 .fun-results {
     display: flex;
@@ -69,6 +90,22 @@
     margin-bottom: 1.5rem;
     min-height: 2.5em;
 }
+.recommendations {
+    text-align: left;
+    margin-top: 1rem;
+}
+.recommendations h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-blue);
+}
+.recommendations ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+.recommendations li {
+    margin-bottom: 0.5rem;
+}
 .fun-btn {
     background: var(--color-blue);
     color: #fff;
@@ -78,6 +115,7 @@
     font-weight: bold;
     transition: background 0.2s, transform 0.2s;
     box-shadow: 0 2px 8px rgba(75,104,165,0.10);
+    text-decoration: none;
 }
 .fun-btn:hover {
     background: var(--color-deep-purple);
@@ -97,12 +135,13 @@
     100% { opacity: 0; transform: translateY(60px) scale(0.5); }
 }
 </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Fun emoji and confetti based on likelihood
     var likelihood = document.getElementById('likelihoodText').textContent.trim().toLowerCase();
     var emoji = '🎉';
     var msg = document.getElementById('resultsMessage');
+
     if (likelihood === 'high') {
         emoji = '🧠';
         msg.textContent = 'You may have a high likelihood of dyscalculia. That’s okay! Numeraid is here to help you every step of the way. Remember, you’re not alone and you can always improve with practice!';
@@ -120,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('likelihoodText').style.color = 'var(--color-green)';
     }
     document.getElementById('resultsEmoji').textContent = emoji;
-    // Confetti burst
+
     function launchConfetti() {
         var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩'];
         for (let i=0; i<8; i++) {
