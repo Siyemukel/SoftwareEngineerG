@@ -41,26 +41,27 @@ This project is a web-based system designed to help detect potential learning di
 
 ```
 SoftwareEngineerG/
-├── app
+├── app/
 │   ├── extensions.py
 │   ├── forms.py
 │   ├── __init__.py
 │   ├── models.py
 │   ├── routes.py
 │   ├── services.py
-│   ├── static
-│   │   ├── images
+│   ├── static/
+│   │   ├── images/
 │   │   ├── script.js
 │   │   └── style.css
-│   └── templates
+│   └── templates/
 │       ├── add_staff.html
 │       ├── admin_signup.html
 │       ├── base.html
-│       ├── edit_staff.html
+│       ├── conversation.html
 │       ├── home.html
 │       ├── login.html
 │       ├── manage_staff.html
 │       ├── manage_students.html
+│       ├── messages.html
 │       ├── staff_dashboard.html
 │       ├── staff_view_results.html
 │       ├── staff_view_survey.html
@@ -73,7 +74,7 @@ SoftwareEngineerG/
 ├── .env
 ├── README.md
 └── run.py
-```
+
 
 ---
 
