@@ -5,10 +5,10 @@ from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 from .models import *
-from .extensions import db
+from .extensions import db, socketio
 from .services import get_next_question, ai_evaluate_answer , assign_student_to_staff,send_department_email
-from .forms import  * 
-from .extensions import mail  
+from .forms import  *
+from .extensions import mail
 from sqlalchemy import or_, and_
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -96,35 +96,35 @@ def login_user_account():
     username_or_email = request.form.get("username")
     password = request.form.get("password")
 
-    # --- Check student login ---
     student = Student.query.filter_by(student_email=username_or_email).first()
     if student and student.check_password(password):
         login_user(student)
 
-        # Check if the student has done the survey
-        survey_exists = StudentSurvey.query.filter_by(student_id=student.id).first()
+        # Update last login and record login history
+        student.last_login = datetime.utcnow()
+        login_history = LoginHistory(
+            student_id=student.id,
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
+        db.session.add(login_history)
+        db.session.commit()
 
-        if not survey_exists:
-            # New student: force onboarding -> survey
-            flash("Welcome! Let's get started with onboarding.", "info")
+        if not student.has_completed_onboarding:
+            print("Welcome! Let’s get started with a quick setup, shall we? ", "info")
             return redirect(url_for("main.student_onboarding"))
 
-        # Survey exists: straight to dashboard
-        flash(f"Welcome back, {student.name}!", "success")
+        print("Logged in as student!", "success")
         return redirect(url_for("main.student_dashboard"))
 
-    # --- Check staff login ---
     staff = Staff.query.filter_by(username=username_or_email).first()
     if staff and staff.check_password(password):
         login_user(staff)
-        flash(f"Logged in as {staff.name}!", "success")
+        print("Logged in as staff!", "success")
         return redirect(url_for("main.staff_dashboard"))
 
-    # Invalid credentials
-    flash("Invalid credentials, please try again.", "danger")
+    print("Invalid credentials, please try again.", "danger")
     return redirect(url_for("main.login"))
-
-
 
 
 @main.route('/uploads/<filename>')
@@ -244,6 +244,8 @@ def mark_notifications_read():
 
 
 
+
+
 @main.route("/", methods=["GET", "POST"]) 
 def home():
     if not Staff.query.first():
@@ -285,17 +287,17 @@ def login():
 @login_required
 def student_onboarding():
     if not isinstance(current_user, Student):
-        flash("Access denied!", "danger")
+        print("Access denied!", "danger")
         return redirect(url_for("main.home"))
 
+    # If onboarding is done (e.g., submitted a form), mark as completed and redirect to survey
     if request.method == "POST":
-        # After onboarding, redirect student to survey
+        # handle any onboarding form data here if needed
+        current_user.has_completed_onboarding = True
+        db.session.commit()
         return redirect(url_for("main.survey"))
 
-    # Render onboarding page for new students
     return render_template("/student/student_onboarding.html", student=current_user)
-
-
 
    
 
@@ -359,7 +361,60 @@ def student_dashboard():
         testTimes=test_times                  # Data for the chart script
     )
 
- 
+
+#--------------------Student Settings--------------------
+@main.route("/student/settings", methods=["GET", "POST"])
+@login_required
+def student_settings():
+    if not isinstance(current_user, Student):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.home"))
+
+    if request.method == "POST":
+        # Handle profile update
+        name = request.form.get("name")
+        surname = request.form.get("surname")
+        email = request.form.get("email")
+
+        if name:
+            current_user.name = name
+        if surname:
+            current_user.surname = surname
+        if email:
+            current_user.student_email = email
+
+        # Handle password change
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        if new_password:
+            if new_password != confirm_password:
+                flash("Passwords do not match.", "danger")
+                return redirect(url_for("main.student_settings"))
+            current_user.set_password(new_password)
+            flash("Password updated successfully.", "success")
+
+        # Handle profile image upload
+        if 'profile_image' in request.files:
+            file = request.files['profile_image']
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_")
+                filename = timestamp + filename
+                upload_path = os.path.join(current_app.root_path, '..', 'uploads', "profile_images", filename)
+                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+                file.save(upload_path)
+                current_user.profile_image = filename
+
+        db.session.commit()
+        flash("Profile updated successfully.", "success")
+        return redirect(url_for("main.student_settings"))
+
+    # Get login history
+    login_histories = LoginHistory.query.filter_by(student_id=current_user.id).order_by(LoginHistory.login_time.desc()).limit(5).all()
+
+    return render_template("student/settings.html", login_histories=login_histories)
+
+
 #--------------------Student Survey--------------------
 @main.route("/survey", methods=["GET", "POST"])
 @login_required
@@ -503,83 +558,35 @@ def test_part(part, q_num, difficulty):
 @main.route("/results")
 @login_required
 def test_results():
-    # --- Get test scores ---
-    numbers_score = session.get("numbers_score", 0)
-    logic_score = session.get("logic_score", 0)
-    shapes_score = session.get("shapes_score", 0)
-    max_test_score = 5  # per section
+    # Fetch the latest test result from DB
+    test_result = TestResult.query.filter_by(student_id=current_user.id).order_by(TestResult.created_at.desc()).first()
 
-    # --- Invert test score for risk ---
-    test_risk_score = (max_test_score * 3) - (numbers_score + logic_score + shapes_score)
+    if not test_result:
+        return render_template("/student/test_results.html", no_results=True)
 
-    # --- Load survey scores ---
-    survey = StudentSurvey.query.filter_by(student_id=current_user.id).first()
-    survey_scores = {}
-    survey_struggles = []
-    if survey:
-        survey_scores = json.loads(survey.survey_data)
-        for key, value in survey_scores.items():
-            if value > 0:
-                survey_struggles.append(key.replace("_", " ").capitalize())
+    # Extract data from the test result
+    staff_breakdown = test_result.staff_breakdown
+    numbers_score = staff_breakdown["test_scores"]["numbers"]
+    logic_score = staff_breakdown["test_scores"]["logic"]
+    shapes_score = staff_breakdown["test_scores"]["shapes"]
+    survey_scores = staff_breakdown["survey_scores"]
 
-    # --- Identify low-performing test sections ---
-    low_test_sections = []
-    if numbers_score < 3:
-        low_test_sections.append("Numbers")
-    if logic_score < 3:
-        low_test_sections.append("Logic")
-    if shapes_score < 3:
-        low_test_sections.append("Shapes")
-
-    # --- Combine risk areas ---
-    risk_areas = set(low_test_sections + survey_struggles)
-
-    # --- Combine risk score ---
+    total_test_score = numbers_score + logic_score + shapes_score
     total_survey_score = sum(survey_scores.values()) if survey_scores else 0
+
+    max_test_score = 5  # per section
+    test_risk_score = (max_test_score * 3) - total_test_score
     combined_risk_score = test_risk_score + total_survey_score
 
-    # --- Determine likelihood ---
-    if combined_risk_score >= 15:
-        likelihood = "High"
-        message = f"You may need extra support in: {', '.join(risk_areas)}. A staff member will review your results."
-    elif combined_risk_score >= 8:
-        likelihood = "Moderate"
-        message = f"You show some areas that could use support: {', '.join(risk_areas)}. Staff may follow up if needed."
-    else:
-        likelihood = "Low"
-        message = "Your results are within the expected range. Keep up the good work!"
-
-    # --- Save result to DB ---
-    test_result = TestResult(
-        student_id=current_user.id,
-        numbers_score=numbers_score,
-        logic_score=logic_score,
-        shapes_score=shapes_score,
-        disability_likelihood=likelihood,
-        outcome_message=message,
-        staff_breakdown={
-            "test_scores": {
-                "numbers": numbers_score,
-                "logic": logic_score,
-                "shapes": shapes_score
-            },
-            "survey_scores": survey_scores
-        }
-    )
-    db.session.add(test_result)
-    db.session.commit()
-
-    # --- Clear session ---
-    session.pop("numbers_score", None)
-    session.pop("logic_score", None)
-    session.pop("shapes_score", None)
+    likelihood = test_result.disability_likelihood
+    message = test_result.outcome_message
 
     return render_template(
         "/student/test_results.html",
         numbers_score=numbers_score,
         logic_score=logic_score,
         shapes_score=shapes_score,
-        total_test_score=numbers_score + logic_score + shapes_score,
+        total_test_score=total_test_score,
         total_survey_score=total_survey_score,
         combined_risk_score=combined_risk_score,
         likelihood=likelihood,
@@ -591,6 +598,11 @@ def test_results():
 @main.route("/exercises/<part>", methods=["GET", "POST"])
 @login_required
 def exercises(part):
+    # Reset session for new exercise start
+    if request.method == "GET":
+        session["exercise_q_num"] = 1
+        session["exercise_difficulty"] = "easy"
+
     # Retrieve current difficulty and question number from session, or set defaults
     difficulty = session.get("exercise_difficulty", "easy")
     q_num = session.get("exercise_q_num", 1)
@@ -665,6 +677,17 @@ def exercises(part):
 
 
  
+#--------------------Need to Know (students only)--------------------
+@main.route("/need_to_know")
+@login_required
+def need_to_know():
+    if not isinstance(current_user, Student):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.home"))
+
+    return render_template("student/need_to_know.html")
+
+
 #--------------------Upload Medical Proof (students only)--------------------
 
 @main.route("/upload_medical_proof", methods=["GET", "POST"])
@@ -696,6 +719,10 @@ def upload_medical_proof():
             db.session.add(proof)
             db.session.commit()
 
+            # Set application status to under_review
+            current_user.application_status = 'under_review'
+            db.session.commit()
+
             if assigned_staff:
                 flash(f"Medical proof uploaded and assigned to {assigned_staff.name} {assigned_staff.surname}!", "success")
             else:
@@ -711,11 +738,15 @@ def upload_medical_proof():
     return render_template("student/upload_medical_proof.html", form=form)
 
 
+#--------------------Student Application Status--------------------
+@main.route("/student/application")
+@login_required
+def student_application():
+    if not isinstance(current_user, Student):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.home"))
 
-
-
-  
-
+    return render_template("student/student_application.html", status=current_user.application_status)
 
 
 #--------------------Staff Dashboard--------------------
@@ -1091,6 +1122,16 @@ def review_medical_proof(proof_id):
                 proof.status = "rejected"
                 proof.rejection_reason = reason
                 flash("Application rejected.", "info")
+            elif action == "update_status":
+                app_status = request.form.get("app_status")
+                if app_status in ['under_review', 'initial_approval', 'accepted', 'rejected']:
+                    proof.student.application_status = app_status
+                    flash(f"Application status updated to {app_status.replace('_', ' ').title()}.", "success")
+                    # Emit real-time update
+                    socketio.emit('application_status_update', {'student_id': proof.student.id, 'status': app_status})
+                else:
+                    flash("Invalid status.", "danger")
+                    return render_template("staff/review_medical_proof.html", proof=proof)
             else:
                 flash("Invalid action.", "danger")
                 return render_template("staff/review_medical_proof.html", proof=proof)
@@ -1501,6 +1542,23 @@ def generate_student_report(student_id):
         flash("Unsupported report format.", "danger")
         return redirect(url_for("main.staff_dashboard"))
 
+
+#--------------------Student Study Material--------------------
+@main.route("/student/study_material")
+@login_required
+def student_study_material():
+    if not isinstance(current_user, Student):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.home"))
+
+    return render_template("student/study_material.html")
+
+
+#--------------------Contact--------------------
+@main.route("/contact")
+@login_required
+def contact():
+    return render_template("contact.html")
 
 #--------------------Logout--------------------
 @main.route("/logout")
