@@ -1,180 +1,350 @@
 {% extends "base.html" %}
 
+{% block title %}Test Results{% endblock %}
+
 {% block content %}
-<div class="results-container fun-results">
-    <div class="results-card fun-card" id="resultsCard">
-        <div class="results-emoji" id="resultsEmoji">🎉</div>
-        <h2 class="results-title">Your Test Results</h2>
-        <h3 class="results-likelihood">
-            Disability Likelihood: <span id="likelihoodText">{{ likelihood }}</span>
-        </h3>
-        <p class="results-message" id="resultsMessage">{{ message }}</p>
+<!-- Background bubbles -->
+<div class="bubble" style="width: 100px; height: 100px; top: 40px; left: 10%;"></div>
+<div class="bubble blue" style="width: 140px; height: 140px; top: 200px; right: 8%;"></div>
+<div class="bubble" style="width: 90px; height: 90px; bottom: 120px; left: 25%;"></div>
 
-        <!-- Personalized Recommendations -->
-        {% if recommended_resources %}
-        <div class="recommendations">
-            <h4>Recommended Resources</h4>
-            <ul>
-                {% for resource in recommended_resources %}
-                <li><a href="{{ resource.link }}" target="_blank">{{ resource.title }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        <!-- Actions -->
-        <div class="results-actions" style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:1.5rem;">
-            <a class="dashboard-btn fun-btn" href="{{ url_for('main.student_dashboard') }}">Go to Dashboard 🚀</a>
-            <a class="pdf-btn fun-btn" href="#">Download PDF 📄</a>
-            <a class="apply-btn fun-btn" href="{{ url_for('main.upload_medical_proof') }}">Apply for Assistance 📝</a>
-        </div>
+<div class="container py-5 position-relative">
+  <h2 class="text-center dashboard-heading">Results</h2>
+  
+  {% if no_results %}
+    <div class="results-card">
+      <div class="alert alert-info text-center">
+        <h4>No Test Results Available</h4>
+        <p>You haven't completed any tests yet. <a href="{{ url_for('main.start_test') }}">Start your first test</a> to see your results here.</p>
+      </div>
     </div>
+  {% else %}
+    <!-- Subject Bar Chart Section -->
+    <div class="results-card">
+      <div class="score-chart-title mb-3 text-center">Overall Progress by Subject</div>
+      <canvas id="subjectChart" height="200"></canvas>
+    </div>
+    
+    <!-- Summary Box -->
+    <div class="results-card">
+      <div class="score-chart-title mb-3">Summary</div>
+      <ul class="list-unstyled mb-0">
+        <li><strong>Numbers Score:</strong> {{ numbers_score }} / 5</li>
+        <li><strong>Logic Score:</strong> {{ logic_score }} / 5</li>
+        <li><strong>Shapes Score:</strong> {{ shapes_score }} / 5</li>
+        <li><strong>Total Test Score:</strong> {{ total_test_score }} / 15</li>
+        <li><strong>Survey Score:</strong> {{ total_survey_score }}</li>
+        <li><strong>Combined Risk Score:</strong> {{ combined_risk_score }}</li>
+        <li><strong>Disability Likelihood:</strong> <span class="badge bg-{{ 'danger' if likelihood == 'High' else 'warning' if likelihood == 'Moderate' else 'success' }}">{{ likelihood }}</span></li>
+        <li><strong>Outcome Message:</strong> {{ message }}</li>
+      </ul>
+    </div>
+    
+    <!-- Test Table -->
+    <div class="results-card">
+      <h5 class="score-chart-title mb-3">Test Breakdown</h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Section</th>
+              <th>Score</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Numbers</td>
+              <td>{{ numbers_score }} / 5</td>
+              <td>{{ (numbers_score / 5 * 100) | round(1) }}%</td>
+            </tr>
+            <tr>
+              <td>Logic</td>
+              <td>{{ logic_score }} / 5</td>
+              <td>{{ (logic_score / 5 * 100) | round(1) }}%</td>
+            </tr>
+            <tr>
+              <td>Shapes</td>
+              <td>{{ shapes_score }} / 5</td>
+              <td>{{ (shapes_score / 5 * 100) | round(1) }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
 </div>
 
+<!-- Back Button -->
+<a href="{{ url_for('main.student_dashboard') }}" class="back-btn">Back to Dashboard</a>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <style>
-.fun-results {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+:root {
+  --primary-blue: #4B68A5;
+  --pastel-blue: #d6ecff;
+  --pastel-purple: #e6d6ff;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
 }
-.fun-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 6px 32px rgba(129,37,117,0.10);
-    padding: 2.5rem 2rem 2rem 2rem;
-    text-align: center;
-    position: relative;
-    animation: pop-in 0.8s cubic-bezier(.36,.07,.19,.97);
+
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  position: relative;
+  padding-bottom: 100px;
+  overflow-x: hidden;
 }
-@keyframes pop-in {
-    0% { transform: scale(0.7) rotate(-8deg); opacity: 0; }
-    60% { transform: scale(1.08) rotate(2deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0); }
+
+.dashboard-heading {
+  color: var(--primary-blue);
+  font-weight: 600;
+  margin-bottom: 2rem;
+  z-index: 2;
+  position: relative;
 }
-.results-emoji {
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
-    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
+
+/* Floating Background Bubbles */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--pastel-purple);
+  opacity: 0.4;
+  animation: floatBubble 12s infinite ease-in-out;
+  z-index: 0;
 }
-@keyframes emoji-bounce {
-    0%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-18px) scale(1.2); }
-    50% { transform: translateY(0) scale(1.1); }
-    70% { transform: translateY(-8px) scale(1.15); }
+
+.bubble.blue { 
+  background: var(--pastel-blue); 
 }
-.results-title {
-    font-family: var(--font-primary);
-    color: var(--color-blue);
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem;
+
+@keyframes floatBubble {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+  33% { transform: translateY(-20px) rotate(120deg); opacity: 0.3; }
+  66% { transform: translateY(10px) rotate(240deg); opacity: 0.5; }
+  100% { transform: translateY(0) rotate(360deg); opacity: 0.4; }
 }
-.results-likelihood {
-    font-size: 1.2rem;
-    color: var(--color-deep-purple);
-    margin-bottom: 1rem;
+
+/* Contact Cards */
+.results-card {
+  background: var(--white);
+  border: 2px solid var(--pastel-blue);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: var(--transition);
+  height: 100%;
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
 }
-#likelihoodText {
-    font-weight: bold;
-    text-transform: capitalize;
-    padding: 0.2em 0.7em;
-    border-radius: 1em;
-    background: #f3e8ff;
-    color: var(--color-red);
-    margin-left: 0.3em;
+
+.results-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
-.results-message {
-    font-size: 1.1rem;
-    color: var(--color-black);
+
+.score-chart-title {
+  color: var(--primary-blue);
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Back to Dashboard Button */
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  z-index: 10000;
+  transition: var(--transition);
+}
+
+.back-btn:hover {
+  background: #3a5588;
+  color: var(--white);
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Table styling */
+.table {
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead {
+  background: var(--pastel-blue);
+}
+
+.table thead th {
+  border: none;
+  color: var(--primary-blue);
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.table tbody td {
+  border: none;
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(214, 236, 255, 0.3);
+}
+
+/* Summary list styling */
+.list-unstyled li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--medium-gray);
+  text-align: left;
+  color: var(--dark-gray);
+}
+
+.list-unstyled li:last-child {
+  border-bottom: none;
+}
+
+.list-unstyled strong {
+  color: var(--primary-blue);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+  
+  .results-card {
+    padding: 1.5rem;
     margin-bottom: 1.5rem;
-    min-height: 2.5em;
+  }
+  
+  .dashboard-heading {
+    font-size: 1.8rem;
+  }
+  
+  .back-btn {
+    bottom: 10px;
+    left: 10px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Adjust bubble sizes for mobile */
+  .bubble {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .bubble.blue {
+    width: 80px !important;
+    height: 80px !important;
+  }
 }
-.recommendations {
-    text-align: left;
-    margin-top: 1rem;
-}
-.recommendations h4 {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--color-blue);
-}
-.recommendations ul {
-    list-style-type: disc;
-    padding-left: 1.5rem;
-}
-.recommendations li {
-    margin-bottom: 0.5rem;
-}
-.fun-btn {
-    background: var(--color-blue);
-    color: #fff;
-    border-radius: 30px;
-    padding: 1rem 2.5rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background 0.2s, transform 0.2s;
-    box-shadow: 0 2px 8px rgba(75,104,165,0.10);
-    text-decoration: none;
-}
-.fun-btn:hover {
-    background: var(--color-deep-purple);
-    transform: scale(1.07) rotate(-2deg);
-}
-.confetti {
-    position: absolute;
-    left: 50%;
-    top: 30px;
-    font-size: 2rem;
-    pointer-events: none;
-    animation: confetti 1.2s ease-out forwards;
-    z-index: 10;
-}
-@keyframes confetti {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(60px) scale(0.5); }
+
+@media (max-width: 480px) {
+  .score-chart-title {
+    font-size: 1rem;
+  }
+  
+  .table {
+    font-size: 0.9rem;
+  }
 }
 </style>
 
 <script>
+// Chart.js Bar Chart Script
 document.addEventListener('DOMContentLoaded', function() {
-    var likelihood = document.getElementById('likelihoodText').textContent.trim().toLowerCase();
-    var emoji = '🎉';
-    var msg = document.getElementById('resultsMessage');
-
-    if (likelihood === 'high') {
-        emoji = '🧠';
-        msg.textContent = 'You may have a high likelihood of dyscalculia. That’s okay! Numeraid is here to help you every step of the way. Remember, you’re not alone and you can always improve with practice!';
-        document.getElementById('likelihoodText').style.background = '#ffe4e6';
-        document.getElementById('likelihoodText').style.color = 'var(--color-red)';
-    } else if (likelihood === 'moderate') {
-        emoji = '✨';
-        msg.textContent = 'You show some signs of dyscalculia. Keep practicing and use the tools and exercises on Numeraid to build your confidence!';
-        document.getElementById('likelihoodText').style.background = '#fef9c3';
-        document.getElementById('likelihoodText').style.color = '#b45309';
-    } else {
-        emoji = '🚀';
-        msg.textContent = 'Great job! You show a low likelihood of dyscalculia. Keep challenging yourself and enjoy learning with Numeraid!';
-        document.getElementById('likelihoodText').style.background = '#d1fae5';
-        document.getElementById('likelihoodText').style.color = 'var(--color-green)';
-    }
-    document.getElementById('resultsEmoji').textContent = emoji;
-
-    function launchConfetti() {
-        var confettiEmojis = ['🎉','✨','🎈','🍀','🦄','🤩'];
-        for (let i=0; i<8; i++) {
-            let conf = document.createElement('span');
-            conf.className = 'confetti';
-            conf.textContent = confettiEmojis[Math.floor(Math.random()*confettiEmojis.length)];
-            conf.style.left = (40 + Math.random()*20) + '%';
-            conf.style.top = (30 + Math.random()*10) + 'px';
-            conf.style.fontSize = (1.5 + Math.random()) + 'rem';
-            conf.style.animationDelay = (i*0.1)+'s';
-            document.getElementById('resultsCard').appendChild(conf);
-            setTimeout(()=>conf.remove(), 1400);
+  {% if not no_results %}
+  const ctx = document.getElementById('subjectChart').getContext('2d');
+  const subjectChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Numbers', 'Logic', 'Shapes'],
+      datasets: [{
+        label: 'Score (out of 5)',
+        data: [{{ numbers_score }}, {{ logic_score }}, {{ shapes_score }}],
+        backgroundColor: [
+          '#4B68A5',
+          '#e53935',
+          '#ffb400'
+        ],
+        borderRadius: 10,
+        barThickness: 30,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          beginAtZero: true,
+          max: 5,
+          ticks: { 
+            color: '#333',
+            font: {
+              family: "'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif"
+            }
+          },
+          grid: { 
+            display: true,
+            color: '#e0e0e0'
+          }
+        },
+        y: {
+          ticks: { 
+            color: '#333', 
+            font: { 
+              weight: '600',
+              family: "'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif"
+            } 
+          },
+          grid: { display: false }
         }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#4B68A5',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: '#4B68A5',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              return `Score: ${context.parsed.x} / 5`;
+            }
+          }
+        }
+      }
     }
-    launchConfetti();
+  });
+  {% endif %}
 });
 </script>
 {% endblock %}
