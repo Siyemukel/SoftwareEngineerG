@@ -20,7 +20,7 @@ except ImportError:
 
 # Configure Gemini
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.0-pro")
 
 
 # IMAGE GENERATION (AI + FALLBACK)
@@ -104,11 +104,8 @@ def generate_shape_image_pil(shape_type, question_data):
 
 def generate_shape_image(shape_type, question_data):
     """
-    Try AI first, fallback to PIL if AI fails.
+    Use PIL for shape images.
     """
-    img = generate_shape_image_ai(shape_type, question_data)
-    if img:
-        return img
     return generate_shape_image_pil(shape_type, question_data)
 
 
@@ -278,7 +275,7 @@ def get_fallback_question(part, difficulty, q_num):
             }
         }
     }
-    
+
     try:
         fallback = fallbacks[part][difficulty][q_num]
         if part == "shapes" and "shape_type" in fallback:
@@ -287,6 +284,17 @@ def get_fallback_question(part, difficulty, q_num):
                 fallback["shape_image"] = shape_image
         return fallback
     except KeyError:
+        # If no specific fallback, try to find any for the part and difficulty
+        if part in fallbacks and difficulty in fallbacks[part]:
+            # Return the first available question
+            available_q = list(fallbacks[part][difficulty].keys())
+            if available_q:
+                fallback = fallbacks[part][difficulty][available_q[0]]
+                if part == "shapes" and "shape_type" in fallback:
+                    shape_image = generate_shape_image(fallback["shape_type"], {})
+                    if shape_image:
+                        fallback["shape_image"] = shape_image
+                return fallback
         return {"error": "No fallback question available"}
 
 
