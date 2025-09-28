@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+
+{% block title %}DUT Support | Contact Us{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+      --primary-blue: #4B68A5;
+      --light-blue: #6F9FEF;
+      --extra-light-blue: #B3D4FF;
+      --white: #ffffff;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --text-dark: #333333;
+      --text-light: #666666;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding-bottom: 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Floating bubbles */
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: float 8s infinite ease-in-out;
+      z-index: 0;
+    }
+    
+    .blue { background: var(--primary-blue); }
+    .light-blue { background: var(--light-blue); }
+    .extra-light-blue { background: var(--extra-light-blue); }
+
+    .bubble.one { width: 80px; height: 80px; top: 10%; left: 15%; animation-delay: 0s; }
+    .bubble.two { width: 50px; height: 50px; top: 30%; left: 70%; animation-delay: 2s; }
+    .bubble.three { width: 100px; height: 100px; top: 60%; left: 40%; animation-delay: 4s; }
+    .bubble.four { width: 60px; height: 60px; top: 80%; left: 20%; animation-delay: 6s; }
+    .bubble.five { width: 40px; height: 40px; top: 15%; right: 10%; animation-delay: 1s; }
+    .bubble.six { width: 70px; height: 70px; top: 70%; right: 25%; animation-delay: 3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      33% { transform: translateY(-15px) rotate(5deg); }
+      66% { transform: translateY(-25px) rotate(-5deg); }
+    }
+
+    /* Main container */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header Section */
+    .contact-header {
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 4rem 3rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      z-index: 1;
+    }
+
+    .contact-header * {
+      position: relative;
+      z-index: 2;
+    }
+
+    .contact-header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .support-info {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      opacity: 0.95;
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+    }
+
+    /* Contact blocks */
+    .contact-blocks {
+      margin-bottom: 4rem;
+    }
+
+    .contact-block {
+      background: var(--white);
+      padding: 2.5rem 2rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      height: 100%;
+      border: 1px solid rgba(75, 104, 165, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--light-blue));
+      transform: translateX(-100%);
+      transition: var(--transition);
+    }
+
+    .contact-block:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .contact-block:hover::before {
+      transform: translateX(0);
+    }
+
+    .contact-block i {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-blue);
+      background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .contact-block h5 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .contact-block p {
+      color: var(--text-light);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .contact-block strong {
+      color: var(--primary-blue);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn-apply {
+      background: linear-gradient(45deg, var(--primary-blue), var(--light-blue));
+      color: var(--white);
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-apply::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: var(--transition);
+    }
+
+    .btn-apply:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(75, 104, 165, 0.3);
+      color: var(--white);
+    }
+
+    .btn-apply:hover::before {
+      left: 100%;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      background: var(--white);
+      padding: 3rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 3rem;
+    }
+
+    .faq-section h4 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: var(--primary-blue);
+      text-align: center;
+    }
+
+    .faq-item {
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--medium-gray);
+    }
+
+    .faq-question {
+      font-weight: 600;
+      cursor: pointer;
+      padding: 1.25rem;
+      background: var(--light-gray);
+      transition: var(--transition);
+      position: relative;
+      color: var(--text-dark);
+    }
+
+    .faq-question::after {
+      content: '+';
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: var(--primary-blue);
+      transition: var(--transition);
+    }
+
+    .faq-question.active::after {
+      content: '−';
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .faq-question:hover {
+      background: var(--medium-gray);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 1.25rem;
+      background: var(--white);
+      color: var(--text-light);
+      line-height: 1.6;
+      border-top: 1px solid var(--medium-gray);
+    }
+
+    .faq-answer.show {
+      display: block;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Back button */
+    .back-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      background: var(--primary-blue);
+      color: var(--white);
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+      background: #355292;
+      color: var(--white);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
+      }
+
+      .contact-header {
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .contact-header h1 {
+        font-size: 2.5rem;
+      }
+
+      .support-info {
+        font-size: 1rem;
+        padding: 1.5rem;
+      }
+
+      .contact-block {
+        padding: 2rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .faq-section {
+        padding: 2rem;
+      }
+
+      .back-btn {
+        bottom: 20px;
+        left: 20px;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .contact-header h1 {
+        font-size: 2rem;
+      }
+
+      .contact-block i {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+
+  <!-- Floating Bubbles -->
+  <div class="bubble blue one"></div>
+  <div class="bubble light-blue two"></div>
+  <div class="bubble extra-light-blue three"></div>
+  <div class="bubble blue four"></div>
+  <div class="bubble light-blue five"></div>
+  <div class="bubble extra-light-blue six"></div>
+
+  <div class="main-container">
+    <!-- Header Section -->
+    <div class="contact-header">
+      <h1>Contact Us</h1>
+      <div class="support-info">
+        If you are struggling with dyscalculia and need support, Numeraid provides assistance to help you succeed. Below are resources and services available to guide you through your academic journey.
+      </div>
+    </div>
+
+    <!-- Contact Blocks -->
+    <div class="contact-blocks">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="contact-block">
+            <i class="fas fa-phone"></i>
+            <h5>Call Us</h5>
+            <p>Mon - Fri from 8am to 5pm</p>
+            <p><strong>+1 (555) 000-0000</strong></p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="contact-block">
+            <i class="fas fa-map-marker-alt"></i>
+            <h5>DUT Office</h5>
+            <p>Steve Biko Campus, First Floor<br>Above the Library</p>
+            <a href="https://www.google.com/maps/search/?api=1&query=Durban+University+of+Technology+Steve+Biko+Campus" target="_blank" class="btn btn-apply">Find Us</a>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="contact-block">
+            <i class="fas fa-hands-helping"></i>
+            <h5>Apply for Assistance</h5>
+            <p>Get the help you need to succeed academically.</p>
+            <a href="{{ url_for('main.upload_medical_proof') }}" class="btn btn-apply">Apply Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+      <h4>Frequently Asked Questions</h4>
+      <div class="faq-item">
+        <div class="faq-question">How do I apply for assistance?</div>
+        <div class="faq-answer">You can apply online by clicking the "Apply Now" button above and completing the form. Our support team will review your application and contact you within 2-3 business days with next steps.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why should I apply for assistance?</div>
+        <div class="faq-answer">Applying ensures you have access to essential academic support tailored to your specific needs with dyscalculia. This includes personalized learning strategies, assistive technology, and ongoing mentorship to help you succeed in your studies.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">How long does it take to get a response?</div>
+        <div class="faq-answer">Responses typically take 2-3 business days after submission. For urgent matters, you can call our support line during office hours for immediate assistance.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Can I visit the office for in-person support?</div>
+        <div class="faq-answer">Yes, visit the DUT Office on the first floor above the library during office hours (Mon-Fri, 8am-5pm). Walk-ins are welcome, but appointments are recommended for personalized consultations.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">What types of support are available?</div>
+        <div class="faq-answer">We offer various support services including academic tutoring, assistive technology training, study skills workshops, exam accommodations, and peer support groups specifically for students with dyscalculia.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back to Dashboard Button -->
+  <a href="{{ url_for('main.student_dashboard') }}" class="back-btn">
+    ← Back to Dashboard
+  </a>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script>
+    // Enhanced FAQ toggle with smooth animations
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isOpen = answer.classList.contains('show');
+        
+        // Close all other FAQ items
+        document.querySelectorAll('.faq-answer').forEach(otherAnswer => {
+          otherAnswer.classList.remove('show');
+        });
+        
+        document.querySelectorAll('.faq-question').forEach(otherQuestion => {
+          otherQuestion.classList.remove('active');
+        });
+        
+        // Toggle current item
+        if (!isOpen) {
+          answer.classList.add('show');
+          question.classList.add('active');
+        }
+      });
+    });
+
+    // Add smooth scroll behavior for better UX
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Add intersection observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe contact blocks for animations
+    document.querySelectorAll('.contact-block, .faq-section').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.6s ease-out';
+      observer.observe(el);
+    });
+  </script>
+{% endblock %}
