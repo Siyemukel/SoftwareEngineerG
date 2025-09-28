@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Numeraid Study Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  :root{
+    --primary-blue:#4B68A5;
+    --white:#ffffff;
+    --light-gray:#f8f9fa;
+    --medium-gray:#e0e0e0;
+    --dark-gray:#333333;
+    --text-gray:#555555;
+    --shadow:0 6px 20px rgba(0,0,0,0.07);
+    --transition:all 0.25s ease;
+  }
+  body{
+    background:var(--light-gray);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    padding-bottom:120px;
+  }
+  .app{
+    max-width:1150px;
+    margin:24px auto;
+    background:var(--white);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  header{
+    background:var(--primary-blue);
+    color:var(--white);
+    padding:22px;
+    text-align:center;
+  }
+  .theme-sub{
+    color:var(--primary-blue);
+    font-weight:600;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 340px;
+    gap:18px;
+    padding:22px;
+  }
+  .panel{
+    background:var(--white);
+    border-radius:10px;
+    padding:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.04);
+    border:1px solid var(--medium-gray);
+  }
+  .study-card{
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    cursor:pointer;
+    transition:var(--transition);
+    border:1px solid var(--medium-gray);
+    background:linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  }
+  .study-card:hover{ transform:translateY(-6px); box-shadow:0 10px 24px rgba(75,104,165,0.08); }
+  .study-card h5{ color:var(--primary-blue); margin-bottom:6px; }
+  .small-muted{ color:var(--text-gray); font-size:0.95rem; }
+  .lesson-list{ max-height:420px; overflow:auto; padding-right:6px; }
+  .lesson-item{ cursor:pointer; padding:10px; border-radius:8px; transition:var(--transition); }
+  .lesson-item:hover{ background:#f6f9ff; }
+  .active-lesson{ background: linear-gradient(90deg, rgba(75,104,165,0.08), rgba(214,236,255,0.4)); border-left:4px solid var(--primary-blue); }
+  .flashcard{ width:210px; height:140px; perspective:1000px; margin:8px; }
+  .card-inner{ transition:transform .7s; transform-style:preserve-3d; position:relative; height:100%; border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
+  .card.flip .card-inner{ transform:rotateY(180deg); }
+  .card-face{ position:absolute; width:100%; height:100%; backface-visibility:hidden; display:flex; align-items:center; justify-content:center; padding:12px; text-align:center; border-radius:12px; }
+  .front{ background:var(--primary-blue); color:white; }
+  .back{ background:#f7fbff; transform:rotateY(180deg); color:var(--dark-gray); border:1px solid var(--medium-gray); }
+  .controls { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+  .game-box{ display:flex; flex-direction:column; gap:12px; align-items:center; padding:14px; border-radius:12px; background:#f6f9ff; }
+  .back-btn{
+    position:fixed; left:20px; bottom:20px;
+    background:var(--primary-blue); color:var(--white);
+    padding:10px 14px; border-radius:30px; text-decoration:none; font-weight:600; box-shadow:var(--shadow);
+  }
+  /* Responsive */
+  @media (max-width:980px){
+    .grid{ grid-template-columns: 1fr; }
+    .controls{ flex-direction:column; }
+  }
+  /* Accessible bigger text for dyscalculia */
+  .lesson-text { font-size:1.05rem; line-height:1.5; color:var(--dark-gray); }
+  .note { background:#fff8e6; border:1px solid #ffeab0; padding:10px; border-radius:8px; margin-top:10px; color:#715800; }
+</style>
+</head>
+<body>
+
+<div class="app" role="application" aria-label="Numeraid study dashboard">
+  <header>
+    <h2>Numeraid — Study Dashboard (Dyscalculia Friendly)</h2>
+    <div class="small-muted">Choose a topic to start: simple steps, practice, quizzes, flashcards & games</div>
+  </header>
+
+  <div class="grid">
+    <!-- Main Column -->
+    <div style="padding:18px;">
+      <!-- Selection / Main Views -->
+      <div id="view-selection" class="panel">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="study-card" onclick="openSection('maths')">
+              <h5>Maths</h5>
+              <div class="small-muted">Numbers, operations, real-life examples</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="study-card" onclick="openSection('logic')">
+              <h5>Logic</h5>
+              <div class="small-muted">Reasoning, sequences, puzzles & critical thinking</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="study-card" onclick="openSection('shapes')">
+              <h5>Shapes</h5>
+              <div class="small-muted">Geometry, area, visual understanding</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="study-card" onclick="openSection('scenarios')">
+              <h5>Scenario Games (Py Games)</h5>
+              <div class="small-muted">Interactive story problems and choices</div>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <p class="lesson-text">Tip: Choose a topic to see 10 short, clear lessons. Each lesson has: <strong>notes</strong>, a short example, a memory tip, and an <strong>end-of-chapter quiz</strong>. At the section's end there is a cumulative test. Use flashcards to memorise steps. Games help practice logic in a playful way.</p>
+      </div>
+
+      <!-- Section Container (dynamic) -->
+      <div id="section-panel" class="panel" style="display:none;">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h4 id="section-title" class="theme-sub"></h4>
+            <div id="section-desc" class="small-muted"></div>
+          </div>
+          <div>
+            <div class="controls">
+              <button class="btn btn-outline-secondary" onclick="backToSelection()">Back to Selection</button>
+              <button class="btn btn-outline-primary" onclick="openFlashcardCreator()">Create Flashcards</button>
+              <button class="btn btn-primary" onclick="openCumulativeTest()">Cumulative Test</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-7">
+            <!-- Lesson content -->
+            <div id="lesson-content" class="panel">
+              <h5 id="lesson-title" class="theme-sub">Choose a lesson</h5>
+              <div id="lesson-body" class="lesson-text">Select a lesson from the list on the right. Lessons are small and focused.</div>
+              <div id="lesson-example" style="margin-top:14px;"></div>
+              <div id="lesson-tip" style="margin-top:12px;"></div>
+              <div id="lesson-quiz" style="margin-top:18px;"></div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <!-- Lesson list -->
+            <div class="panel lesson-list">
+              <h6 class="theme-sub mb-2">Lessons</h6>
+              <div id="lesson-list"></div>
+            </div>
+
+            <div class="panel mt-3">
+              <h6 class="theme-sub mb-2">Flashcards (Your Deck)</h6>
+              <div id="flashcards-row" style="display:flex; flex-wrap:wrap;"></div>
+              <div class="small-muted mt-2">You can create new flashcards for a lesson (they are saved in your browser).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flashcard Creator / Viewer -->
+      <div id="flashcard-panel" class="panel" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="theme-sub">Flashcard Creator & Deck</h5>
+          <div>
+            <button class="btn btn-outline-secondary" onclick="closeFlashcardCreator()">Back to Section</button>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Question</label>
+            <textarea id="fc-question" class="form-control" rows="3" placeholder="Enter question (front of card)"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Answer</label>
+            <textarea id="fc-answer" class="form-control" rows="3" placeholder="Enter answer (back of card)"></textarea>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-primary" onclick="saveFlashcard()">Save Flashcard</button>
+          <button class="btn btn-outline-secondary" onclick="clearFlashcardInputs()">Clear</button>
+        </div>
+        <hr />
+        <div>
+          <h6>Your Flashcards</h6>
+          <div id="deck" style="display:flex; flex-wrap:wrap;"></div>
+        </div>
+      </div>
+
+      <!-- Cumulative Test -->
+      <div id="cumulative-panel" class="panel" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="theme-sub">Cumulative Test</h5>
+          <div><button class="btn btn-outline-secondary" onclick="closeCumulativeTest()">Back</button></div>
+        </div>
+        <div id="cum-test-area"></div>
+      </div>
+
+      <!-- Games Panel -->
+      <div id="games-panel" class="panel" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="theme-sub">Logic Games</h5>
+          <div><button class="btn btn-outline-secondary" onclick="backToSelection()">Back to Selection</button></div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="game-box">
+              <h6>Sequence Builder</h6>
+              <p class="small-muted">Continue the pattern. Choose the next number or color.</p>
+              <div id="seq-pattern" style="font-weight:700; font-size:1.1rem;"></div>
+              <div id="seq-options" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+              <div id="seq-feedback" style="min-height:28px; margin-top:8px;"></div>
+              <button class="btn btn-primary" onclick="newSequence()">New Pattern</button>
+            </div>
+          </div>
+
+
+
+          <div class="col-md-6">
+            <div class="game-box">
+              <h6>Matching Pairs (Memory)</h6>
+              <p class="small-muted">Flip two cards — find matching pairs.</p>
+              <div id="match-grid" style="display:grid; grid-template-columns:repeat(4, 60px); gap:8px; justify-content:center;"></div>
+              <div style="margin-top:8px;"><button class="btn btn-primary" onclick="startMatch()">Restart</button></div>
+              <div id="match-feedback" style="min-height:28px; margin-top:8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+          <!-- Resources Panel -->
+    <div id="resources-panel" class="panel" style="display:none;">
+       <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="theme-sub">Resources</h5>
+        <div>
+        <button class="btn btn-outline-secondary" onclick="closeResources()">Back</button>
+    </div>
+  </div>
+  <ul class="small-muted">
+    <li><a href="https://bridges.mathlearningcenter.org/sites/default/files/documents/intervention/tla-9learningdisabilites.pdf" target="_blank">Math PDF Guide</a></li>
+    <li><a href="https://www.youtube.com/watch?v=-r6WRVJut9c" target="_blank">Understanding Learning Disabilities Webinar</a></li>
+    <li><a href="https://www.youtube.com/watch?v=yG_xSBsFMPQ" target="_blank">Learning Disabilities, What Are the Different Types?</a></li>
+    <li><a href="https://www.youtube.com/watch?v=-k3dIUI5-r8" target="_blank">Everything about learning disabilities – Ask the Mayo Mom</a></li>
+    <li><a href="https://www.youtube.com/watch?v=reRSfIML9iA" target="_blank">Learning Disabilities and Disorders: Types in Students</a></li>
+  </ul>
+</div>
+
+
+
+    <!-- Right Column -->
+    <div style="padding:18px;">
+      <div class="panel">
+        <h6 class="theme-sub">Quick Controls</h6>
+        <div class="mt-2">
+          <label class="form-label">Study Mode</label>
+          <select id="study-mode" class="form-select" aria-label="Study mode">
+            <option value="learn">Learn (read + examples)</option>
+            <option value="practice">Practice (flashcards & quizzes)</option>
+            <option value="test">Test (timed)</option>
+          </select>
+        </div>
+
+        <hr />
+        <div>
+          <h6 class="theme-sub">Progress Tips</h6>
+          <ul class="small-muted">
+            <li>Work 15–20 minutes per lesson.</li>
+            <li>Use flashcards daily for short sessions.</li>
+            <li>Read examples aloud — it helps memory.</li>
+            <li>Break problems into small steps.</li>
+          </ul>
+        </div>
+
+        <hr />
+        <div class="mt-2">
+          <h6 class="theme-sub">Navigation</h6>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" onclick="openSection('maths')">Maths</button>
+            <button class="btn btn-outline-primary" onclick="openSection('logic')">Logic</button>
+            <button class="btn btn-outline-primary" onclick="openSection('shapes')">Shapes</button>
+            <button class="btn btn-outline-primary" onclick="openSection('scenarios')">Scenarios</button>
+            <button class="btn btn-outline-primary" onclick="openGames()">Logic Games</button>
+            <button class="btn btn-outline-primary" onclick="openResources()">Resources</button>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mt-3">
+        <h6 class="theme-sub">Notes for Tutors</h6>
+        <div class="note">
+          Keep instructions short. Use visuals and repeat steps. Allow students to use calculators and manipulatives while learning the steps — focus on understanding, not speed.
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- grid -->
+
+ <a href="{{ url_for('main.student_dashboard') }}" class="back-btn">
+  ← Back to Dashboard
+  </a>
+</div>
+
+<script>
+/* ---------- Data (10 lessons per section) ---------- */
+/* Lessons are short, dyscalculia-friendly: simple language, examples, memory tips */
+const SECTIONS = {
+  maths: {
+    title: "Maths — Numbers & Operations",
+    desc: "Clear steps for working with numbers, operations, and everyday examples.",
+    lessons: [
+      { id:1, title:"Understanding Numbers", notes:`Numbers are labels we use to count or measure. Think of numbers as boxes that hold how many items you have. Example: 3 apples = three items. Start by saying numbers out loud as you point.` , example:"If you have 2 pens and get 3 more, count 1,2 then 3,4,5 — total 5 pens.", tip:"Use fingers or objects to represent each number. 'Count out' helps memory." , quiz: {q:"2 + 3 = ?", options:["4","5","6"], answer:1} },
+      { id:2, title:"Addition as 'Putting together'", notes:"Addition is combining groups. Use small objects." , example:"3 + 4: Put 3 beads and add 4 beads = count to 7.", tip:"Line up objects to avoid losing track.", quiz:{q:"5 + 2 = ?", options:["7","9","8"], answer:0} },
+      { id:3, title:"Subtraction as 'Taking away'", notes:"Start with a group, remove some, count what's left." , example:"6 - 2: start 6, take away 2, left 4.", tip:"Cross out drawn dots as you take away.", quiz:{q:"7 - 3 = ?", options:["3","4","5"], answer:1} },
+      { id:4, title:"Multiplication as Groups", notes:"Think of multiplication as 'several equal groups'. 3×4 = 3 groups of 4." , example:"3 boxes with 4 biscuits each = 12 biscuits.", tip:"Draw groups or use repeated addition.", quiz:{q:"4 × 2 = ?", options:["6","8","10"], answer:1} },
+      { id:5, title:"Division as sharing", notes:"Division splits a number into equal groups." , example:"10 ÷ 2: share 10 apples into 2 groups → 5 each.", tip:"Use sharing objects to visualise.", quiz:{q:"8 ÷ 4 = ?", options:["2","3","4"], answer:0} },
+      { id:6, title:"Place Value (units, tens)", notes:"Each digit has a place. 42 = 4 tens and 2 ones.", example:"Think of tens as packets of ten items.", tip:"Use base-10 blocks or draw rods.", quiz:{q:"In 37, tens digit is?", options:["3","7","10"], answer:0} },
+      { id:7, title:"Rounding & Estimating", notes:"Use rounding when exact number isn't needed. Round to the nearest ten.", example:"Round 46 to 50.", tip:"If last digit 5+, round up.", quiz:{q:"Round 34 to nearest ten", options:["30","35","40"], answer:0} },
+      { id:8, title:"Simple Fractions", notes:"Fraction = part of a whole. 1/2 is half." , example:"Slice a pizza in 4, one slice = 1/4.", tip:"Draw the shape and shade parts.", quiz:{q:"1/2 + 1/2 = ?", options:["1/2","1","2"], answer:1} },
+      { id:9, title:"Working with Money", notes:"Math with money = count in rand and cents. Add prices carefully.", example:"R5 + R10 = R15.", tip:"Use coins/cards to group amounts.", quiz:{q:"If R12 + R8 = ?", options:["R18","R20","R15"], answer:1} },
+      { id:10, title:"Word Problems — Step by step", notes:"Read slowly. Identify numbers, decide operation, solve step-by-step.", example:"Sam had 5 candies, got 3 more. How many now? 5 + 3 = 8", tip:"Underline numbers and key words (add, take away).", quiz:{q:"You have 4, buy 2 more → total?", options:["5","6","8"], answer:1} }
+    ]
+  },
+
+  logic: {
+    title: "Logic — Thinking & Reasoning",
+    desc: "Short exercises to build pattern recognition, deduction and step-by-step reasoning.",
+    lessons: [
+      {id:1, title:"Patterns & Sequences", notes:"Look for repeating or growing patterns. Use colours or numbers.", example:"2,4,6,8 → add 2 each time.", tip:"Say pattern aloud.", quiz:{q:"Next in 3,6,9,...", options:["10","12","11"], answer:1}},
+      {id:2, title:"If-Then Reasoning", notes:"If A then B. Learn simple rules and follow them." , example:"If it rains, take umbrella.", tip:"Write rules as short sentences.", quiz:{q:"If light is red, then stop. What to do at red light?", options:["Go","Stop","Wait"], answer:1}},
+      {id:3, title:"Deduction from clues", notes:"Use clues stepwise to eliminate wrong choices.", example:"Three boxes — one heavy — choose by clues.", tip:"Cross out impossible options.", quiz:{q:"If A > B and B > C, who is smallest?", options:["A","B","C"], answer:2}},
+      {id:4, title:"Sorting & Classifying", notes:"Group similar items to reduce confusion.", example:"Sort shapes by sides.", tip:"Make small piles.", quiz:{q:"Which is not a mammal? (cat,dog,frog)", options:["cat","dog","frog"], answer:2}},
+      {id:5, title:"Logic puzzles (step-by-step)", notes:"Break the puzzle into small facts and fill a table.", example:"Who sat where? Use steps.", tip:"Number the steps.", quiz:{q:"If A next to B and B next to C, who is middle?", options:["A","B","C"], answer:1}},
+      {id:6, title:"Cause & Effect", notes:"Identify what caused a result.", example:"If you water plants, they grow.", tip:"Ask 'why' once.", quiz:{q:"If you study, you usually...?", options:["Forget","Improve","No change"], answer:1}},
+      {id:7, title:"Logical Fallacies", notes:"Spot bad reasoning (eg. cause ≠ correlation).", example:"Ice cream sales and drowning both rise in summer (not cause).", tip:"Look for missing steps.", quiz:{q:"Correlation always = cause?", options:["Yes","No","Sometimes"], answer:1}},
+      {id:8, title:"Strategy Games", notes:"Learn simple strategies like checking moves ahead.", example:"Think two moves ahead in a game.", tip:"Pause before acting.", quiz:{q:"In planning, you should...?", options:["Rush","Think","Ignore"], answer:1}},
+      {id:9, title:"Working Backwards", notes:"Start from the solution and trace back steps.", example:"If final amount is 10 after adding 3, start 10 then subtract 3.", tip:"Write reverse steps.", quiz:{q:"If final is 9 and previous +2 = final, previous was?", options:["7","11","9"], answer:0}},
+      {id:10, title:"Combining clues", notes:"Use several small facts together to solve.", example:"Clue A + Clue B => answer.", tip:"Keep a checklist.", quiz:{q:"Use clues to find who is tallest, you need...", options:["One fact","Many facts","No facts"], answer:1}}
+    ]
+  },
+
+  shapes: {
+    title: "Shapes — Geometry & Visual Skills",
+    desc: "Simple geometry, area and perimeter using visuals and step rules.",
+    lessons:[
+      {id:1, title:"Recognising shapes", notes:"Circle, square, triangle — name by look and sides.", example:"Triangle has 3 sides.", tip:"Trace shape with finger.", quiz:{q:"How many sides in square?", options:["3","4","5"], answer:1}},
+      {id:2, title:"Perimeter basics", notes:"Perimeter = distance around shape; add all sides.", example:"Square side 4 → perimeter 16.", tip:"Walk around the shape with finger.", quiz:{q:"Perimeter of 3,3,3 triangle?", options:["6","9","12"], answer:1}},
+      {id:3, title:"Area basics", notes:"Area = space inside. For rectangle: length × width.", example:"8 × 3 = 24 m²", tip:"Count squares on grid.", quiz:{q:"Area of 5×2 rectangle?", options:["7","10","15"], answer:1}},
+      {id:4, title:"Understanding units", notes:"Meters, cm — keep units consistent.", example:"100 cm = 1 m", tip:"Write units each step.", quiz:{q:"100 cm = ? m", options:["0.1","1","10"], answer:1}},
+      {id:5, title:"Circle basics", notes:"Radius, diameter, and π.", example:"Diameter = 2×radius.", tip:"Memorise radius→half of diameter.", quiz:{q:"If radius=3, diameter=?", options:["3","6","9"], answer:1}},
+      {id:6, title:"Angles simple", notes:"Right angle = 90°, straight = 180°.", example:"Corner of paper is ~90°.", tip:"Use corner as reference.", quiz:{q:"Right angle is?", options:["45°","90°","180°"], answer:1}},
+      {id:7, title:"Shapes in real life", notes:"Identify shapes around you (doors, tiles).", example:"Door ~ rectangle.", tip:"Match objects to shapes.", quiz:{q:"Traffic sign 'STOP' shape is?", options:["Square","Octagon","Circle"], answer:1}},
+      {id:8, title:"Combining shapes", notes:"Some shapes are made of others; split complex shapes into simple ones.", example:"L-shaped area = rectangle + rectangle.", tip:"Draw dividing lines.", quiz:{q:"Split into 2 rectangles to find area? True or False", options:["True","False","Sometimes"], answer:0}},
+      {id:9, title:"Scaling & size", notes:"If you double sides, area grows by 4× for squares.", example:"2× side → area ×4", tip:"Use small models.", quiz:{q:"Double side of square area becomes?", options:["2×","4×","8×"], answer:1}},
+      {id:10, title:"Problem solving with diagrams", notes:"Draw the shape, label sides, follow steps.", example:"Find missing side using perimeter.", tip:"Label everything you know.", quiz:{q:"If rectangle perimeter 10 and width 2, length is?", options:["1","3","4"], answer:2}}
+    ]
+  },
+
+  scenarios: {
+    title:"Scenario Games — Story Problems & Choices",
+    desc:"Interactive problems presented as short stories. Choose solutions and see consequences.",
+    lessons:[
+      {id:1, title:"Buying snacks (budgeting)", notes:"Plan how to spend money with limits.", example:"You have R20, snacks cost R6 each, how many can you buy?", tip:"Divide money by item cost", quiz:{q:"How many R6 snacks from R20?", options:["3","2","4"], answer:0}},
+      {id:2, title:"Travel time", notes:"Read times, add or subtract durations.", example:"Leave at 9:00, travel 2 hours → arrive 11:00.", tip:"Use clock drawings", quiz:{q:"9:30 + 1h 20m = ?", options:["10:40","10:50","11:00"], answer:0}},
+      {id:3, title:"Group sharing", notes:"Divide items fairly among friends.", example:"12 sweets among 4 friends = 3 each.", tip:"Make equal piles", quiz:{q:"12 ÷ 4 = ?", options:["2","3","4"], answer:1}},
+      {id:4, title:"Project planning", notes:"Break big tasks into small steps.", example:"Study 4 chapters in 2 days → 2 per day.", tip:"Use a checklist", quiz:{q:"2 chapters per day ×2days = ?", options:["2","4","6"], answer:1}},
+      {id:5, title:"Shopping discounts", notes:"Calculate new price after discount.", example:"R100 with 20% off = R80.", tip:"Find 10% then double it for 20%", quiz:{q:"20% of R50 = ?", options:["R5","R10","R20"], answer:1}},
+      {id:6, title:"Time management", notes:"Prioritise quick tasks first to build momentum.", example:"Do 15min tasks then big ones.", tip:"Use timer", quiz:{q:"Pomodoro uses 25min work blocks? (Y/N)", options:["Yes","No","Sometimes"], answer:0}},
+      {id:7, title:"Reading tables", notes:"Extract numbers from a table step-by-step.", example:"Find totals by column", tip:"Highlight the column", quiz:{q:"Find total of 2,3,5 = ?", options:["8","10","9"], answer:2}},
+      {id:8, title:"Estimating time", notes:"Round times to nearest 5 or 10 minutes to plan.", example:"9:07 ≈ 9:10", tip:"Estimate for planning", quiz:{q:"9:07 rounds to?", options:["9:00","9:05","9:10"], answer:2}},
+      {id:9, title:"Simple probability", notes:"Chance of picking a red ball from 1 red + 3 blue = 1/4", example:"1/4 = 25%", tip:"Count favourable / total", quiz:{q:"1 out of 4 = ?", options:["25%","50%","75%"], answer:0}},
+      {id:10, title:"Putting it together", notes:"Use several skills to solve real problem: read, select operation, compute, check.", example:"Combine shopping + change + time.", tip:"Small steps", quiz:{q:"Use steps to solve story problems: True?", options:["Yes","No","Sometimes"], answer:0}}
+    ]
+  }
+};
+
+/* ---------- App state ---------- */
+let currentSection = null;
+let currentLessonIndex = 0;
+
+/* ---------- Utility functions ---------- */
+function $(id){ return document.getElementById(id); }
+function clearPanels(){
+  $("view-selection").style.display = "";
+  $("section-panel").style.display = "none";
+  $("flashcard-panel").style.display = "none";
+  $("cumulative-panel").style.display = "none";
+  $("games-panel").style.display = "none";
+  $("lesson-list").innerHTML = "";
+  $("lesson-title").innerText = "Choose a lesson";
+  $("lesson-body").innerText = "Select a lesson from the list on the right.";
+  $("lesson-example").innerHTML = "";
+  $("lesson-tip").innerHTML = "";
+  $("lesson-quiz").innerHTML = "";
+}
+
+/* ---------- Navigation ---------- */
+function openSection(key){
+  if(!SECTIONS[key]) return;
+  currentSection = key;
+  currentLessonIndex = 0;
+  $("view-selection").style.display = "none";
+  $("section-panel").style.display = "";
+  $("flashcard-panel").style.display = "none";
+  $("cumulative-panel").style.display = "none";
+  $("games-panel").style.display = "none";
+  $("section-title").innerText = SECTIONS[key].title;
+  $("section-desc").innerText = SECTIONS[key].desc;
+  renderLessonList();
+  showLesson(0);
+  renderDeck();
+}
+
+function backToSelection(){
+  currentSection = null;
+  clearPanels();
+  $("view-selection").style.display = "";
+}
+
+/* ---------- Lessons UI ---------- */
+function renderLessonList(){
+  const list = $("lesson-list");
+  list.innerHTML = "";
+  const lessons = SECTIONS[currentSection].lessons;
+  lessons.forEach((ls, idx)=>{
+    const div = document.createElement("div");
+    div.className = "lesson-item" + (idx===currentLessonIndex ? " active-lesson" : "");
+    div.innerHTML = `<strong>Lesson ${ls.id}:</strong> ${ls.title}`;
+    div.onclick = ()=>{ currentLessonIndex = idx; showLesson(idx); renderLessonList(); };
+    list.appendChild(div);
+  });
+}
+
+function showLesson(idx){
+  const ls = SECTIONS[currentSection].lessons[idx];
+  $("lesson-title").innerText = `Lesson ${ls.id}: ${ls.title}`;
+  $("lesson-body").innerHTML = `<div class="lesson-text">${ls.notes}</div>`;
+  $("lesson-example").innerHTML = ls.example ? `<div style="margin-top:10px;"><strong>Example:</strong> ${ls.example}</div>` : "";
+  $("lesson-tip").innerHTML = ls.tip ? `<div class="note"><strong>Memory tip:</strong> ${ls.tip}</div>` : "";
+  // Quiz
+  if(ls.quiz){
+    const q = ls.quiz;
+    let html = `<div class="mt-3"><strong>Quick Quiz:</strong> <div style="margin-top:8px;">${q.q}</div>`;
+    html += `<div class="mt-2">`;
+    q.options.forEach((opt,i)=>{
+      html += `<div class="form-check"><input class="form-check-input" type="radio" name="qopt" id="opt${i}" value="${i}"> <label class="form-check-label" for="opt${i}">${opt}</label></div>`;
+    });
+    html += `</div><div style="margin-top:10px;"><button class="btn btn-primary btn-sm" onclick="checkLessonQuiz(${currentSection === 'maths' ? 1 : 0}, ${SECTIONS[currentSection].lessons[idx].quiz.answer})">Check Answer</button></div></div>`;
+    $("lesson-quiz").innerHTML = html;
+  } else {
+    $("lesson-quiz").innerHTML = "";
+  }
+}
+
+/* checkLessonQuiz uses simple feedback; we pass the correct index */
+function checkLessonQuiz(dummy, correctIndex){
+  const opts = document.getElementsByName("qopt");
+  let chosen = null;
+  for(const o of opts) if(o.checked) chosen = parseInt(o.value);
+  if(chosen === null){ alert("Please pick an answer."); return; }
+  if(chosen === correctIndex){
+    alert("Good job — correct! ✅\nBrief explanation: Review the example and try another lesson.");
+  } else {
+    alert("Not quite — try again. Tip: read the example and use objects or drawing to help.");
+  }
+}
+
+/* ---------- Flashcards (save to localStorage) ---------- */
+function saveFlashcard(){
+  const q = $("fc-question").value.trim();
+  const a = $("fc-answer").value.trim();
+  if(!q || !a){ alert("Please enter both question and answer."); return; }
+  const deck = JSON.parse(localStorage.getItem("numeraid_deck") || "[]");
+  deck.push({section: currentSection || "general", question:q, answer:a});
+  localStorage.setItem("numeraid_deck", JSON.stringify(deck));
+  clearFlashcardInputs();
+  renderDeck();
+  alert("Flashcard saved.");
+}
+
+function clearFlashcardInputs(){
+  $("fc-question").value = "";
+  $("fc-answer").value = "";
+}
+
+function renderDeck(){
+  const deck = JSON.parse(localStorage.getItem("numeraid_deck") || "[]");
+  const container = $("deck");
+  const row = $("flashcards-row");
+  container.innerHTML = "";
+  row.innerHTML = "";
+  deck.forEach((card, idx)=>{
+    const el = document.createElement("div");
+    el.className = "flashcard card";
+    el.innerHTML = `<div class="card-inner">
+      <div class="card-face front">${escapeHtml(card.question)}</div>
+      <div class="card-face back">${escapeHtml(card.answer)}<div style="margin-top:8px;"><button class="btn btn-sm btn-outline-danger" onclick="deleteCard(${idx})">Delete</button></div></div>
+    </div>`;
+    el.onclick = (e)=>{
+      // flip
+      if(e.target.tagName.toLowerCase() === 'button') return; // avoid flipping when pressing delete
+      el.classList.toggle("flip");
+    };
+    container.appendChild(el);
+
+    // also add tiny preview on right column
+    const el2 = el.cloneNode(true);
+    el2.onclick = ()=>{ el2.classList.toggle("flip"); };
+    row.appendChild(el2);
+  });
+  // if none
+  if(deck.length === 0){ container.innerHTML = "<div class='small-muted'>No flashcards yet. Create one above.</div>"; row.innerHTML = "<div class='small-muted'>Your deck will show here.</div>"; }
+}
+
+function deleteCard(index){
+  let deck = JSON.parse(localStorage.getItem("numeraid_deck") || "[]");
+  if(confirm("Delete this flashcard?")){ deck.splice(index,1); localStorage.setItem("numeraid_deck", JSON.stringify(deck)); renderDeck(); }
+}
+
+function openFlashcardCreator(){
+  if(!currentSection){ alert("Open a section first."); return; }
+  $("section-panel").style.display = "none";
+  $("flashcard-panel").style.display = "";
+  $("cumulative-panel").style.display = "none";
+  renderDeck();
+}
+function closeFlashcardCreator(){
+  $("flashcard-panel").style.display = "none";
+  $("section-panel").style.display = "";
+}
+
+/* ---------- Cumulative Test (10 items built from first items of lessons) ---------- */
+function openCumulativeTest(){
+  if(!currentSection){ alert("Open a section first."); return; }
+  $("section-panel").style.display = "none";
+  $("cumulative-panel").style.display = "";
+  $("flashcard-panel").style.display = "none";
+  const lessons = SECTIONS[currentSection].lessons;
+  // Build 10-question test (use available quiz questions; if less than 10, repeat)
+  const questions = [];
+  for(let i=0;i<10;i++){
+    const source = lessons[i % lessons.length].quiz;
+    questions.push({ q: source.q, options: source.options, answer: source.answer });
+  }
+  renderCumulativeTest(questions);
+}
+
+function renderCumulativeTest(questions){
+  const area = $("cum-test-area");
+  area.innerHTML = "";
+  questions.forEach((qs, idx)=>{
+    const div = document.createElement("div");
+    div.className = "mb-3";
+    div.innerHTML = `<div><strong>Q${idx+1}:</strong> ${qs.q}</div>`;
+    const opts = document.createElement("div");
+    qs.options.forEach((opt,i)=>{
+      const id = `cum_${idx}_${i}`;
+      opts.innerHTML += `<div class="form-check"><input class="form-check-input" type="radio" name="cum_${idx}" id="${id}" value="${i}"> <label class="form-check-label" for="${id}">${opt}</label></div>`;
+    });
+    div.appendChild(opts);
+    area.appendChild(div);
+  });
+  area.innerHTML += `<div class="mt-3"><button class="btn btn-primary" onclick="submitCumulative()">Submit Test</button> <button class="btn btn-outline-secondary" onclick="closeCumulativeTest()">Cancel</button></div>`;
+  // store correct answers for checking
+  area.dataset.answers = JSON.stringify(questions.map(q=>q.answer));
+}
+
+function submitCumulative(){
+  const area = $("cum-test-area");
+  const answers = JSON.parse(area.dataset.answers || "[]");
+  let score = 0;
+  for(let i=0;i<answers.length;i++){
+    const opts = document.getElementsByName(`cum_${i}`);
+    let chosen = null;
+    for(const o of opts) if(o.checked) chosen = parseInt(o.value);
+    if(chosen === answers[i]) score++;
+  }
+  alert(`You scored ${score} / ${answers.length}.\nFeedback:\n${score===answers.length ? "Excellent — you mastered this section!" : score >= Math.ceil(answers.length*0.7) ? "Good work — review the lessons with low confidence." : "Keep practicing — use flashcards and redo lessons."}`);
+  // After submission, offer to return
+}
+
+function closeCumulativeTest(){
+  $("cumulative-panel").style.display = "none";
+  $("section-panel").style.display = "";
+}
+
+/* ---------- Games ---------- */
+function openGames(){
+  $("view-selection").style.display = "none";
+  $("section-panel").style.display = "none";
+  $("flashcard-panel").style.display = "none";
+  $("cumulative-panel").style.display = "none";
+  $("games-panel").style.display = "";
+  newSequence();
+  startMatch();
+}
+
+/* Sequence Builder game */
+let seqAnswer = null;
+function newSequence(){
+  // create simple numeric patterns or color patterns
+  const types = ["add2","multiply2","alternating"];
+  const t = types[Math.floor(Math.random()*types.length)];
+  let patternText = "";
+  let options = [];
+  if(t==="add2"){
+    const start = Math.floor(Math.random()*5)+1; // 1..5
+    const seq = [start,start+2,start+4,start+6];
+    seqAnswer = start+8;
+    patternText = seq.join(", ") + ", ...";
+    options = [seqAnswer, seqAnswer+2, seqAnswer-2].sort(()=>Math.random()-0.5);
+  } else if(t==="multiply2"){
+    const start = Math.floor(Math.random()*3)+2; // 2..4
+    const seq = [start, start*2, start*4, start*8];
+    seqAnswer = start*16;
+    patternText = seq.join(", ") + ", ...";
+    options = [seqAnswer, seqAnswer/2, seqAnswer+ (Math.floor(Math.random()*3)+1)].sort(()=>Math.random()-0.5);
+  } else {
+    const seq = ["red","blue","red","blue"];
+    seqAnswer = "red";
+    patternText = seq.join(", ") + ", ... (colors)";
+    options = ["red","green","blue"].sort(()=>Math.random()-0.5);
+  }
+  $("seq-pattern").innerText = patternText;
+  const optArea = $("seq-options");
+  optArea.innerHTML = "";
+  options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.className = "btn btn-outline-primary btn-sm";
+    b.innerText = opt;
+    b.onclick = ()=>{ if(String(opt) === String(seqAnswer)){ $("seq-feedback").innerHTML = "<span style='color:green;'>Correct — great spotting!</span>"; } else { $("seq-feedback").innerHTML = "<span style='color:#c00;'>Not quite — try again. Look at the step pattern.</span>"; } };
+    optArea.appendChild(b);
+  });
+}
+
+/* Matching pairs game */
+let matchState = { grid:[], first:null, second:null, found:0 };
+function startMatch(){
+  matchState = { grid:[], first:null, second:null, found:0 };
+  const pairs = ["★","▲","●","◆","■","♥","♣","♦"];
+  const items = pairs.slice(0,6).concat(pairs.slice(0,6)); // 12 cards
+  shuffle(items);
+  matchState.grid = items.map((v,i)=>({val:v,index:i, flipped:false, matched:false}));
+  renderMatchGrid();
+  $("match-feedback").innerText = "Find matching pairs!";
+}
+
+function renderMatchGrid(){
+  const grid = $("match-grid");
+  grid.innerHTML = "";
+  matchState.grid.forEach(cell=>{
+    const tile = document.createElement("div");
+    tile.style.width = "60px";
+    tile.style.height = "60px";
+    tile.style.display = "flex";
+    tile.style.alignItems = "center";
+    tile.style.justifyContent = "center";
+    tile.style.background = cell.matched ? "#e6f7ea" : "#ffffff";
+    tile.style.border = "1px solid var(--medium-gray)";
+    tile.style.borderRadius = "6px";
+    tile.style.cursor = "pointer";
+    tile.innerText = cell.flipped || cell.matched ? cell.val : "";
+    tile.onclick = ()=>{ flipTile(cell.index); };
+    grid.appendChild(tile);
+  });
+}
+
+function flipTile(idx){
+  if(matchState.grid[idx].matched || matchState.grid[idx].flipped) return;
+  if(matchState.first!==null && matchState.second!==null) return; // wait
+  matchState.grid[idx].flipped = true;
+  if(matchState.first === null) matchState.first = idx;
+  else if(matchState.second === null) { matchState.second = idx; checkMatch(); }
+  renderMatchGrid();
+}
+
+function checkMatch(){
+  const a = matchState.first, b = matchState.second;
+  if(!a || a===0){} // just placeholder to avoid linter
+  setTimeout(()=>{
+    if(matchState.grid[a].val === matchState.grid[b].val){
+      matchState.grid[a].matched = true; matchState.grid[b].matched = true; matchState.found++;
+      $("match-feedback").innerText = "Nice! You found a pair.";
+    } else {
+      matchState.grid[a].flipped = false; matchState.grid[b].flipped = false;
+      $("match-feedback").innerText = "Not a match — try again.";
+    }
+    matchState.first = null; matchState.second = null;
+    renderMatchGrid();
+    if(matchState.found === 6) $("match-feedback").innerText = "Great — you matched all pairs!";
+  }, 800);
+}
+
+/* ---------- Helpers ---------- */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---------- Init ---------- */
+(function init(){
+  // show selection view
+  clearPanels();
+  renderDeck();
+})();
+
+function openResources(){
+  $("view-selection").style.display = "none";
+  $("section-panel").style.display = "none";
+  $("flashcard-panel").style.display = "none";
+  $("cumulative-panel").style.display = "none";
+  $("games-panel").style.display = "none";
+  $("resources-panel").style.display = "";
+}
+
+function closeResources(){
+  $("resources-panel").style.display = "none";
+  $("view-selection").style.display = ""; // go back to main selection
+}
+
+</script>
+
+</body>
+</html>
