@@ -11,7 +11,6 @@ class Student(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     student_email = db.Column(db.String(120), unique=True, nullable=False)
-    onboarding_completed = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
     course = db.Column(db.String(100), nullable=False)
@@ -19,6 +18,7 @@ class Student(UserMixin, db.Model):
     faculty = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime, nullable=True)
 
     # Relationships
     test_results = db.relationship(
@@ -45,6 +45,8 @@ class Student(UserMixin, db.Model):
     notifications = db.relationship(
         "Notification", backref="student", lazy=True, cascade="all, delete-orphan"
     )
+    application_status = db.Column(db.String(20), nullable=True)  # 'under_review', 'initial_approval', 'accepted', 'rejected'
+    has_completed_onboarding = db.Column(db.Boolean, default=False)
 
     def get_id(self):
         return f"student-{self.id}"
@@ -341,7 +343,7 @@ class StaffFeedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
     staff_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=False)
-    
+
     feedback_text = db.Column(db.Text, nullable=False)      # General feedback
     progress_notes = db.Column(db.Text, nullable=True)      # Optional progress notes (e.g., exercise completion, test areas)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -349,6 +351,19 @@ class StaffFeedback(db.Model):
     # Relationships
     student = db.relationship("Student", backref="feedbacks")
     staff = db.relationship("Staff", backref="given_feedbacks")
+
+
+class LoginHistory(db.Model):
+    __tablename__ = "login_history"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
+    login_time = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45), nullable=True)  # IPv4/IPv6
+    user_agent = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    student = db.relationship("Student", backref="login_history")
 
 
 # Performance indexes
