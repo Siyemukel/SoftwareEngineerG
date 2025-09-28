@@ -7,148 +7,213 @@
 <nav class="navbar navbar-exercise">
     <div class="nav-container">
         <div class="nav-brand">
-            <span class="brand-icon">🔢</span>
             <span class="brand-text">Numeraid</span>
         </div>
         <div class="nav-links">
-            <a href="/" class="nav-link">🏠 Home</a>
-            <a href="/about" class="nav-link">ℹ️ About</a>
-            <a href="/contact" class="nav-link">📞 Contact Us</a>
-            <a href="/support" class="nav-link">🛟 Support</a>
-            <a href="/logout" class="nav-link logout-link">🚪 Logout</a>
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact Us</a>
+            <a href="/support" class="nav-link">Support</a>
+            <a href="/logout" class="nav-link logout-link">Logout</a>
         </div>
     </div>
 </nav>
 
-<div class="survey-full-container">
-    <div class="survey-main-content">
-        <div class="survey-header">
-            <span class="emoji-animate" id="survey-emoji">📋</span>
-            <h2>Dyscalculia Survey</h2>
-            <p class="survey-intro">
-                Your responses are confidential and will help us understand your learning needs so we can provide the best possible support and personalized tools.
-            </p>
+<!-- Floating Background Bubbles -->
+<div class="bubble blue one"></div>
+<div class="bubble light-blue two"></div>
+<div class="bubble extra-light-blue three"></div>
+<div class="bubble blue four"></div>
+<div class="bubble light-blue five"></div>
+<div class="bubble extra-light-blue six"></div>
+
+<div class="test-full-container">
+    <!-- Main Survey Content -->
+    <div class="test-main-content">
+        <div class="test-header">
+            <h2 class="test-title">Dyscalculia Survey</h2>
+            <p class="test-subtitle">Your responses help us provide personalized support</p>
         </div>
         
-        <div class="survey-card">
-            <form method="POST" class="survey-form">
+        <div class="test-card">
+            <form method="POST" class="test-form">
                 {{ form.hidden_tag() }}
 
-                <div class="section-group">
+                <!-- Numbers & Math Section -->
+                <div class="question-block">
                     <h4 class="section-title">🔢 Numbers & Math</h4>
                     
-                    <div class="form-group">
-                        {{ form.math_difficulty.label(class="form-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.math_difficulty.label.text }}</strong></p>
                         {{ form.math_difficulty(class="form-select") }}
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.reading_numbers(class="form-check-input") }}
-                        {{ form.reading_numbers.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.reading_numbers.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.reading_numbers(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have difficulty reading numbers</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.math_anxiety(class="form-check-input") }}
-                        {{ form.math_anxiety.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.math_anxiety.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.math_anxiety(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I experience math anxiety</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.time_management(class="form-check-input") }}
-                        {{ form.time_management.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.time_management.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.time_management(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have time management difficulties</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.previous_diagnosis(class="form-check-input") }}
-                        {{ form.previous_diagnosis.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.previous_diagnosis.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.previous_diagnosis(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have received a previous diagnosis</span>
+                        </label>
                     </div>
                 </div>
 
-                <div class="section-group">
+                <!-- Reading, Writing & Memory Section -->
+                <div class="question-block">
                     <h4 class="section-title">📚 Reading, Writing & Memory</h4>
                     
-                    <div class="form-group form-check">
-                        {{ form.reading_difficulty(class="form-check-input") }}
-                        {{ form.reading_difficulty.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.reading_difficulty.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.reading_difficulty(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have reading difficulties</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.writing_numbers(class="form-check-input") }}
-                        {{ form.writing_numbers.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.writing_numbers.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.writing_numbers(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have difficulty writing numbers</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.memory_issues(class="form-check-input") }}
-                        {{ form.memory_issues.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.memory_issues.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.memory_issues(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have memory issues</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.attention_difficulty(class="form-check-input") }}
-                        {{ form.attention_difficulty.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.attention_difficulty.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.attention_difficulty(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have attention difficulties</span>
+                        </label>
                     </div>
                 </div>
 
-                <div class="section-group">
+                <!-- Daily Challenges Section -->
+                <div class="question-block">
                     <h4 class="section-title">🏠 Daily Challenges</h4>
                     
-                    <div class="form-group">
-                        {{ form.daily_math_challenges.label(class="form-label") }}
-                        {{ form.daily_math_challenges(class="form-control") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.daily_math_challenges.label.text }}</strong></p>
+                        {{ form.daily_math_challenges(class="form-textarea", placeholder="Describe your daily math challenges...") }}
                     </div>
                     
-                    <div class="form-group">
-                        {{ form.daily_challenges.label(class="form-label") }}
-                        {{ form.daily_challenges(class="form-control") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.daily_challenges.label.text }}</strong></p>
+                        {{ form.daily_challenges(class="form-textarea", placeholder="Describe your daily challenges...") }}
                     </div>
                 </div>
 
-                <div class="section-group">
+                <!-- Support Needed Section -->
+                <div class="question-block">
                     <h4 class="section-title">🤝 Support Needed</h4>
                     
-                    <div class="form-group">
-                        {{ form.support_needed.label(class="form-label") }}
-                        {{ form.support_needed(class="form-control") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.support_needed.label.text }}</strong></p>
+                        {{ form.support_needed(class="form-textarea", placeholder="Describe the support you need...") }}
                     </div>
                 </div>
 
-                <div class="section-group">
+                <!-- Other Areas Section -->
+                <div class="question-block">
                     <h4 class="section-title">🧠 Other Areas</h4>
                     
-                    <div class="form-group form-check">
-                        {{ form.processing_speed(class="form-check-input") }}
-                        {{ form.processing_speed.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.processing_speed.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.processing_speed(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have slow processing speed</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.problem_solving_difficulty(class="form-check-input") }}
-                        {{ form.problem_solving_difficulty.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.problem_solving_difficulty.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.problem_solving_difficulty(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have problem-solving difficulties</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.visual_confusion(class="form-check-input") }}
-                        {{ form.visual_confusion.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.visual_confusion.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.visual_confusion(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I experience visual confusion</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.anxiety_other_subjects(class="form-check-input") }}
-                        {{ form.anxiety_other_subjects.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.anxiety_other_subjects.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.anxiety_other_subjects(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I have anxiety in other subjects</span>
+                        </label>
                     </div>
                     
-                    <div class="form-group form-check">
-                        {{ form.fatigue(class="form-check-input") }}
-                        {{ form.fatigue.label(class="form-check-label") }}
+                    <div class="question-item">
+                        <p class="question-text"><strong>{{ form.fatigue.label.text }}</strong></p>
+                        <label class="checkbox-label">
+                            {{ form.fatigue(class="checkbox-input") }}
+                            <span class="checkbox-text">Yes, I experience fatigue</span>
+                        </label>
                     </div>
                 </div>
 
                 <div class="button-group">
                     {{ form.submit(class="submit-btn") }}
-                    <a href="/" class="cancel-btn">🚪 Cancel</a>
+                    <a href="/" class="quit-btn">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- Back to Dashboard Button -->
+<a href="/student_dashboard" class="back-btn">← Back to Dashboard</a>
+
 <style>
+/* CSS Variables following the theme */
+:root {
+  --primary-blue: #4B68A5;
+  --white: #ffffff;
+  --pastel-blue: #d6ecff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
 /* Reset and base styles for survey page */
 * {
     margin: 0;
@@ -157,27 +222,55 @@
 }
 
 html, body {
-    font-family: var(--font-secondary, Arial, sans-serif);
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
-    background: linear-gradient(135deg, #a56eae 0%, #7ab4b6 100%);
-    background-attachment: fixed;
+    background: var(--light-gray);
     margin: 0;
     padding: 0;
     width: 100%;
+    position: relative;
+    padding-bottom: 100px; /* Space for Back to Dashboard button */
 }
 
-/* Override base nav styles for survey page specifically */
+/* Floating Background Bubbles */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    z-index: 0;
+    animation: float 6s ease-in-out infinite;
+}
+
+.bubble.blue { background: var(--primary-blue); }
+.bubble.light-blue { background: #66ccff; }
+.bubble.extra-light-blue { background: #99e6ff; }
+
+/* Bubble Positions */
+.bubble.one { width: 90px; height: 90px; top: 15%; left: 10%; animation-delay: 0s; }
+.bubble.two { width: 50px; height: 50px; bottom: 20%; right: 15%; animation-delay: 2s; }
+.bubble.three { width: 110px; height: 110px; top: 40%; right: 5%; animation-delay: 4s; }
+.bubble.four { width: 40px; height: 40px; bottom: 10%; left: 5%; animation-delay: 1s; }
+.bubble.five { width: 70px; height: 70px; top: 60%; left: 15%; animation-delay: 3s; }
+.bubble.six { width: 60px; height: 60px; top: 25%; left: 60%; animation-delay: 5s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(120deg); }
+    66% { transform: translateY(5px) rotate(240deg); }
+}
+
+/* Navigation styles */
 .navbar-exercise {
-    background: linear-gradient(135deg, #812575 0%, #4B68A5 100%) !important;
+    background: var(--primary-blue) !important;
     padding: 1rem 2rem !important;
-    box-shadow: 0 4px 20px rgba(129, 37, 117, 0.2) !important;
+    box-shadow: var(--shadow) !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 100 !important;
-    width: 100vw !important;
+    width: 100% !important;
     margin: 0 !important;
     box-sizing: border-box !important;
     max-width: none !important;
@@ -206,18 +299,8 @@ html, body {
     text-decoration: none !important;
 }
 
-.brand-icon {
-    font-size: 1.8rem;
-    animation: brand-pulse 2s ease-in-out infinite;
-}
-
-@keyframes brand-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
 .brand-text {
-    font-family: var(--font-primary, Arial, sans-serif);
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
 .navbar-exercise .nav-links {
@@ -229,261 +312,299 @@ html, body {
 .navbar-exercise .nav-link {
     color: white !important;
     text-decoration: none !important;
-    padding: 0.5rem 1rem !important;
-    border-radius: 25px !important;
+    padding: 0.6rem 1.4rem !important;
+    border-radius: 10px !important;
     font-weight: 500 !important;
     font-size: 0.9rem !important;
-    transition: all 0.3s ease !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(10px) !important;
+    transition: var(--transition) !important;
+    background: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .navbar-exercise .nav-link:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .navbar-exercise .logout-link {
     background: rgba(211, 31, 45, 0.2) !important;
-    border: 1px solid rgba(211, 31, 45, 0.3) !important;
+    border-color: rgba(211, 31, 45, 0.4) !important;
 }
 
 .navbar-exercise .logout-link:hover {
     background: rgba(211, 31, 45, 0.3) !important;
-    border-color: rgba(211, 31, 45, 0.5) !important;
+    border-color: rgba(211, 31, 45, 0.6) !important;
 }
 
 /* Full container covering entire viewport */
-.survey-full-container {
+.test-full-container {
     min-height: 100vh;
     position: relative;
     padding-top: 80px;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
+    z-index: 1;
     padding-bottom: 2rem;
 }
 
-/* Main Survey Content */
-.survey-main-content {
+/* Main Test Content */
+.test-main-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 900px;
+    justify-content: flex-start;
+    max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
     width: 100%;
+    z-index: 1;
+    position: relative;
 }
 
-.survey-header {
+/* Header Section */
+.test-header {
     text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border-radius: 15px;
     margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
 }
 
-.survey-header h2 {
+.test-title {
     color: white;
     font-size: 2.5rem;
     margin: 0.5rem 0;
-    font-family: var(--font-primary, Arial, sans-serif);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-weight: 600;
 }
 
-.emoji-animate {
-    display: inline-block;
-    font-size: 3rem;
-    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes emoji-bounce {
-    0%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-18px) scale(1.2); }
-    50% { transform: translateY(0) scale(1.1); }
-    70% { transform: translateY(-8px) scale(1.15); }
-}
-
-.survey-intro {
+.test-subtitle {
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin-top: 0.5rem;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    max-width: 600px;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
-.survey-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-    padding: 2.5rem 2rem;
-    width: 100%;
-    max-width: 800px;
-    border: 1px solid rgba(255,255,255,0.3);
-}
-
-.survey-form {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-}
-
-.section-group {
-    background: linear-gradient(135deg, #f8f4ff 0%, #f0f4ff 100%);
+/* Test Card */
+.test-card {
+    background: var(--white);
+    border: 2px solid var(--pastel-blue);
     border-radius: 15px;
     padding: 2rem;
-    border: 1px solid rgba(165, 110, 174, 0.1);
+    text-align: left;
+    transition: var(--transition);
+    height: 100%;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.test-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Form Styles */
+.test-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
+}
+
+.question-block {
+    background: var(--light-gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--medium-gray);
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
 }
 
 .section-title {
-    color: var(--color-deep-purple, #812575);
-    font-family: var(--font-primary, Arial, sans-serif);
+    color: var(--primary-blue);
     font-size: 1.4rem;
-    margin: 0;
+    margin: 0 0 1rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid rgba(165, 110, 174, 0.2);
+    border-bottom: 2px solid var(--pastel-blue);
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-weight: 600;
 }
 
-.form-group {
+.question-item {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 1.2rem;
+    border: 1px solid var(--medium-gray);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.8rem;
+    transition: var(--transition);
 }
 
-.form-group.form-check {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 1rem;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(165, 110, 174, 0.1);
-    transition: all 0.3s ease;
+.question-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
 }
 
-.form-group.form-check:hover {
-    background: rgba(255, 255, 255, 0.9);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(165, 110, 174, 0.1);
-}
-
-.form-label {
-    font-weight: 600;
-    color: var(--color-deep-purple, #812575);
+.question-text {
+    color: var(--dark-gray);
     font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 600;
 }
 
-.form-check-label {
-    font-weight: 500;
-    color: var(--color-black, #333);
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.checkbox-label:hover {
+    background: var(--pastel-blue);
+}
+
+.checkbox-input {
+    margin-top: 0.2rem;
+    transform: scale(1.2);
+    accent-color: var(--primary-blue);
+    cursor: pointer;
+}
+
+.checkbox-text {
+    color: var(--text-gray);
     font-size: 1rem;
     line-height: 1.4;
     flex: 1;
-    cursor: pointer;
-}
-
-.form-check-input {
-    margin-top: 0.2rem;
-    transform: scale(1.2);
-    accent-color: var(--color-blue, #4B68A5);
-    cursor: pointer;
 }
 
 .form-select,
-.form-control {
+.form-textarea {
     padding: 1rem;
-    border: 2px solid #e8e8e8;
-    border-radius: 12px;
+    border: 2px solid var(--medium-gray);
+    border-radius: 8px;
     font-size: 1rem;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 3px 12px rgba(129,37,117,0.05);
-    transition: all 0.3s;
-    color: var(--color-black, #333);
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--white);
+    color: var(--dark-gray);
+    transition: var(--transition);
     min-height: 50px;
+    width: 100%;
 }
 
-.form-control {
+.form-textarea {
     resize: vertical;
     min-height: 100px;
 }
 
 .form-select:focus,
-.form-control:focus {
+.form-textarea:focus {
     outline: none;
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 3px rgba(165, 110, 174, 0.3), 0 4px 20px rgba(129,37,117,0.15);
-    border-color: var(--color-deep-purple, #812575);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(75, 104, 165, 0.1);
 }
 
+/* Button Group */
 .button-group {
-    text-align: center;
-    margin-top: 2rem;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     gap: 1rem;
-    align-items: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
 }
 
 .submit-btn {
-    background: linear-gradient(45deg, var(--color-deep-purple, #812575), var(--color-blue, #4B68A5));
-    color: white;
+    background: var(--primary-blue);
+    color: var(--white);
     border: none;
-    padding: 1.2rem 3rem;
-    border-radius: 50px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    font-size: 1.2rem;
-    box-shadow: 0 6px 20px rgba(129, 37, 117, 0.3);
-    transition: all 0.3s ease;
+    padding: 1rem 2.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
     cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
 }
 
 .submit-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(129, 37, 117, 0.4);
+    background: #3a5291;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.cancel-btn {
+.quit-btn {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--color-blue, #4B68A5);
-    border-radius: 30px;
-    padding: 0.8rem 2rem;
+    background: var(--white);
+    color: var(--primary-blue);
+    border-radius: 10px;
+    padding: 1rem 2.5rem;
     font-weight: 600;
     text-decoration: none;
-    font-size: 1rem;
-    box-shadow: 0 4px 15px rgba(75,104,165,0.15);
-    border: 2px solid rgba(255,255,255,0.5);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    font-size: 1.1rem;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--pastel-blue);
+    transition: var(--transition);
 }
 
-.cancel-btn:hover {
-    background: rgba(255, 255, 255, 1);
+.quit-btn:hover {
+    background: var(--pastel-blue);
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(75,104,165,0.25);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: var(--primary-blue);
+}
+
+/* Back to Dashboard Button */
+.back-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    z-index: 50;
+}
+
+.back-btn:hover {
+    background: #3a5291;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: var(--white);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar-exercise {
-        padding: 1rem 0 !important;
+        padding: 1rem !important;
     }
     
     .navbar-exercise .nav-container {
         flex-direction: column !important;
         gap: 1rem !important;
-        padding: 0 1rem !important;
     }
     
     .navbar-exercise .nav-links {
@@ -492,88 +613,87 @@ html, body {
         gap: 0.8rem !important;
     }
     
-    .navbar-exercise .nav-link {
-        font-size: 0.8rem !important;
-        padding: 0.4rem 0.8rem !important;
+    .test-main-content {
+        padding: 1rem;
     }
     
-    .survey-full-container {
-        padding: 120px 1rem 2rem 1rem;
+    .test-header {
+        padding: 1.5rem 1rem;
     }
     
-    .survey-header h2 {
+    .test-title {
         font-size: 2rem;
     }
     
-    .emoji-animate {
-        font-size: 2.5rem;
+    .test-subtitle {
+        font-size: 1rem;
     }
     
-    .survey-card {
-        padding: 2rem 1.5rem;
-    }
-    
-    .section-group {
+    .test-card {
         padding: 1.5rem;
     }
     
+    .question-block {
+        padding: 1rem;
+    }
+    
+    .question-item {
+        padding: 1rem;
+    }
+    
     .button-group {
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 1rem;
+        flex-direction: column;
+        align-items: center;
     }
     
     .submit-btn,
-    .cancel-btn {
-        flex: 1;
-        text-align: center;
-        padding: 1rem;
+    .quit-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .back-btn {
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.8rem 1.2rem;
     }
 }
 
 @media (max-width: 480px) {
-    .survey-main-content {
-        padding: 1rem;
+    .test-main-content {
+        padding: 0.5rem;
     }
     
-    .survey-header h2 {
+    .test-title {
         font-size: 1.8rem;
     }
     
-    .survey-card {
-        padding: 1.5rem 1rem;
+    .test-card {
+        padding: 1rem;
     }
     
-    .section-group {
-        padding: 1.2rem;
+    .question-block {
+        padding: 0.8rem;
     }
     
-    .form-group.form-check {
-        flex-direction: column;
-        gap: 0.8rem;
-        align-items: flex-start;
+    .question-item {
+        padding: 0.8rem;
     }
     
-    .form-check-input {
-        align-self: flex-start;
+    .section-title {
+        font-size: 1.2rem;
+    }
+    
+    .question-text {
+        font-size: 1rem;
     }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Fun emoji randomizer for header
-    var emojis = ['📋','📝','📊','📈','🧠','💭','🔍','📑','✅','🎯','📚','🤔'];
-    var surveyEmoji = document.getElementById('survey-emoji');
-    if (surveyEmoji) {
-        surveyEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-        surveyEmoji.classList.remove('emoji-animate');
-        void surveyEmoji.offsetWidth; // trigger reflow
-        surveyEmoji.classList.add('emoji-animate');
-    }
-    
-    // Add smooth scrolling for long form
-    const sections = document.querySelectorAll('.section-group');
+    // Add smooth scrolling animation for sections
+    const questionBlocks = document.querySelectorAll('.question-block');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -583,11 +703,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, { threshold: 0.1 });
     
-    sections.forEach(section => {
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(20px)';
-        section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        observer.observe(section);
+    questionBlocks.forEach(block => {
+        block.style.opacity = '0';
+        block.style.transform = 'translateY(20px)';
+        block.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(block);
+    });
+    
+    // Add focus enhancement for form elements
+    const formElements = document.querySelectorAll('.form-select, .form-textarea');
+    formElements.forEach(element => {
+        element.addEventListener('focus', function() {
+            this.parentElement.style.backgroundColor = '#f0f8ff';
+        });
+        
+        element.addEventListener('blur', function() {
+            this.parentElement.style.backgroundColor = '';
+        });
     });
 });
 </script>
