@@ -7,18 +7,25 @@
 <nav class="navbar navbar-exercise">
     <div class="nav-container">
         <div class="nav-brand">
-            <span class="brand-icon">🔢</span>
             <span class="brand-text">Numeraid</span>
         </div>
         <div class="nav-links">
-            <a href="/" class="nav-link">🏠 Home</a>
-            <a href="/about" class="nav-link">ℹ️ About</a>
-            <a href="/contact" class="nav-link">📞 Contact Us</a>
-            <a href="/support" class="nav-link">🛟 Support</a>
-            <a href="/student_dashboard" class="nav-link logout-link">🚪 Logout</a>
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact Us</a>
+            <a href="/support" class="nav-link">Support</a>
+            <a href="/student_dashboard" class="nav-link logout-link">Logout</a>
         </div>
     </div>
 </nav>
+
+<!-- Floating Background Bubbles -->
+<div class="bubble blue one"></div>
+<div class="bubble light-blue two"></div>
+<div class="bubble extra-light-blue three"></div>
+<div class="bubble blue four"></div>
+<div class="bubble light-blue five"></div>
+<div class="bubble extra-light-blue six"></div>
 
 <div class="exercise-full-container">
     <!-- Enhanced Fun Facts Sidebar -->
@@ -29,7 +36,7 @@
                 <h3>Did You Know?</h3>
             </div>
             <div class="fun-fact-content">
-                <p id="fun-fact-text">People with dyscalculia often have incredible strengths in creative thinking and visual-spatial skills! 🧠✨</p>
+                <p id="fun-fact-text">People with dyscalculia often have incredible strengths in creative thinking and visual-spatial skills!</p>
             </div>
             <div class="fun-fact-dots">
                 <span class="dot active" data-fact="0"></span>
@@ -38,18 +45,18 @@
                 <span class="dot" data-fact="3"></span>
                 <span class="dot" data-fact="4"></span>
             </div>
-            
-            <!-- Additional motivational content to fill space -->
+
+            <!-- Additional motivational content -->
             <div class="motivation-section">
                 <div class="motivation-header">
                     <span class="motivation-emoji">🎯</span>
                     <h4>Keep Going!</h4>
                 </div>
                 <div class="progress-encouragement">
-                    <p id="encouragement-text">Every question you answer makes you stronger! 💪</p>
+                    <p id="encouragement-text">Every question you answer makes you stronger!</p>
                 </div>
             </div>
-            
+
             <!-- Tips section -->
             <div class="tips-section">
                 <div class="tips-header">
@@ -57,7 +64,7 @@
                     <h4>Quick Tip</h4>
                 </div>
                 <div class="tip-content">
-                    <p id="tip-text">Take your time and read each question carefully. There's no rush! 🐌✨</p>
+                    <p id="tip-text">Take your time and read each question carefully. There's no rush!</p>
                 </div>
             </div>
         </div>
@@ -66,49 +73,65 @@
     <!-- Main Exercise Content -->
     <div class="exercise-main-content">
         <div class="exercise-header">
-            <span class="emoji-animate" id="exercise-emoji">🧩</span>
-            <h2>{{ part|capitalize }} Exercise</h2>
-            <p class="exercise-intro">Let's solve this together! Every answer gets you closer to being a math master. 🎉</p>
+            <h2 class="exercise-title">{{ part|capitalize }} Exercise</h2>
+            <p class="exercise-subtitle">Let's solve this together! Every answer gets you closer to being a math master.</p>
         </div>
+
         <div class="exercise-card">
-            <div class="exercise-question-block">
-                <div class="exercise-q-label">Question:</div>
-                <div class="exercise-q-text">{{ question }}</div>
-                {% if shape_image %}
-                <div class="exercise-shape-img">
-                    <img src="{{ shape_image }}" alt="Shape for the question">
-                    <div class="exercise-shape-caption">Look at the shape above to answer the question.</div>
-                </div>
-                {% endif %}
-                <form method="POST" class="exercise-form">
-                    {% if options %}
-                    <div class="exercise-options-group">
-                        <div class="exercise-options-label">Pick the right answer:</div>
-                        {% for key, value in options.items() %}
-                        <label class="exercise-option-label">
-                            <input type="radio" name="answer" value="{{ key }}" required>
-                            <span class="exercise-option-emoji">{{ ['🟣','🟢','🟡','🔴','🔵','🟠','🟤','⚫','⚪','🟩','🟦','🟧','🟥','🟨','🟪','🟫'][loop.index0 % 16] }}</span>
-                            <span class="exercise-option-text">{{ key }}) {{ value }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="exercise-open-answer">
-                        <label for="answer">Type your answer:</label>
-                        <input type="text" id="answer" name="answer" required autocomplete="off">
-                    </div>
+            <form method="POST" class="exercise-form">
+                <div class="question-block">
+                    <p class="question-text"><strong>{{ question }}</strong></p>
+
+                    {% if shape_image %}
+                        <div class="shape-container">
+                            <img src="{{ shape_image }}" alt="Shape for question" class="shape-image">
+                        </div>
                     {% endif %}
-                    <div class="exercise-btn-group">
-                        <button type="submit" class="exercise-submit-btn">🚀 Submit Answer</button>
-                        <a href="/" class="exercise-quit-btn">🚪 Quit Exercise</a>
-                    </div>
-                </form>
-            </div>
+
+                    {% if options %}
+                        <div class="options-group">
+                            {% for key, value in options.items() %}
+                                <label class="option-label">
+                                    <input type="radio" name="answer" value="{{ key }}" required>
+                                    <span class="option-text">{{ key }}) {{ value }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-answer-group">
+                            <label for="answer" class="answer-label">Your Answer:</label>
+                            <textarea name="answer" id="answer" rows="3"
+                                      placeholder="Type your answer here..." required></textarea>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">Submit Answer</button>
+                    <a href="/" class="quit-btn">Quit Exercise</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+<!-- Back to Dashboard Button -->
+<a href="/student_dashboard" class="back-btn">← Back to Dashboard</a>
+
 <style>
+/* CSS Variables following the theme */
+:root {
+  --primary-blue: #4B68A5;
+  --white: #ffffff;
+  --pastel-blue: #d6ecff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
 /* Reset and base styles for exercise page */
 * {
     margin: 0;
@@ -117,21 +140,49 @@
 }
 
 html, body {
-    font-family: var(--font-secondary, Arial, sans-serif);
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
-    background: linear-gradient(135deg, #a56eae 0%, #7ab4b6 100%);
-    background-attachment: fixed;
+    background: var(--light-gray);
     margin: 0;
     padding: 0;
     width: 100%;
+    position: relative;
+    padding-bottom: 100px; /* Space for Back to Dashboard button */
 }
 
-/* Override base nav styles for exercise page specifically */
+/* Floating Background Bubbles */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    z-index: 0;
+    animation: float 6s ease-in-out infinite;
+}
+
+.bubble.blue { background: var(--primary-blue); }
+.bubble.light-blue { background: #66ccff; }
+.bubble.extra-light-blue { background: #99e6ff; }
+
+/* Bubble Positions */
+.bubble.one { width: 90px; height: 90px; top: 15%; left: 10%; animation-delay: 0s; }
+.bubble.two { width: 50px; height: 50px; bottom: 20%; right: 15%; animation-delay: 2s; }
+.bubble.three { width: 110px; height: 110px; top: 40%; right: 5%; animation-delay: 4s; }
+.bubble.four { width: 40px; height: 40px; bottom: 10%; left: 5%; animation-delay: 1s; }
+.bubble.five { width: 70px; height: 70px; top: 60%; left: 15%; animation-delay: 3s; }
+.bubble.six { width: 60px; height: 60px; top: 25%; left: 60%; animation-delay: 5s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(120deg); }
+    66% { transform: translateY(5px) rotate(240deg); }
+}
+
+/* Navigation styles */
 .navbar-exercise {
-    background: linear-gradient(135deg, #812575 0%, #4B68A5 100%) !important;
+    background: var(--primary-blue) !important;
     padding: 1rem 2rem !important;
-    box-shadow: 0 4px 20px rgba(129, 37, 117, 0.2) !important;
+    box-shadow: var(--shadow) !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -166,26 +217,12 @@ html, body {
     text-decoration: none !important;
 }
 
-.navbar-exercise .nav-brand a {
-    color: white !important;
-    text-decoration: none !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-}
-
 .brand-icon {
     font-size: 1.8rem;
-    animation: brand-pulse 2s ease-in-out infinite;
-}
-
-@keyframes brand-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
 }
 
 .brand-text {
-    font-family: var(--font-primary, Arial, sans-serif);
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
 .navbar-exercise .nav-links {
@@ -197,43 +234,259 @@ html, body {
 .navbar-exercise .nav-link {
     color: white !important;
     text-decoration: none !important;
-    padding: 0.5rem 1rem !important;
-    border-radius: 25px !important;
+    padding: 0.6rem 1.4rem !important;
+    border-radius: 10px !important;
     font-weight: 500 !important;
     font-size: 0.9rem !important;
-    transition: all 0.3s ease !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(10px) !important;
+    transition: var(--transition) !important;
+    background: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .navbar-exercise .nav-link:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .navbar-exercise .logout-link {
     background: rgba(211, 31, 45, 0.2) !important;
-    border: 1px solid rgba(211, 31, 45, 0.3) !important;
+    border-color: rgba(211, 31, 45, 0.4) !important;
 }
 
 .navbar-exercise .logout-link:hover {
     background: rgba(211, 31, 45, 0.3) !important;
-    border-color: rgba(211, 31, 45, 0.5) !important;
+    border-color: rgba(211, 31, 45, 0.6) !important;
 }
 
 /* Full container covering entire viewport */
 .exercise-full-container {
     min-height: 100vh;
     position: relative;
-    padding-top: 80px; /* Account for fixed navbar */
+    padding-top: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
+    z-index: 1;
 }
 
-/* Enhanced Fun Facts Sidebar - positioned absolutely in white space */
+/* Main Exercise Content */
+.exercise-main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+    z-index: 1;
+    position: relative;
+}
+
+/* Header Section */
+.exercise-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+}
+
+.exercise-title {
+    color: white;
+    font-size: 2.5rem;
+    margin: 0.5rem 0;
+    font-weight: 600;
+}
+
+.exercise-subtitle {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Exercise Card */
+.exercise-card {
+    background: var(--white);
+    border: 2px solid var(--pastel-blue);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: var(--transition);
+    height: 100%;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.exercise-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.question-block {
+    margin-bottom: 2rem;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    color: var(--dark-gray);
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+}
+
+.shape-container {
+    text-align: center;
+    margin: 1.5rem 0 1.2rem 0;
+}
+
+.shape-container img {
+    max-height: 220px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    width: 100%;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border: 2px solid var(--pastel-blue);
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 400px;
+    justify-content: flex-start;
+}
+
+.option-label:hover {
+    border-color: var(--primary-blue);
+    background: var(--pastel-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.option-label input[type="radio"] {
+    margin-right: 0.5rem;
+    transform: scale(1.3);
+    accent-color: var(--primary-blue);
+}
+
+.option-text {
+    font-size: 1.1rem;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.text-answer-group {
+    margin-bottom: 1.5rem;
+}
+
+.text-answer-group label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1.1rem;
+}
+
+.text-answer-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 2px solid var(--pastel-blue);
+    font-size: 1.1rem;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    color: var(--dark-gray);
+    resize: vertical;
+}
+
+.text-answer-group textarea:focus {
+    outline: none;
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(75, 104, 165, 0.3), var(--shadow);
+    border-color: var(--primary-blue);
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.submit-btn {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 1.2rem 3rem;
+    border-radius: 10px;
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.submit-btn:hover {
+    background-color: #3a5588;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.quit-btn {
+    display: inline-block;
+    background: var(--white);
+    color: var(--primary-blue);
+    border-radius: 10px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--pastel-blue);
+    transition: var(--transition);
+}
+
+.quit-btn:hover {
+    background: var(--pastel-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: var(--primary-blue);
+}
+
+/* Enhanced Fun Facts Sidebar */
 .fun-facts-sidebar {
     position: fixed;
     right: 1rem;
@@ -246,12 +499,11 @@ html, body {
 }
 
 .fun-fact-card {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
+    background: var(--white);
+    border: 2px solid var(--pastel-blue);
+    border-radius: 15px;
     padding: 1.5rem;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -265,34 +517,20 @@ html, body {
 
 .fun-fact-emoji {
     font-size: 1.5rem;
-    animation: glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
 }
 
 .fun-fact-header h3 {
-    color: var(--color-deep-purple, #812575);
+    color: var(--primary-blue);
     margin: 0;
     font-size: 1.2rem;
-    font-family: var(--font-primary, Arial, sans-serif);
+    font-weight: 600;
 }
 
 .fun-fact-content p {
-    color: var(--color-black, #333);
+    color: var(--dark-gray);
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 0;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    opacity: 0;
-    animation: fadeIn 0.5s ease-in forwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .fun-fact-dots {
@@ -305,23 +543,23 @@ html, body {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #ddd;
+    background: var(--medium-gray);
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: var(--transition);
 }
 
 .dot.active {
-    background: var(--color-deep-purple, #812575);
+    background: var(--primary-blue);
     transform: scale(1.2);
 }
 
 /* New sections for enhanced sidebar */
 .motivation-section,
 .tips-section {
-    background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
-    border-radius: 15px;
+    background: var(--pastel-blue);
+    border-radius: 12px;
     padding: 1.2rem;
-    border: 1px solid rgba(165, 110, 174, 0.2);
+    border: 1px solid var(--medium-gray);
 }
 
 .motivation-header,
@@ -334,277 +572,55 @@ html, body {
 
 .motivation-header h4,
 .tips-header h4 {
-    color: var(--color-deep-purple, #812575);
+    color: var(--primary-blue);
     margin: 0;
     font-size: 1rem;
-    font-family: var(--font-primary, Arial, sans-serif);
+    font-weight: 600;
 }
 
 .motivation-emoji,
 .tips-emoji {
     font-size: 1.2rem;
-    animation: gentle-bounce 3s ease-in-out infinite;
-}
-
-@keyframes gentle-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
 }
 
 .progress-encouragement p,
 .tip-content p {
-    color: var(--color-black, #333);
+    color: var(--dark-gray);
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
-    font-family: var(--font-secondary, Arial, sans-serif);
 }
 
-/* Main Exercise Content - centered */
-.exercise-main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem;
-    width: 100%;
-}
-
-.exercise-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.exercise-header h2 {
-    color: white;
-    font-size: 2.5rem;
-    margin: 0.5rem 0;
-    font-family: var(--font-primary, Arial, sans-serif);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.emoji-animate {
-    display: inline-block;
-    font-size: 3rem;
-    animation: emoji-bounce 1.2s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes emoji-bounce {
-    0%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-18px) scale(1.2); }
-    50% { transform: translateY(0) scale(1.1); }
-    70% { transform: translateY(-8px) scale(1.15); }
-}
-
-.exercise-intro {
-    color: #fff;
-    font-size: 1.2rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.exercise-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-    padding: 2.5rem 2rem;
-    width: 100%;
-    max-width: 500px;
-    border: 1px solid rgba(255,255,255,0.3);
-}
-
-.exercise-question-block {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-}
-
-.exercise-q-label {
-    font-family: var(--font-primary, Arial, sans-serif);
-    color: var(--color-deep-purple, #812575);
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.exercise-q-text {
-    font-size: 1.3rem;
-    color: var(--color-black, #333);
-    margin-bottom: 1.5rem;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    line-height: 1.4;
-}
-
-.exercise-shape-img {
-    text-align: center;
-    margin: 1.5rem 0 1.2rem 0;
-}
-
-.exercise-shape-img img {
-    max-height: 220px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(129,37,117,0.15);
-}
-
-.exercise-shape-caption {
-    color: #666;
-    font-size: 0.98rem;
-    margin-top: 0.5rem;
-}
-
-.exercise-options-group {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    margin-bottom: 1.5rem;
-}
-
-.exercise-options-label {
-    font-weight: 600;
-    color: var(--color-blue, #4B68A5);
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-}
-
-.exercise-option-label {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: linear-gradient(135deg, #f8f4ff 0%, #f0f4ff 100%);
-    border-radius: 12px;
-    padding: 1.2rem 1rem;
-    cursor: pointer;
-    font-size: 1.1rem;
-    border: 2px solid #e8e8e8;
-    transition: all 0.3s cubic-bezier(.36,.07,.19,.97);
-    box-shadow: 0 3px 10px rgba(129,37,117,0.08);
-}
-
-.exercise-option-label:hover {
-    border-color: var(--color-blue, #4B68A5);
-    background: linear-gradient(135deg, #e8f0ff 0%, #f0f8ff 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(165,110,174,0.12);
-}
-
-.exercise-option-label input[type="radio"] {
-    margin-right: 0.5rem;
-    transform: scale(1.3);
-    accent-color: var(--color-blue, #4B68A5);
-}
-
-.exercise-option-label input[type="radio"]:checked + .exercise-option-emoji {
-    animation: emoji-pop 0.3s forwards;
-    transform-origin: bottom;
-}
-
-@keyframes emoji-pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.5); }
-    100% { transform: scale(1.3); }
-}
-
-.exercise-option-emoji {
-    font-size: 1.6rem;
-    transition: all 0.2s ease;
-}
-
-.exercise-option-text {
-    font-size: 1.1rem;
-    color: var(--color-black, #333);
-    font-weight: 500;
-}
-
-.exercise-open-answer {
-    margin-bottom: 1.5rem;
-}
-
-.exercise-open-answer label {
-    font-weight: 600;
-    color: var(--color-blue, #4B68A5);
-    margin-bottom: 0.5rem;
-    display: block;
-    font-size: 1.1rem;
-}
-
-.exercise-open-answer input[type="text"] {
-    width: 100%;
-    padding: 1rem;
-    border-radius: 12px;
-    border: 2px solid #e8e8e8;
-    font-size: 1.1rem;
-    font-family: var(--font-secondary, Arial, sans-serif);
-    background: linear-gradient(135deg, #f8f4ff 0%, #f0f4ff 100%);
-    box-shadow: 0 3px 12px rgba(129,37,117,0.08);
-    transition: all 0.3s;
-    color: var(--color-black, #333);
-}
-
-.exercise-open-answer input[type="text"]:focus {
-    outline: none;
-    background: linear-gradient(135deg, #f0f8ff 0%, #f8f4ff 100%);
-    box-shadow: 0 0 0 3px rgba(165, 110, 174, 0.3), 0 4px 20px rgba(129,37,117,0.15);
-    border-color: var(--color-deep-purple, #812575);
-}
-
-.exercise-btn-group {
-    text-align: center;
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-}
-
-.exercise-submit-btn {
-    background: linear-gradient(45deg, var(--color-deep-purple, #812575), var(--color-blue, #4B68A5));
-    color: white;
-    border: none;
-    padding: 1.2rem 3rem;
-    border-radius: 50px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    font-size: 1.2rem;
-    box-shadow: 0 6px 20px rgba(129, 37, 117, 0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.exercise-submit-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(129, 37, 117, 0.4);
-}
-
-.exercise-quit-btn {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--color-blue, #4B68A5);
+/* Back to Dashboard Button */
+.back-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: var(--primary-blue);
+    color: var(--white);
+    padding: 0.8rem 1.2rem;
     border-radius: 30px;
-    padding: 0.8rem 2rem;
-    font-weight: 600;
     text-decoration: none;
-    font-size: 1rem;
-    box-shadow: 0 4px 15px rgba(75,104,165,0.15);
-    border: 2px solid rgba(255,255,255,0.5);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    z-index: 10000;
+    transition: var(--transition);
 }
 
-.exercise-quit-btn:hover {
-    background: rgba(255, 255, 255, 1);
+.back-btn:hover {
+    background: #3a5588;
+    color: var(--white);
+    text-decoration: none;
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(75,104,165,0.25);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
     .exercise-full-container {
         padding: 80px 1rem 2rem 1rem;
+        flex-direction: column;
+        align-items: stretch;
     }
     
     .fun-facts-sidebar {
@@ -614,11 +630,6 @@ html, body {
         max-width: 500px;
         margin: 0 auto 2rem auto;
         max-height: none;
-    }
-    
-    .exercise-full-container {
-        flex-direction: column;
-        align-items: stretch;
     }
 }
 
@@ -653,10 +664,6 @@ html, body {
         font-size: 2rem;
     }
     
-    .emoji-animate {
-        font-size: 2.5rem;
-    }
-    
     .exercise-card {
         padding: 2rem 1.5rem;
     }
@@ -682,6 +689,21 @@ html, body {
     .fun-fact-card {
         padding: 1.2rem;
     }
+    
+    .back-btn {
+        bottom: 10px;
+        left: 10px;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Adjust bubble sizes for mobile */
+    .bubble.one { width: 60px; height: 60px; }
+    .bubble.two { width: 40px; height: 40px; }
+    .bubble.three { width: 80px; height: 80px; }
+    .bubble.four { width: 30px; height: 30px; }
+    .bubble.five { width: 50px; height: 50px; }
+    .bubble.six { width: 45px; height: 45px; }
 }
 
 @media (max-width: 480px) {
@@ -710,55 +732,69 @@ html, body {
     font-size: 1.08rem;
     font-weight: 600;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(209,31,45,0.07);
+    box-shadow: var(--shadow);
 }
 
-.alert-success { background: #e0f7fa; color: #1C8441; }
-.alert-danger { background: #ffeaea; color: #D11F2D; }
-.alert-warning { background: #fff3e0; color: #ff9800; }
+.alert-success { 
+    background: #d4edda; 
+    color: #155724; 
+    border: 2px solid #c3e6cb;
+}
+
+.alert-danger { 
+    background: #f8d7da; 
+    color: #721c24; 
+    border: 2px solid #f5c6cb;
+}
+
+.alert-warning { 
+    background: #fff3cd; 
+    color: #856404; 
+    border: 2px solid #ffeaa7;
+}
 </style>
 
 <script>
 // Enhanced Fun Facts Data
 const funFacts = [
     {
-        text: "People with dyscalculia often have incredible strengths in creative thinking and visual-spatial skills! 🧠✨",
+        text: "People with dyscalculia often have incredible strengths in creative thinking and visual-spatial skills!",
         emoji: "💡"
     },
     {
-        text: "Many successful entrepreneurs and artists have dyslexia, including Richard Branson and Steven Spielberg! 🎬🚀",
+        text: "Many successful entrepreneurs and artists have dyslexia, including Richard Branson and Steven Spielberg!",
         emoji: "🌟"
     },
     {
-        text: "Students with ADHD often show exceptional creativity and out-of-the-box thinking abilities! 🎨🔥",
+        text: "Students with ADHD often show exceptional creativity and out-of-the-box thinking abilities!",
         emoji: "⚡"
     },
     {
-        text: "People with autism can have amazing attention to detail and pattern recognition skills! 🔍🧩",
+        text: "People with autism can have amazing attention to detail and pattern recognition skills!",
         emoji: "🎯"
     },
     {
-        text: "Different learning styles mean different superpowers - visual, auditory, and kinesthetic learners all bring unique strengths! 🦸‍♂️💫",
+        text: "Different learning styles mean different superpowers - visual, auditory, and kinesthetic learners all bring unique strengths!",
         emoji: "🌈"
     }
 ];
 
 // Encouragement messages
 const encouragements = [
-    "Every question you answer makes you stronger! 💪",
-    "You're doing amazing - keep up the great work! 🌟",
-    "Mistakes are just learning opportunities in disguise! 🎭",
-    "Your brain is like a muscle - it grows with practice! 🧠",
-    "Believe in yourself - you've got this! ✨"
+    "Every question you answer makes you stronger!",
+    "You're doing amazing - keep up the great work!",
+    "Mistakes are just learning opportunities in disguise!",
+    "Your brain is like a muscle - it grows with practice!",
+    "Believe in yourself - you've got this!"
 ];
 
 // Quick tips
 const quickTips = [
-    "Take your time and read each question carefully. There's no rush! 🐌✨",
-    "Try drawing or visualizing the problem if it helps! 🎨",
-    "Break complex problems into smaller, manageable steps! 📝",
-    "Don't be afraid to guess if you're unsure - learning happens through trying! 🎯",
-    "Remember: every expert was once a beginner! 🌱"
+    "Take your time and read each question carefully. There's no rush!",
+    "Try drawing or visualizing the problem if it helps!",
+    "Break complex problems into smaller, manageable steps!",
+    "Don't be afraid to guess if you're unsure - learning happens through trying!",
+    "Remember: every expert was once a beginner!"
 ];
 
 let currentFactIndex = 0;
@@ -832,16 +868,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 8000);
         });
     });
-    
-    // Fun emoji randomizer for header
-    var emojis = ['🧩','🎲','🎉','🦄','✨','🤩','🧠','🔢','🎯','🎈','🍀','🚀','🏆','🟣','🟢','🟡','🔴','🔵','🟠','🟤','⚫','⚪'];
-    var exEmoji = document.getElementById('exercise-emoji');
-    if (exEmoji) {
-        exEmoji.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-        exEmoji.classList.remove('emoji-animate');
-        void exEmoji.offsetWidth;
-        exEmoji.classList.add('emoji-animate');
-    }
 });
 
 // Pause content rotation during user interaction
