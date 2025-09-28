@@ -3,389 +3,573 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-container dashboard-flex">
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-profile">
-            <div class="sidebar-avatar">{{ student.name[0]|upper }}{{ student.surname[0]|upper }}</div>
-            <div class="sidebar-profile-details">
-                <div class="sidebar-name">{{ student.name }} {{ student.surname }}</div>
-                <div class="sidebar-meta">{{ student.course }} (Year {{ student.year_of_study }})</div>
-                <div class="sidebar-meta">{{ student.faculty }}</div>
-            </div>
-        </div>
-          <nav class="sidebar-nav">
-    <ul>
-        <li><a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}">Start Test</a></li>
-        <li><a href="{{ url_for('main.exercises', part='numbers') }}">Exercises</a></li>
-        {% if assigned_staff_id %}
-        <li>
-            <a href="{{ url_for('main.conversation', student_id=student.id, staff_id=assigned_staff_id) }}">
-                Chat with Staff
-            </a>
-        </li>
-        {% else %}
-        <li><span style="color: #888;">Chat with Staff (No staff assigned yet)</span></li>
-        {% endif %}
-        <li><a href="{{ url_for('main.survey')}}">Survey</a></li>
-        <li><a href="{{ url_for('main.upload_medical_proof') }}">Extra Help</a></li>
-        <li><a href="{{ url_for('main.logout') }}" class="sidebar-logout">Logout</a></li>
-    </ul>
-</nav>
-    </aside>
-    <div class="main-content">
-        <h2>Welcome, {{ student.name }} {{ student.surname }}! 👋</h2>
-        <p>Course: {{ student.course }} (Year {{ student.year_of_study }})</p>
-        <p>Faculty: {{ student.faculty }}</p>
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        <!-- Dyscalculia Overview Section -->
-        <div class="dashboard-overview-grid">
-            <div class="overview-card blue">
-                <span class="overview-emoji">🧮</span>
-                <div>
-                    <div class="overview-stat">~5-7%</div>
-                    <div class="overview-desc">of people have dyscalculia</div>
-                </div>
-            </div>
-            <div class="overview-card red">
-                <span class="overview-emoji">👦</span>
-                <div>
-                    <div class="overview-stat">1 in 20</div>
-                    <div class="overview-desc">students face this learning disability</div>
-                </div>
-            </div>
-            <div class="overview-card purple">
-                <span class="overview-emoji">🔗</span>
-                <div>
-                    <div class="overview-stat">14%</div>
-                    <div class="overview-desc">also have dyslexia</div>
-                </div>
-            </div>
-        </div>
-
-        {% if student_results %}
-        <div class="dashboard-grid dashboard-grid-4">
-            <div class="dashboard-card chart-card">
-                <h4 style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                    <span style="font-size:1.5rem;">📝</span> Exercise Status
-                </h4>
-                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:1.2rem 0;">
-                    {% if student.exercises_completed|length > 0 %}
-                        <div style="background:linear-gradient(90deg,#1C8441 60%,#7ab4b6 100%);border-radius:2rem;padding:1.2rem 2.2rem;box-shadow:0 4px 18px rgba(28,132,65,0.13);display:flex;flex-direction:column;align-items:center;">
-                            <span style="font-size:2.5rem;">🏆</span>
-                            <span style="color:#fff;font-size:1.2rem;font-weight:600;margin-top:0.5rem;">{{ student.exercises_completed|length }} Exercise{{ 's' if student.exercises_completed|length > 1 else '' }} Completed!</span>
-                            <span style="color:#e0f7fa;font-size:1rem;margin-top:0.2rem;">Keep practicing to improve!</span>
-                        </div>
-                    {% else %}
-                        <div style="background:linear-gradient(90deg,#D11F2D 60%,#f7b2b2 100%);border-radius:2rem;padding:1.2rem 2.2rem;box-shadow:0 4px 18px rgba(209,31,45,0.13);display:flex;flex-direction:column;align-items:center;">
-                            <span style="font-size:2.5rem;">🕑</span>
-                            <span style="color:#fff;font-size:1.2rem;font-weight:600;margin-top:0.5rem;">No Exercises Completed Yet</span>
-                            <span style="color:#fff3e0;font-size:1rem;margin-top:0.2rem;">Start your first exercise to begin your journey!</span>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="dashboard-card chart-card">
-                <h4 style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                    <span style="font-size:1.5rem;">📋</span> Survey Status
-                </h4>
-                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin:1.2rem 0;">
-                    {% if student.survey %}
-                        <div style="background:linear-gradient(90deg,#4B68A5 60%,#7ab4b6 100%);border-radius:2rem;padding:1.2rem 2.2rem;box-shadow:0 4px 18px rgba(75,104,165,0.13);display:flex;flex-direction:column;align-items:center;">
-                            <span style="font-size:2.5rem;">✅</span>
-                            <span style="color:#fff;font-size:1.2rem;font-weight:600;margin-top:0.5rem;">Survey Submitted!</span>
-                            <span style="color:#e0f7fa;font-size:1rem;margin-top:0.2rem;">Thank you for your feedback!</span>
-                        </div>
-                    {% else %}
-                        <div style="background:linear-gradient(90deg,#D11F2D 60%,#f7b2b2 100%);border-radius:2rem;padding:1.2rem 2.2rem;box-shadow:0 4px 18px rgba(209,31,45,0.13);display:flex;flex-direction:column;align-items:center;">
-                            <span style="font-size:2.5rem;">⚠️</span>
-                            <span style="color:#fff;font-size:1.2rem;font-weight:600;margin-top:0.5rem;">Survey Not Completed</span>
-                            <span style="color:#fff3e0;font-size:1rem;margin-top:0.2rem;">Please complete your survey to help us help you!</span>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="dashboard-card chart-card">
-                <h4>Your Test Scores 📊</h4>
-                <div class="chart-container small">
-                    <canvas id="scoresChart"></canvas>
-                </div>
-            </div>
-            <div class="dashboard-card chart-card">
-                <h4>Dyscalculia Likelihood 🧠</h4>
-                <div class="chart-container small">
-                    <canvas id="likelihoodPieChart"></canvas>
-                </div>
-                <p class="text-center">
-                    <strong>Likelihood:</strong> <span class="badge {{ 'badge-danger' if student_results.disability_likelihood == 'high' else 'badge-info' }}">{{ student_results.disability_likelihood }}</span>
-                </p>
-            </div>
-            <div class="dashboard-card chart-card">
-                <h4>Time to Completion ⏱️</h4>
-                <div class="chart-container small">
-                    <canvas id="timeChart"></canvas>
-                </div>
-            </div>
-            <div class="dashboard-card chart-card">
-                <h4>Your Score vs. Average 📈</h4>
-                <div class="chart-container small">
-                    <canvas id="compareChart"></canvas>
-                </div>
-                <div style="font-size:0.95rem;color:var(--color-dark-grey);margin-top:0.5rem;">See how your scores compare to the average for each part.</div>
-            </div>
-        </div>
-        {% endif %}
+<div class="dashboard-wrapper" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <h1>Student Dashboard</h1>
     </div>
+
+    <div class="sidebar-profile-compact text-center px-3 mb-3">
+      <div class="avatar-circle">{{ student.name[0]|upper }}{{ student.surname[0]|upper }}</div>
+      <div class="small text-muted">Manage Profile</div>
+    </div>
+    <hr class="sidebar-separator">
+
+    <ul class="nav-links">
+      <li>
+        <a href="#" class="active">
+          <i class="fas fa-home"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.contact') }}">
+          <i class="fas fa-headset"></i>
+          <span>Contact Support</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.student_application') }}">
+          <i class="fas fa-th"></i>
+          <span>Applications</span>
+        </a>
+      </li>
+      {% if assigned_staff_id %}
+      <li>
+        <a href="{{ url_for('main.conversation', student_id=student.id, staff_id=assigned_staff_id) }}">
+          <i class="fas fa-envelope"></i>
+          <span>Messages</span>
+        </a>
+      </li>
+      {% else %}
+      <li>
+        <span class="nav-link disabled-link" title="No staff assigned">
+          <i class="fas fa-envelope"></i>
+          <span>Messages (No staff)</span>
+        </span>
+      </li>
+      {% endif %}
+      <li>
+        <a href="{{ url_for('main.need_to_know') }}">
+          <i class="fas fa-info-circle"></i>
+          <span>Need to Know</span>
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('main.student_settings') }}">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="logout-container">
+      <button class="logout-btn" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 d-flex align-items-center">
+      <div class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+        <span class="hamburger-fallback">☰</span>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center">
+        <div class="user-icon me-3">
+          {% if student.profile_image %}
+            <img src="{{ url_for('main.uploaded_file', filename='profile_images/' + student.profile_image) }}" alt="User Icon">
+          {% else %}
+            <img src="https://static.vecteezy.com/system/resources/previews/047/733/682/non_2x/grey-avatar-icon-user-avatar-photo-icon-social-media-user-icon-vector.jpg" alt="User Icon">
+          {% endif %}
+        </div>
+        <div>
+          <h2>{{ student.name }} {{ student.surname }}</h2>
+          <div class="small text-muted">{{ student.course }} (Year {{ student.year_of_study }}) • {{ student.faculty }}</div>
+        </div>
+      </div>
+      <div class="input-group" style="max-width:300px;">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search dashboard..." id="dashboard-search">
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <h1>Welcome {{ student.name }} {{ student.surname }}</h1>
+      <div class="bg-white-25 p-3 rounded mt-3 text-white">
+        <p>Numeraid helps students test for dyscalculia and provides tools and practice to improve their numerical learning skills.</p>
+      </div>
+    </section>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-4" id="dashboard-cards">
+      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
+        <div class="card dashboard-card p-3">
+          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+          <h5>Results</h5>
+          <p>View your progress and performance metrics</p>
+          <a href="{{ url_for('main.test_results') }}" class="btn btn-sm btn-outline-primary">View</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
+        <div class="card dashboard-card p-3">
+          <div class="card-icon"><i class="fas fa-brain"></i></div>
+          <h5>Tests for Dyscalculia</h5>
+          <p>Assess your numerical learning abilities</p>
+          <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-sm btn-outline-primary">Start Test</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
+        <div class="card dashboard-card p-3">
+          <div class="card-icon"><i class="fas fa-book"></i></div>
+          <h5>Study Material</h5>
+          <p>Access lecture notes, guides, and resources</p>
+          <a href="{{ url_for('main.student_study_material') }}" class="btn btn-sm btn-outline-primary">Open</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
+        <div class="card dashboard-card p-3">
+          <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+          <h5>Practice Tests</h5>
+          <p>Test your knowledge with practice exams</p>
+          <a href="{{ url_for('main.exercises', part='numbers') }}" class="btn btn-sm btn-outline-primary">Practice</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motivation Section -->
+    <section class="motivation-section">
+      <h2>Daily Motivation</h2>
+      <div class="motivation-slider">
+        <div class="motivation-slide">
+          <div class="motivation-image">
+            <img src="https://i.pinimg.com/1200x/e6/f1/c0/e6f1c0568c0d77f75c3450f9da15a820.jpg" alt="Motivation 1">
+          </div>
+          <p class="motivation-text">"Your learning difference is your superpower. It allows you to see the world in ways others can't."</p>
+        </div>
+        <div class="motivation-slide">
+          <div class="motivation-image">
+            <img src="https://i.pinimg.com/736x/fa/86/22/fa8622eb54b2f0a262ccebee6fdf195a.jpg" alt="Progress Motivation">
+          </div>
+          <p class="motivation-text">"Progress is progress, no matter how small. Every step forward is a victory worth celebrating."</p>
+        </div>
+        <div class="motivation-slide">
+          <div class="motivation-image">
+            <img src="https://i.pinimg.com/1200x/2b/2e/a7/2b2ea7d85d2b6c96947497e9b8aba39b.jpg" alt="Different Thinking">
+          </div>
+          <p class="motivation-text">"Different thinking leads to innovative solutions. Your unique perspective is valuable."</p>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center mt-3">
+        <div class="slider-dot active" data-index="0"></div>
+        <div class="slider-dot" data-index="1"></div>
+        <div class="slider-dot" data-index="2"></div>
+      </div>
+    </section>
+  </div>
 </div>
 
-{% set studentScores = {'numbers': student_results.numbers_score | default(0), 'logic': student_results.logic_score | default(0), 'shapes': student_results.shapes_score | default(0)} %}
-{% set studentLikelihood = student_results.disability_likelihood | default('low') %}
-{% set testTimes = {'numbers': student_results.numbers_time | default(30), 'logic': student_results.logic_time | default(45), 'shapes': student_results.shapes_time | default(25)} %}
 <style>
-.dashboard-overview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0 1.5rem 0;
-    max-width: 700px;
-    width: 100%;
+:root {
+    --color-blue: #4B68A5;
+    --white: #ffffff;
+    --primary-blue: var(--color-blue);
+    --light-blue: rgba(75, 104, 165, 0.08);
+    --light-gray: #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray: #333333;
+    --text-gray: #5f6368;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --transition: all 0.3s ease;
 }
-.overview-card {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    border-radius: 10px;
-    padding: 1rem 1rem;
-    min-width: 0;
-    max-width: 240px;
-    min-height: 70px;
-    box-shadow: 0 2px 8px rgba(75,104,165,0.07);
-}
-.overview-card.blue { background: var(--color-blue); color: #fff; }
-.overview-card.red { background: var(--color-red); color: #fff; }
-.overview-card.purple { background: var(--color-light-purple); color: #fff; }
-.overview-emoji { font-size: 1.6rem; }
-.overview-stat { font-size: 1.1rem; font-weight: bold; }
-.overview-desc { font-size: 0.95rem; }
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 1.2rem;
-    margin-bottom: 2rem;
-}
-.dashboard-grid-4 {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
-.chart-card {
-    padding: 1.2rem 1rem 1.5rem 1rem;
-    border-radius: 12px;
-    min-width: 0;
-}
-.chart-container.small {
-    width: 210px;
-    height: 180px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.chart-container.small canvas {
-    width: 100% !important;
-    height: 180px !important;
-    max-width: 210px;
-    max-height: 180px;
-}
-/* Sidebar styles */
-.dashboard-flex {
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
-}
-.dashboard-sidebar {
-    min-width: 220px;
-    max-width: 260px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(75,104,165,0.07);
-    padding: 2rem 1.2rem 1.2rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 1.5rem;
-    position: sticky;
-    top: 2rem;
-    height: fit-content;
-}
-.sidebar-profile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-.sidebar-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--color-blue);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.7rem;
-    box-shadow: 0 2px 8px rgba(75,104,165,0.13);
-}
-.sidebar-profile-details {
-    text-align: center;
-}
-.sidebar-name {
-    font-family: var(--font-primary);
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--color-blue);
-}
-.sidebar-meta {
-    font-size: 0.95rem;
-    color: var(--color-dark-grey);
-}
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
+body {
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    line-height: 1.6;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     margin: 0;
-    width: 100%;
+    padding: 0;
 }
-.sidebar-nav li {
-    margin: 0.7rem 0;
+
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
 }
-.sidebar-nav a {
-    display: block;
-    padding: 0.7rem 1rem;
-    border-radius: 8px;
-    color: var(--color-blue);
-    font-weight: 600;
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1.5rem 0;
+    transition: transform 0.3s ease;
+    z-index: 999;
+}
+
+.sidebar.collapsed { 
+    transform: translateX(-100%); 
+}
+
+.logo h1 { 
+    color: var(--white); 
+    font-size: 1.5rem; 
+    padding-left: 1rem; 
+    margin: 0;
+}
+
+.sidebar-profile-compact .avatar-circle {
+    width: 64px; 
+    height: 64px; 
+    border-radius: 50%; 
+    background: rgba(255,255,255,0.12);
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 700; 
+    font-size: 1.2rem; 
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-separator {
+    border-color: rgba(255,255,255,0.2);
+    margin: 1rem 1.5rem;
+}
+
+.nav-links { 
+    list-style: none; 
+    padding-left: 0; 
+    flex-grow: 1; 
+    margin: 0;
+}
+
+.nav-links li { 
+    margin-bottom: 0.5rem; 
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: var(--white);
     text-decoration: none;
-    font-family: var(--font-secondary);
-    background: #f3f4f6;
-    transition: background 0.2s, color 0.2s;
+    transition: var(--transition);
 }
-.sidebar-nav a:hover, .sidebar-nav a:focus {
-    background: var(--color-blue);
-    color: #fff;
+
+.nav-links a:hover, 
+.nav-links a.active {
+    background-color: rgba(255,255,255,0.08);
+    border-left: 4px solid var(--white);
+    color: var(--white);
+    text-decoration: none;
 }
-.sidebar-logout {
-    color: var(--color-red);
-    background: #fff0f1;
+
+.nav-links i { 
+    margin-right: 1rem; 
+    width: 20px; 
+    text-align: center; 
 }
-.sidebar-logout:hover, .sidebar-logout:focus {
-    background: var(--color-red);
-    color: #fff;
+
+.disabled-link { 
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: rgba(255,255,255,0.6);
+    cursor: not-allowed;
 }
-@media (max-width: 900px) {
-    .dashboard-flex {
-        flex-direction: column;
-    }
-    .dashboard-sidebar {
-        max-width: 100%;
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-        position: static;
-    }
+
+/* Logout Button */
+.logout-container { 
+    margin-top: auto; 
+    padding: 1.5rem; 
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #3A528F;
+    border: none;
+    color: var(--white);
+    border-radius: 12px;
+    cursor: pointer;
+    justify-content: center;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.logout-btn:hover { 
+    background-color: #2D3E75; 
+}
+
+.logout-btn i { 
+    margin-right: 0.5rem; 
+}
+
+/* Main Content */
+.main-content { 
+    margin-left: 250px; 
+    padding: 1.5rem; 
+    transition: margin-left 0.3s ease; 
+    flex: 1;
+    min-height: 100vh;
+}
+
+.main-content.full-width { 
+    margin-left: 0; 
+}
+
+.user-icon img { 
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
+
+/* Hamburger Button */
+.hamburger {
+    display: block !important;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.hamburger:hover {
+    background: #3a5588;
+    transform: scale(1.05);
+}
+
+.hamburger .fas {
+    color: var(--white);
+}
+
+.hamburger-fallback {
+    display: none;
+}
+
+/* Sidebar Icons */
+.nav-links i {
+    margin-right: 1rem;
+    width: 20px;
+    text-align: center;
+    color: var(--white);
+    font-size: 1.1rem;
+}
+
+@media (max-width: 992px) {
+    .main-content { margin-left: 0; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.show { transform: translateX(0); }
+}
+
+/* Welcome Section */
+.welcome-section {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.welcome-section h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+}
+
+.bg-white-25 {
+    background-color: rgba(255,255,255,0.25);
+}
+
+/* Dashboard Cards */
+.dashboard-card { 
+    border-top: 4px solid var(--primary-blue); 
+    transition: var(--transition); 
+    cursor: pointer; 
+    text-align: center; 
+}
+
+.dashboard-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+}
+
+.card-icon { 
+    font-size: 2.5rem; 
+    margin-bottom: 1rem; 
+    color: var(--primary-blue); 
+}
+
+/* Motivation Section */
+.motivation-section { 
+    background-color: var(--white); 
+    border-radius: 12px; 
+    padding: 1.5rem; 
+    box-shadow: var(--shadow); 
+    overflow: hidden; 
+}
+
+.motivation-section h2 { 
+    color: var(--primary-blue); 
+    text-align: center; 
+    margin-bottom: 1.5rem; 
+}
+
+.motivation-slider { 
+    display: flex; 
+    transition: transform 0.5s ease; 
+}
+
+.motivation-slide { 
+    min-width: 100%; 
+    padding: 1rem; 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+.motivation-image { 
+    width: 100%; 
+    max-width: 600px; 
+    height: 300px; 
+    border-radius: 12px; 
+    margin-bottom: 1rem; 
+    overflow: hidden; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
+
+.motivation-image img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    object-position: center; 
+}
+
+.motivation-text { 
+    font-style: italic; 
+    color: var(--text-gray); 
+    max-width: 600px; 
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.slider-dot { 
+    width: 12px; 
+    height: 12px; 
+    border-radius: 50%; 
+    background-color: var(--medium-gray); 
+    margin: 0 5px; 
+    cursor: pointer; 
+    transition: var(--transition); 
+}
+
+.slider-dot.active { 
+    background-color: var(--primary-blue); 
+}
+
+/* Responsive Design */
+@media (max-width: 992px) { 
+    .col-lg-3 { flex: 0 0 50%; max-width: 50%; } 
+}
+
+@media (max-width: 576px) { 
+    .col-lg-3 { flex: 0 0 100%; max-width: 100%; } 
+    .main-content { padding: 1rem; }
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // Data from Flask backend
-    var studentScores = {{ studentScores | tojson | safe }};
-    var studentLikelihood = {{ studentLikelihood | tojson | safe }};
-    var testTimes = {{ testTimes | tojson | safe }};
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('full-width');
+});
 
-        // Scores Bar Chart (single bar for each part)
-        const scoresCtx = document.getElementById('scoresChart').getContext('2d');
-        new Chart(scoresCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Numbers', 'Logic', 'Shapes'],
-                datasets: [{
-                    label: 'Your Score',
-                    data: [studentScores.numbers, studentScores.logic, studentScores.shapes],
-                    backgroundColor: ['#4B68A5', '#1C8441', '#D11F2D'],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, max: 5 }
-                }
-            }
-        });
+// Motivation slider
+const slider = document.querySelector('.motivation-slider');
+const dots = document.querySelectorAll('.slider-dot');
+let currentSlide = 0;
+const slideCount = document.querySelectorAll('.motivation-slide').length;
+function showSlide(index) {
+    if(index < 0) index = slideCount - 1;
+    if(index >= slideCount) index = 0;
+    slider.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach(dot => dot.classList.remove('active'));
+    dots[index].classList.add('active');
+    currentSlide = index;
+}
+dots.forEach(dot => {
+    dot.addEventListener('click', () => showSlide(parseInt(dot.getAttribute('data-index'))));
+});
+setInterval(() => showSlide(currentSlide + 1), 5000);
 
-        // Likelihood Pie Chart
-        const likelihoodCtx = document.getElementById('likelihoodPieChart').getContext('2d');
-        const pieData = studentLikelihood === 'high' ? [1, 0] : [1, 0];
-        const pieColors = studentLikelihood === 'high' ? ['#D11F2D', '#D3D3D3'] : ['#1C8441', '#D3D3D3'];
-        const pieLabels = studentLikelihood === 'high' ? ['High Likelihood', ''] : ['Low Likelihood', ''];
-        
-        new Chart(likelihoodCtx, {
-            type: 'pie',
-            data: {
-                labels: pieLabels,
-                datasets: [{ data: pieData, backgroundColor: pieColors }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
 
-        // Time to Completion Bar Chart
-        const timeCtx = document.getElementById('timeChart').getContext('2d');
-        new Chart(timeCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Numbers', 'Logic', 'Shapes'],
-                datasets: [{
-                    label: 'Time Taken (seconds)',
-                    data: [testTimes.numbers, testTimes.logic, testTimes.shapes],
-                    backgroundColor: ['#4B68A5', '#1C8441', '#D11F2D'],
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-
-        // Score Comparison Bar Chart (student vs average)
-        const compareCtx = document.getElementById('compareChart').getContext('2d');
-        const avgScores = { numbers: 3.5, logic: 4.0, shapes: 3.0 }; // Example averages
-        new Chart(compareCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Numbers', 'Logic', 'Shapes'],
-                datasets: [
-                    {
-                        label: 'Your Score',
-                        data: [studentScores.numbers, studentScores.logic, studentScores.shapes],
-                        backgroundColor: 'rgba(75, 104, 165, 0.8)'
-                    },
-                    {
-                        label: 'Average Score',
-                        data: [avgScores.numbers, avgScores.logic, avgScores.shapes],
-                        backgroundColor: 'rgba(28, 132, 65, 0.6)'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: true } },
-                scales: {
-                    y: { beginAtZero: true, max: 5 }
-                }
-            }
-        });
+// Sidebar active link
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Only prevent default for anchor links
+        if (this.getAttribute('href') === '#') {
+            e.preventDefault();
+        }
+        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
     });
+});
+
+// Live search for dashboard cards
+const searchInput = document.getElementById('dashboard-search');
+const cardWrappers = document.querySelectorAll('.dashboard-card-wrapper');
+searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    cardWrappers.forEach(wrapper => {
+        const title = wrapper.querySelector('h5').textContent.toLowerCase();
+        const desc = wrapper.querySelector('p').textContent.toLowerCase();
+        wrapper.style.display = (title.includes(query) || desc.includes(query)) ? '' : 'none';
+    });
+});
 </script>
+
 {% endblock %}
