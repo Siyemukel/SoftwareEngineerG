@@ -1,13 +1,188 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+body {
+  background-color: #f5f6fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+.staff-sidebar {
+  height: 100vh;
+  background-color: #111;
+  color: #fff;
+  padding-top: 20px;
+  position: fixed;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.staff-sidebar .side-links {
+  flex-grow: 1;
+}
+
+.staff-sidebar .logo {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.staff-sidebar .logo a {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+
+.staff-sidebar a {
+  color: #ddd;
+  display: block;
+  padding: 12px 20px;
+  text-decoration: none;
+}
+
+.staff-sidebar a:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.staff-sidebar .chat-links {
+  padding: 0 20px;
+  font-size: 0.9rem;
+}
+
+.staff-sidebar .chat-links a {
+  padding: 8px 0;
+  font-size: 0.85rem;
+}
+
+/* Dashboard content */
+.staff-content {
+  margin-left: 240px;
+  padding: 20px;
+}
+
+/* Header */
+.staff-header {
+  margin-bottom: 30px;
+}
+
+.staff-header h2 {
+  color: #0d6efd;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.status-badge {
+  background-color: #0d6efd;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stats-card {
+  background-color: #000;
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: center;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stats-card h6 {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.stats-card h3 {
+  color: #ffc107;
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* Search and Filter */
+.search-filter-group {
+  margin-bottom: 20px;
+}
+
+/* Table */
+.students-table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.students-table thead {
+  background-color: #111;
+  color: #fff;
+}
+
+.students-table thead th {
+  border: none;
+  padding: 12px;
+}
+
+.students-table tbody td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+/* Profile/Notification Area */
+.notifications {
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .staff-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  
+  .staff-content {
+    margin-left: 0;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
 <div class="staff-dashboard-container">
     <!-- Sidebar -->
     <aside class="staff-sidebar">
         <nav>
             <div class="side-links">
                 <div class="logo">
-                    <a href="{{ url_for('main.staff_dashboard') }}">Numeraid</a>
+                    <a href="{{ url_for('main.staff_dashboard') }}">NUMERAID</a>
                 </div>
                 <hr>
                 <a href="{{ url_for('main.profile') }}">My Profile</a>
@@ -15,7 +190,6 @@
                   <a href="{{ url_for('main.manage_students') }}">Manage Students</a>
                 {% endif %}
                 
-
                 {% if not user.is_admin %}
                     <!-- Applications link with notification badge -->
                     <a href="{{ url_for('main.staff_applications') }}" class="d-flex justify-content-between align-items-center">
@@ -47,9 +221,9 @@
                     <a href="{{ url_for('main.review_deletion_requests') }}">Review Deletion Requests</a>
                     <a href="{{ url_for('main.report_settings') }}">Customize Reports</a>
                     <a href="{{ url_for('main.notification_settings') }}">Customize Notifications</a>
+                    <hr>
                 {% endif %}
-                <hr>
-                <a href="{{ url_for('main.logout') }}">Logout</a>
+                <a href="{{ url_for('main.logout') }}" style="color: #dc3545;">Logout</a>
             </div>
         </nav>
     </aside>
@@ -60,7 +234,7 @@
             <!-- Header with notification icon -->
             <div class="staff-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h2>Welcome, {{ user.name }}!</h2>
+                    <h2>WELCOME, {{ user.name.upper() }}!</h2>
                     <span class="status-badge">
                         {% if user.is_admin %} Admin Dashboard {% else %} Staff Dashboard {% endif %}
                     </span>
@@ -81,37 +255,37 @@
             <div class="stats-grid">
                 <div class="stats-card">
                     {% if not user.is_admin %}
-                        <h6>Assigned Students</h6>
+                        <h6>ASSIGNED STUDENTS</h6>
                     {% else %}
-                        <h6>Total Students</h6>
+                        <h6>TOTAL STUDENTS</h6>
                     {% endif %}
-                    <h3>{{ total_students }}</h3>
+                    <h3 id="totalStudentsCount">{{ total_students }}</h3>
                 </div>
                 <div class="stats-card">
-                    <h6>Exercises In Progress</h6>
-                    <h3>{{ exercises_in_progress }}</h3>
+                    <h6>EXERCISES IN PROGRESS</h6>
+                    <h3 id="exercisesInProgressCount">{{ exercises_in_progress }}</h3>
                 </div>
                 <div class="stats-card">
-                    <h6>Tests Pending Review</h6>
-                    <h3>{{ tests_pending_review }}</h3>
+                    <h6>TESTS PENDING REVIEW</h6>
+                    <h3 id="testsPendingCount">{{ tests_pending_review }}</h3>
                 </div>
                 <div class="stats-card">
-                    <h6>Flagged Students</h6>
-                    <h3>{{ flagged_students }}</h3>
+                    <h6>FLAGGED STUDENTS</h6>
+                    <h3 id="flaggedStudentsCount">{{ flagged_students }}</h3>
                 </div>
                 {% if user.is_admin %}
                     <div class="stats-card">
-                        <h6>Total Staff</h6>
+                        <h6>TOTAL STAFF</h6>
                         <h3>{{ total_staff }}</h3>
                     </div>
                 {% endif %}
             </div>
 
             <!-- Search / Filter -->
-            <div class="search-filter-group mt-4 d-flex gap-2">
-                <input type="text" id="studentSearch" class="form-control" placeholder="Search by name or email..." style="flex-grow: 1;">
+            <div class="search-filter-group d-flex gap-2">
+                <input type="text" id="studentSearch" class="form-control" placeholder="Search by name or email...">
                 {% if user.is_admin %}
-                <select id="staffFilter" class="form-select" style="flex-grow: 0; width: auto;">
+                <select id="staffFilter" class="form-select" style="width: auto;">
                     <option value="">Filter by Staff</option>
                     {% for staff_member in all_staff %}
                         <option value="{{ staff_member.name }}">{{ staff_member.name }}</option>
@@ -121,23 +295,27 @@
             </div>
 
             <!-- Students Table -->
-            <div class="students-table-container mt-4">
-                <table class="students-table table table-striped table-hover">
+            <div class="students-table-container">
+                <table class="students-table table table-striped table-hover" id="studentsTable">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Exercises Progress</th>
-                            <th>Test Progress</th>
-                            <th>Joined On</th>
-                            {% if user.is_admin %}<th>Assigned Staff</th>{% endif %}
-                            <th>Flagged</th>
-                            <th>Actions</th>
+                            <th>NAME</th>
+                            <th>EMAIL</th>
+                            <th>EXERCISES PROGRESS</th>
+                            <th>TEST PROGRESS</th>
+                            <th>JOINED ON</th>
+                            {% if user.is_admin %}<th>ASSIGNED STAFF</th>{% endif %}
+                            <th>FLAGGED</th>
+                            <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for student in students %}
-                        <tr>
+                        <tr data-student-name="{{ student.name }}" data-student-email="{{ student.student_email }}" 
+                            data-assigned-staff="{% if student.assigned_staff %}{{ student.assigned_staff | join(', ') }}{% endif %}"
+                            data-exercises="{{ student.exercises_progress }}" 
+                            data-test="{{ student.test_progress }}"
+                            data-flagged="{{ 'yes' if student.flagged else 'no' }}">
                             <td>{{ student.name }}</td>
                             <td>{{ student.student_email }}</td>
                             <td>
@@ -176,7 +354,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('main.manage_students', student_id=student.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                <a href="{{ url_for('main.manage_students', student_id=student.id) }}" class="btn btn-sm btn-primary">View</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -186,4 +364,116 @@
         </main>
     </div>
 </div>
+
+<script>
+// Get elements
+const searchInput = document.getElementById('studentSearch');
+const staffFilter = document.getElementById('staffFilter');
+const table = document.getElementById('studentsTable');
+const tbody = table.getElementsByTagName('tbody')[0];
+
+// Filter function
+function filterTable() {
+  const searchText = searchInput.value.toLowerCase();
+  const selectedStaff = staffFilter ? staffFilter.value : '';
+  const rows = tbody.getElementsByTagName('tr');
+  
+  let visibleCount = 0;
+  let exercisesInProgress = 0;
+  let testsPending = 0;
+  let flaggedCount = 0;
+
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].id === 'noResults') continue;
+    
+    const row = rows[i];
+    const name = row.getAttribute('data-student-name').toLowerCase();
+    const email = row.getAttribute('data-student-email').toLowerCase();
+    const assignedStaff = row.getAttribute('data-assigned-staff');
+    const exercises = row.getAttribute('data-exercises');
+    const test = row.getAttribute('data-test');
+    const flagged = row.getAttribute('data-flagged');
+    
+    // Check search match
+    const searchMatch = name.includes(searchText) || email.includes(searchText);
+    
+    // Check staff filter match (admin only)
+    let staffMatch = true;
+    if (staffFilter && selectedStaff !== '') {
+      staffMatch = assignedStaff.includes(selectedStaff);
+    }
+    
+    // Show or hide row
+    if (searchMatch && staffMatch) {
+      row.style.display = '';
+      visibleCount++;
+      
+      // Count stats for visible rows
+      if (exercises === 'In Progress') exercisesInProgress++;
+      if (test === 'Pending Review') testsPending++;
+      if (flagged === 'yes') flaggedCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  }
+  
+  // Handle no results
+  const existingNoResults = document.getElementById('noResults');
+  if (visibleCount === 0) {
+    if (!existingNoResults) {
+      const noResultRow = document.createElement('tr');
+      noResultRow.id = 'noResults';
+      noResultRow.innerHTML = '<td colspan="8" class="text-center text-muted py-4">No results found</td>';
+      tbody.appendChild(noResultRow);
+    }
+  } else {
+    if (existingNoResults) {
+      existingNoResults.remove();
+    }
+  }
+  
+  // Update stats
+  updateStats(visibleCount, exercisesInProgress, testsPending, flaggedCount);
+}
+
+// Update stats counters
+function updateStats(totalStudents, exercisesInProgress, testsPending, flaggedStudents) {
+  document.getElementById('totalStudentsCount').innerText = totalStudents;
+  document.getElementById('exercisesInProgressCount').innerText = exercisesInProgress;
+  document.getElementById('testsPendingCount').innerText = testsPending;
+  document.getElementById('flaggedStudentsCount').innerText = flaggedStudents;
+}
+
+// Initialize stats on load
+function initializeStats() {
+  const rows = tbody.getElementsByTagName('tr');
+  let totalStudents = 0;
+  let exercisesInProgress = 0;
+  let testsPending = 0;
+  let flaggedCount = 0;
+  
+  for (let i = 0; i < rows.length; i++) {
+    totalStudents++;
+    const exercises = rows[i].getAttribute('data-exercises');
+    const test = rows[i].getAttribute('data-test');
+    const flagged = rows[i].getAttribute('data-flagged');
+    
+    if (exercises === 'In Progress') exercisesInProgress++;
+    if (test === 'Pending Review') testsPending++;
+    if (flagged === 'yes') flaggedCount++;
+  }
+  
+  updateStats(totalStudents, exercisesInProgress, testsPending, flaggedCount);
+}
+
+// Event listeners
+searchInput.addEventListener('keyup', filterTable);
+if (staffFilter) {
+  staffFilter.addEventListener('change', filterTable);
+}
+
+// Initialize on page load
+window.addEventListener('load', initializeStats);
+</script>
+
 {% endblock %}
