@@ -63,11 +63,13 @@ class Staff(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    is_admin = db.Column(db.Boolean, default=True) 
+    is_admin = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime, nullable=True)
     max_students = db.Column(db.Integer, default=5)
 
     # Relationships - Fixed with explicit foreign_keys
@@ -364,6 +366,19 @@ class LoginHistory(db.Model):
 
     # Relationships
     student = db.relationship("Student", backref="login_history")
+
+
+class StaffLoginHistory(db.Model):
+    __tablename__ = "staff_login_history"
+
+    id = db.Column(db.Integer, primary_key=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey("staff.id"), nullable=False)
+    login_time = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45), nullable=True)  # IPv4/IPv6
+    user_agent = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    staff = db.relationship("Staff", backref="login_history")
 
 
 # Performance indexes

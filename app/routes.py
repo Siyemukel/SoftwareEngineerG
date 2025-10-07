@@ -5,15 +5,17 @@ from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 from .models import *
-from .extensions import db, socketio
+from datetime import datetime
+from .extensions import db, socketio, mail
 from .services import get_next_question, ai_evaluate_answer , assign_student_to_staff,send_department_email
 from .forms import  *
-from .extensions import mail
 from sqlalchemy import or_, and_
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import pandas as pd
+from itsdangerous import URLSafeTimedSerializer
+from flask_mail import Message as MailMessage
 
 
 main = Blueprint("main", __name__)
@@ -120,6 +122,17 @@ def login_user_account():
     staff = Staff.query.filter_by(username=username_or_email).first()
     if staff and staff.check_password(password):
         login_user(staff)
+
+        # Update last login and record login history
+        staff.last_login = datetime.utcnow()
+        login_history = StaffLoginHistory(
+            staff_id=staff.id,
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
+        db.session.add(login_history)
+        db.session.commit()
+
         print("Logged in as staff!", "success")
         return redirect(url_for("main.staff_dashboard"))
 
@@ -849,6 +862,7 @@ def profile():
         current_user.name = request.form.get("name")
         current_user.surname = request.form.get("surname")
         current_user.username = request.form.get("username")
+        current_user.email = request.form.get("email")
 
         # Handle password update (with confirm check)
         password = request.form.get("password")
@@ -870,6 +884,47 @@ def profile():
         return redirect(url_for("main.profile"))
 
     return render_template("/staff/staff_profile.html", user=current_user)
+
+
+@main.route("/api/staff_profile_data", methods=["GET"])
+@login_required
+def staff_profile_data():
+    if not isinstance(current_user, Staff):
+        return {"error": "Unauthorized"}, 403
+
+    import requests
+
+    # Get IP address
+    ip = request.remote_addr
+    if ip == '127.0.0.1' or ip.startswith('192.168.') or ip.startswith('10.'):
+        # Local IP, use a public IP for testing, or default
+        ip = '8.8.8.8'  # Google's DNS for example
+
+    # Fetch geolocation
+    try:
+        response = requests.get(f'http://ipapi.co/{ip}/json/')
+        data = response.json()
+        country = data.get('country_name', 'Unknown')
+        timezone = data.get('timezone', 'Unknown')
+    except:
+        country = 'South Africa'  # Default
+        timezone = 'Africa/Johannesburg'
+
+    # Get login history
+    login_histories = StaffLoginHistory.query.filter_by(staff_id=current_user.id).order_by(StaffLoginHistory.login_time.desc()).limit(5).all()
+    login_activity = []
+    for lh in login_histories:
+        login_activity.append({
+            'date': lh.login_time.strftime('%d %b %Y, %H:%M'),
+            'device': 'Unknown',  # Could parse user_agent
+            'ip': lh.ip_address or 'Unknown'
+        })
+
+    return {
+        'country': country,
+        'timezone': timezone,
+        'login_activity': login_activity
+    }
 
 
 
@@ -1567,3 +1622,62 @@ def logout():
     logout_user()
     print("You have been logged out.", "success")
     return redirect(url_for("main.home"))
+
+#--------------------Forgot Password--------------------
+@main.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+        user = None
+        # Check if student or staff
+        user = Student.query.filter_by(student_email=email).first()
+        if not user:
+            user = Staff.query.filter_by(username=email).first()  # Assuming username is email for staff
+
+        if user:
+            s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+            token = s.dumps(email, salt='password-reset')
+            reset_url = url_for('main.reset_password', token=token, _external=True)
+
+            # For demo, print the reset link to console instead of sending email
+            print(f"Password reset link: {reset_url}")
+
+            flash("A password reset link has been generated. Check the console for the link.", "info")
+        else:
+            flash("Email not found.", "danger")
+
+        return redirect(url_for("main.login"))
+
+    return render_template("auth/forgot_password.html")
+
+#--------------------Reset Password--------------------
+@main.route("/reset_password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        email = s.loads(token, salt='password-reset', max_age=3600)  # 1 hour
+    except:
+        flash("The reset link is invalid or has expired.", "danger")
+        return redirect(url_for("main.login"))
+
+    if request.method == "POST":
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for("main.reset_password", token=token))
+
+        user = Student.query.filter_by(student_email=email).first()
+        if not user:
+            user = Staff.query.filter_by(username=email).first()
+
+        if user:
+            user.set_password(password)
+            db.session.commit()
+            flash("Your password has been reset.", "success")
+            return redirect(url_for("main.login"))
+        else:
+            flash("User not found.", "danger")
+
+    return render_template("auth/reset_password.html", token=token)
