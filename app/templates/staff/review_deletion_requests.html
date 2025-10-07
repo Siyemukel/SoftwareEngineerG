@@ -1,52 +1,385 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Review Student Deletion Requests</h2>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --warning-yellow: #ffc107;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.deletion-requests-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.stats-badge {
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.search-filter-section {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.requests-table-container {
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.requests-table {
+  width: 100%;
+  margin: 0;
+}
+
+.requests-table thead {
+  background: var(--black);
+  color: var(--white);
+}
+
+.requests-table thead th {
+  padding: 1.2rem 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.requests-table tbody td {
+  padding: 1.2rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.requests-table tbody tr {
+  transition: var(--transition);
+}
+
+.requests-table tbody tr:hover {
+  background: var(--light-gray);
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name {
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: 0.25rem;
+}
+
+.student-email {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-warning {
+  background: var(--warning-yellow);
+  color: var(--black);
+}
+
+.badge-approved {
+  background: var(--success-green);
+  color: var(--white);
+}
+
+.badge-rejected {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.request-id {
+  font-weight: 700;
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+}
+
+.reason-text {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reason-text:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.85rem;
+}
+
+.btn-success {
+  background: var(--success-green);
+  color: var(--white);
+}
+
+.btn-success:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-danger {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.empty-state-icon {
+  font-size: 5rem;
+  color: var(--medium-gray);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-gray);
+  font-size: 1.1rem;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+.deleted-indicator {
+  color: var(--text-gray);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .requests-table-container {
+    overflow-x: auto;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.requests-table tbody tr {
+  animation: fadeIn 0.3s ease-out backwards;
+}
+
+.requests-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.requests-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+.requests-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+.requests-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+.requests-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+</style>
+
+<div class="deletion-requests-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2> Student Deletion Requests</h2>
+        <div class="stats-badge" id="requestCount">
+            {{ requests|length if requests else 0 }} Pending
+        </div>
+    </div>
 
     {% if requests %}
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
+    <!-- Search Section -->
+    <div class="search-filter-section">
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by student name, email, or reason...">
+    </div>
+
+    <!-- Requests Table -->
+    <div class="requests-table-container">
+        <table class="requests-table" id="requestsTable">
+            <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Student</th>
-                    <th>Requested By</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Requested At</th>
-                    <th>Actions</th>
+                    <th>STUDENT</th>
+                    <th>REQUESTED BY</th>
+                    <th>REASON</th>
+                    <th>STATUS</th>
+                    <th>REQUESTED AT</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
                 {% for req in requests %}
-                <tr>
-                    <td>{{ req.id }}</td>
+                <tr data-student-name="{% if req.student %}{{ req.student.name }} {{ req.student.surname }}{% endif %}"
+                    data-student-email="{% if req.student %}{{ req.student.student_email }}{% endif %}"
+                    data-reason="{{ req.reason }}"
+                    data-requested-by="{{ req.requested_by.name if req.requested_by else 'Unknown' }}">
+                    <td>
+                        <span class="request-id">#{{ req.id }}</span>
+                    </td>
                     <td>
                         {% if req.student %}
-                            {{ req.student.name }} {{ req.student.surname }}
-                            <small class="d-block text-muted">{{ req.student.student_email }}</small>
+                            <div class="student-info">
+                                <span class="student-name">{{ req.student.name }} {{ req.student.surname }}</span>
+                                <span class="student-email">{{ req.student.student_email }}</span>
+                            </div>
                         {% else %}
-                            <span class="text-muted">[Student Deleted]</span>
+                            <span class="deleted-indicator">[Student Already Deleted]</span>
                         {% endif %}
                     </td>
-                    <td>{{ req.requested_by.name if req.requested_by else 'Unknown' }}</td>
-                    <td>{{ req.reason }}</td>
                     <td>
-                        <span class="badge bg-warning">{{ req.status }}</span>
+                        <strong>{{ req.requested_by.name if req.requested_by else 'Unknown' }}</strong>
+                    </td>
+                    <td>
+                        <span class="reason-text" title="{{ req.reason }}">{{ req.reason }}</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-warning">{{ req.status }}</span>
                     </td>
                     <td>{{ req.created_at.strftime('%b %d, %Y %H:%M') }}</td>
                     <td>
-                        <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='approve') }}"
-                           class="btn btn-success btn-sm"
-                           onclick="return confirm('Are you sure you want to approve and delete this student?');">
-                            Approve
-                        </a>
-                        <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='reject') }}"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Are you sure you want to reject this request?');">
-                            Reject
-                        </a>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='approve') }}"
+                               class="btn btn-success"
+                               onclick="return confirm('⚠️ Are you sure you want to APPROVE and DELETE this student?\n\nStudent: {% if req.student %}{{ req.student.name }} {{ req.student.surname }}{% endif %}\n\nThis action is PERMANENT and cannot be undone!');">
+                                ✓ Approve
+                            </a>
+                            <a href="{{ url_for('main.handle_deletion_request', request_id=req.id, action='reject') }}"
+                               class="btn btn-danger"
+                               onclick="return confirm('Are you sure you want to REJECT this deletion request?\n\nThe student will remain in the system.');">
+                                ✗ Reject
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -54,7 +387,71 @@
         </table>
     </div>
     {% else %}
-        <p class="text-muted">No pending deletion requests at this time.</p>
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3>No Pending Deletion Requests</h3>
+        <p>There are no student deletion requests waiting for your review at this time.</p>
+    </div>
     {% endif %}
 </div>
+
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+
+<script>
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('requestsTable');
+    
+    if (searchInput && table) {
+        const tbody = table.getElementsByTagName('tbody')[0];
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const studentName = row.getAttribute('data-student-name').toLowerCase();
+                const studentEmail = row.getAttribute('data-student-email').toLowerCase();
+                const reason = row.getAttribute('data-reason').toLowerCase();
+                const requestedBy = row.getAttribute('data-requested-by').toLowerCase();
+                
+                const searchMatch = studentName.includes(searchText) || 
+                                  studentEmail.includes(searchText) || 
+                                  reason.includes(searchText) ||
+                                  requestedBy.includes(searchText);
+                
+                if (searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            
+            // Update count badge
+            const countBadge = document.getElementById('requestCount');
+            if (countBadge) {
+                countBadge.textContent = visibleCount + ' Pending';
+            }
+        });
+    }
+    
+    // Add smooth scroll to top when clicking approve/reject
+    const actionButtons = document.querySelectorAll('.btn-success, .btn-danger');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Scroll happens after confirmation
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
+        });
+    });
+});
+</script>
+
 {% endblock %}
