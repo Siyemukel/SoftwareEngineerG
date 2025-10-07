@@ -1,28 +1,529 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Notification Settings</h2>
-<form method="POST">
-    <table>
-        <thead>
-            <tr>
-                <th>Notification Type</th>
-                <th>Enabled</th>
-                <th>Email</th>
-                <th>Dashboard</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for notif in notifications %}
-            <tr>
-                <td>{{ notif.notification_type }}</td>
-                <td><input type="checkbox" name="enabled_{{ notif.id }}" {% if notif.enabled %}checked{% endif %}></td>
-                <td><input type="checkbox" name="email_{{ notif.id }}" {% if notif.method_email %}checked{% endif %}></td>
-                <td><input type="checkbox" name="dashboard_{{ notif.id }}" {% if notif.method_dashboard %}checked{% endif %}></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit">Save Settings</button>
-</form>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --warning-yellow: #ffc107;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.settings-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.settings-icon {
+  font-size: 2.5rem;
+}
+
+.info-box {
+  background: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--primary-blue);
+}
+
+.info-box p {
+  margin: 0;
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+.settings-form-container {
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.settings-table {
+  width: 100%;
+  margin: 0;
+}
+
+.settings-table thead {
+  background: var(--black);
+  color: var(--white);
+}
+
+.settings-table thead th {
+  padding: 1.2rem 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: none;
+  text-align: left;
+}
+
+.settings-table thead th:first-child {
+  width: 40%;
+}
+
+.settings-table tbody td {
+  padding: 1.5rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.settings-table tbody tr {
+  transition: var(--transition);
+}
+
+.settings-table tbody tr:hover {
+  background: var(--light-gray);
+}
+
+.notification-type {
+  font-weight: 600;
+  color: var(--dark-gray);
+  font-size: 1.05rem;
+}
+
+/* Custom Checkbox Styling */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-checkbox {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 24px;
+  width: 24px;
+  background-color: var(--white);
+  border: 2px solid var(--medium-gray);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.custom-checkbox:hover .checkmark {
+  border-color: var(--primary-blue);
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark:after {
+  display: block;
+}
+
+.form-actions {
+  padding: 2rem;
+  background: var(--light-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-save {
+  padding: 1rem 2.5rem;
+  background: var(--success-green);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-save:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-save:active {
+  transform: translateY(0);
+}
+
+.save-hint {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Success Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 2.5rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 500px;
+  margin: 0 20px;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-message {
+  color: var(--dark-gray);
+  font-size: 1.1rem;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+}
+
+.btn-modal {
+  padding: 0.75rem 2.5rem;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-modal:hover {
+  background: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-table tbody tr {
+  animation: fadeIn 0.3s ease-out backwards;
+}
+
+.settings-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.settings-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+.settings-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+.settings-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+.settings-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 0 15px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .settings-form-container {
+    overflow-x: auto;
+  }
+
+  .settings-table thead th,
+  .settings-table tbody td {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .btn-save {
+    width: 100%;
+  }
+
+  .back-btn {
+    bottom: 15px;
+    left: 15px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    padding: 2rem;
+    margin: 0 15px;
+  }
+}
+</style>
+
+<div class="settings-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2> Notification Settings</h2>
+        
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p> Customize how you receive notifications. Enable or disable specific notification types and choose your preferred delivery methods (Email or Dashboard).</p>
+    </div>
+
+    <!-- Settings Form -->
+    <form method="POST" id="settingsForm">
+        <div class="settings-form-container">
+            <table class="settings-table">
+                <thead>
+                    <tr>
+                        <th>NOTIFICATION TYPE</th>
+                        <th style="text-align: center;">ENABLED</th>
+                        <th style="text-align: center;"> EMAIL</th>
+                        <th style="text-align: center;"> DASHBOARD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notif in notifications %}
+                    <tr>
+                        <td>
+                            <span class="notification-type">{{ notif.notification_type }}</span>
+                        </td>
+                        <td>
+                            <div class="checkbox-wrapper">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="enabled_{{ notif.id }}" {% if notif.enabled %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox-wrapper">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="email_{{ notif.id }}" {% if notif.method_email %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox-wrapper">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="dashboard_{{ notif.id }}" {% if notif.method_dashboard %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <span class="save-hint"> Don't forget to save your changes</span>
+            <button type="submit" class="btn-save"> Save Settings</button>
+        </div>
+    </form>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <p class="modal-message">Notification settings saved successfully!</p>
+        <button onclick="closeModal()" class="btn-modal">Close</button>
+    </div>
+</div>
+
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for success message in URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+        showSuccessModal();
+    }
+
+    // Form submission with confirmation
+    const form = document.getElementById('settingsForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const confirmed = confirm('Save Notification Settings?\n\nAre you sure you want to save these changes?');
+            
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+
+    // Auto-enable at least one delivery method when enabled is checked
+    const enabledCheckboxes = document.querySelectorAll('input[name^="enabled_"]');
+    enabledCheckboxes.forEach(function(enabledCheckbox) {
+        enabledCheckbox.addEventListener('change', function() {
+            const notifId = this.name.split('_')[1];
+            const emailCheckbox = document.querySelector(`input[name="email_${notifId}"]`);
+            const dashboardCheckbox = document.querySelector(`input[name="dashboard_${notifId}"]`);
+            
+            if (this.checked) {
+                // If enabled but no delivery method selected, auto-enable dashboard
+                if (!emailCheckbox.checked && !dashboardCheckbox.checked) {
+                    dashboardCheckbox.checked = true;
+                }
+            }
+        });
+    });
+
+    // Visual feedback for row changes
+    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    allCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const row = this.closest('tr');
+            row.style.background = 'rgba(13, 110, 253, 0.1)';
+            setTimeout(function() {
+                row.style.background = '';
+            }, 500);
+        });
+    });
+});
+
+// Show success modal
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Close modal function
+function closeModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('successModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+</script>
+
 {% endblock %}

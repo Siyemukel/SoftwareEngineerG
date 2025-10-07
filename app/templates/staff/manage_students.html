@@ -1,40 +1,379 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Manage Students</h2>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --warning-yellow: #ffc107;
+  --info-cyan: #17a2b8;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
 
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
 
-{% block head %}
-<!-- Add Manage Students CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_students.css') }}">
-{% endblock %}
+.manage-students-container {
+  max-width: 1600px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
 
-    <!-- Back to Dashboard Button -->
-    <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary mb-3">Back to Dashboard</a>
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover students-table">
-            <thead class="table-dark">
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.stats-badge {
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.search-section {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.students-table-container {
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.students-table {
+  width: 100%;
+  margin: 0;
+}
+
+.students-table thead {
+  background: var(--black);
+  color: var(--white);
+}
+
+.students-table thead th {
+  padding: 1.2rem 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: none;
+  white-space: nowrap;
+}
+
+.students-table tbody td {
+  padding: 1.2rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.students-table tbody tr {
+  transition: var(--transition);
+}
+
+.students-table tbody tr:hover {
+  background: var(--light-gray);
+}
+
+.student-id {
+  font-weight: 700;
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+}
+
+.student-name {
+  font-weight: 600;
+  color: var(--dark-gray);
+}
+
+.student-email {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.btn-danger {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-warning {
+  background: var(--warning-yellow);
+  color: var(--black);
+}
+
+.btn-warning:hover {
+  background: #e0a800;
+  color: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.btn-info {
+  background: var(--info-cyan);
+  color: var(--white);
+}
+
+.btn-info:hover {
+  background: #138496;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.btn-success {
+  background: var(--success-green);
+  color: var(--white);
+}
+
+.btn-success:hover {
+  background: #218838;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.empty-state-icon {
+  font-size: 5rem;
+  color: var(--medium-gray);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-gray);
+  font-size: 1.1rem;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.students-table tbody tr {
+  animation: fadeIn 0.3s ease-out backwards;
+}
+
+.students-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.students-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+.students-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+.students-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+.students-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .manage-students-container {
+    padding: 0 15px;
+  }
+
+  .students-table-container {
+    overflow-x: auto;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    min-width: 150px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .back-btn {
+    bottom: 15px;
+    left: 15px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+</style>
+
+<div class="manage-students-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Manage Students</h2>
+        <div class="stats-badge" id="studentCount">
+            {{ students|length }} Students
+        </div>
+    </div>
+
+    {% if students %}
+    <!-- Search Section -->
+    <div class="search-section">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by name, surname, email, course, or faculty...">
+    </div>
+
+    <!-- Students Table -->
+    <div class="students-table-container">
+        <table class="students-table" id="studentsTable">
+            <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Surname</th>
-                    <th>Email</th>
-                    <th>Course</th>
-                    <th>Year</th>
-                    <th>Faculty</th>
-                    <th>Department</th>
-                    <th>Actions</th>
+                    <th>NAME</th>
+                    <th>SURNAME</th>
+                    <th>EMAIL</th>
+                    <th>COURSE</th>
+                    <th>YEAR</th>
+                    <th>FACULTY</th>
+                    <th>DEPARTMENT</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student in students %}
-                <tr>
-                    <td>{{ student.id }}</td>
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.surname }}</td>
-                    <td>{{ student.student_email }}</td>
+                <tr data-name="{{ student.name }}"
+                    data-surname="{{ student.surname }}"
+                    data-email="{{ student.student_email }}"
+                    data-course="{{ student.course }}"
+                    data-faculty="{{ student.faculty }}">
+                    <td>
+                        <span class="student-id">#{{ student.id }}</span>
+                    </td>
+                    <td>
+                        <span class="student-name">{{ student.name }}</span>
+                    </td>
+                    <td>
+                        <span class="student-name">{{ student.surname }}</span>
+                    </td>
+                    <td>
+                        <span class="student-email">{{ student.student_email }}</span>
+                    </td>
                     <td>{{ student.course }}</td>
                     <td>{{ student.year_of_study }}</td>
                     <td>{{ student.faculty }}</td>
@@ -48,44 +387,92 @@
                         {% endif %}
                     </td>
                     <td>
-                        <div class="action-buttons d-flex flex-wrap gap-2">
-
+                        <div class="action-buttons">
                             {% if current_user.is_admin %}
-                            <a href="#" class="btn btn-danger btn-sm"
+                            <a href="#" class="btn btn-danger"
                                data-bs-toggle="modal" 
                                data-bs-target="#confirmDeleteModal" 
-                               data-student-id="{{ student.id }}">
+                               data-student-id="{{ student.id }}"
+                               onclick="return confirm('Are you sure you want to DELETE this student?\n\nStudent: {{ student.name }} {{ student.surname }}\nEmail: {{ student.student_email }}\n\nThis action is PERMANENT and cannot be undone!');">
                                Delete
                             </a>
                             {% else %}
                             <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
-                               class="btn btn-warning btn-sm">Request Deletion</a>
+                               class="btn btn-warning">Request Deletion</a>
                             {% endif %}
                           
-                            <!-- Single View Progress Button -->
                             <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}" 
-                               class="btn btn-info btn-sm">View Student Progress</a>
+                               class="btn btn-info">View Progress</a>
 
-                            <!-- Quick Feedback Button -->
                             <a href="{{ url_for('main.refer_student_department', student_id=student.id) }}" 
-                               class="btn btn-success btn-sm">Refer Student</a>
+                               class="btn btn-success">Refer Student</a>
 
                             <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
-                               class="btn btn-primary btn-sm">Generate Report</a>
+                               class="btn btn-primary">Generate Report</a>
                         </div>
                     </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9" class="text-center">No students found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">📚</div>
+        <h3>No Students Found</h3>
+        <p>There are no students in the system at this time.</p>
+    </div>
+    {% endif %}
 </div>
 
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('studentsTable');
+    
+    if (searchInput && table) {
+        const tbody = table.getElementsByTagName('tbody')[0];
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const name = row.getAttribute('data-name').toLowerCase();
+                const surname = row.getAttribute('data-surname').toLowerCase();
+                const email = row.getAttribute('data-email').toLowerCase();
+                const course = row.getAttribute('data-course').toLowerCase();
+                const faculty = row.getAttribute('data-faculty').toLowerCase();
+                
+                const searchMatch = name.includes(searchText) || 
+                                  surname.includes(searchText) || 
+                                  email.includes(searchText) ||
+                                  course.includes(searchText) ||
+                                  faculty.includes(searchText);
+                
+                if (searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            
+            // Update count badge
+            const countBadge = document.getElementById('studentCount');
+            if (countBadge) {
+                countBadge.textContent = visibleCount + ' Students';
+            }
+        });
+    }
+});
+</script>
 
-<script src="{{ url_for('static', filename='js/manage_students.js') }}"></script>
 {% endblock %}

@@ -1,24 +1,316 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;">
-    <div class="card shadow-sm p-4">
-        <h3 class="mb-4">Request Deletion: {{ student.name }}</h3>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --danger-red: #dc3545;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
 
-        <form method="POST">
-            <div class="mb-3">
-                <label for="reason" class="form-label fw-bold">Reason for deletion</label>
-                <textarea name="reason" id="reason" class="form-control" rows="4" required></textarea>
-            </div>
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
 
-            <div class="d-grid mt-3">
-                <button type="submit" class="btn btn-danger btn-lg">Submit Request</button>
-            </div>
-        </form>
+.deletion-form-container {
+  max-width: 700px;
+  width: 100%;
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: slideUp 0.5s ease-out;
+}
 
-        <div class="text-center mt-3">
-            <a href="{{ url_for('main.manage_students') }}" class="btn btn-outline-secondary">Back to Students</a>
-        </div>
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-header {
+  background: var(--black);
+  color: var(--white);
+  padding: 2rem;
+  text-align: center;
+}
+
+.form-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.student-name-display {
+  color: var(--primary-blue);
+  background: rgba(13, 110, 253, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.form-body {
+  padding: 2.5rem;
+}
+
+.warning-box {
+  background: #fff5f5;
+  border-left: 4px solid var(--danger-red);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.warning-box-title {
+  color: var(--danger-red);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.warning-box-text {
+  color: #c92a2a;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition);
+  resize: vertical;
+  min-height: 150px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.char-counter {
+  text-align: right;
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-danger {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--medium-gray);
+  color: var(--dark-gray);
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+  color: var(--dark-gray);
+  transform: translateY(-2px);
+}
+
+.info-text {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--light-gray);
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-body {
+    padding: 1.5rem;
+  }
+
+  .form-header {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+</style>
+
+<div class="deletion-form-container">
+  <!-- Header -->
+  <div class="form-header">
+    <h3>Request Student Deletion</h3>
+    <div class="student-name-display">{{ student.name }} {{ student.surname if student.surname else '' }}</div>
+  </div>
+
+  <!-- Body -->
+  <div class="form-body">
+    <!-- Warning Box -->
+    <div class="warning-box">
+      <div class="warning-box-title">Warning: Permanent Action</div>
+      <p class="warning-box-text">
+        This request will be reviewed by an administrator. If approved, all student data including progress, test results, and chat history will be permanently deleted. This action cannot be undone.
+      </p>
     </div>
+
+    <!-- Form -->
+    <form method="POST" id="deletionForm">
+      <div class="form-group">
+        <label for="reason" class="form-label">Reason for Deletion Request</label>
+        <textarea 
+          name="reason" 
+          id="reason" 
+          class="form-control" 
+          placeholder="Please provide a detailed explanation for why this student should be removed from the system..."
+          required
+          maxlength="1000"></textarea>
+        <div class="char-counter">
+          <span id="charCount">0</span> / 1000 characters
+        </div>
+      </div>
+
+      <div class="info-text">
+        <strong>Note:</strong> Your request will be sent to the system administrator for review. You will be notified once a decision has been made. Please ensure your reason is clear and justified.
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <a href="{{ url_for('main.manage_students') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger" id="submitBtn">Submit Request</button>
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('deletionForm');
+  const reasonTextarea = document.getElementById('reason');
+  const charCount = document.getElementById('charCount');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Character counter
+  reasonTextarea.addEventListener('input', function() {
+    const length = this.value.length;
+    charCount.textContent = length;
+    
+    // Change color as approaching limit
+    if (length > 900) {
+      charCount.style.color = '#dc3545';
+    } else if (length > 700) {
+      charCount.style.color = '#ffc107';
+    } else {
+      charCount.style.color = '#555555';
+    }
+  });
+
+  // Form validation
+  form.addEventListener('submit', function(e) {
+    const reason = reasonTextarea.value.trim();
+    
+    if (reason.length < 20) {
+      e.preventDefault();
+      alert('Please provide a more detailed reason (at least 20 characters).');
+      reasonTextarea.focus();
+      return false;
+    }
+
+    // Confirmation dialog
+    const studentName = '{{ student.name }} {{ student.surname if student.surname else '' }}';
+    const confirmed = confirm(
+      'Are you sure you want to submit this deletion request?\n\n' +
+      'Student: ' + studentName + '\n\n' +
+      'This will be sent to the administrator for review.'
+    );
+
+    if (!confirmed) {
+      e.preventDefault();
+      return false;
+    }
+
+    // Disable button to prevent double submission
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+  });
+
+  // Focus on textarea when page loads
+  reasonTextarea.focus();
+});
+</script>
+
 {% endblock %}

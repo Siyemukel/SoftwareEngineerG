@@ -1,40 +1,403 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Customize Report Settings</h2>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
 
-<form method="POST">
-    {{ form.hidden_tag() }}
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
 
-    <div>
-        {{ form.include_student_email.label }} {{ form.include_student_email() }}
-    </div>
-    <div>
-        {{ form.include_name.label }} {{ form.include_name() }}
-    </div>
-    <div>
-        {{ form.include_surname.label }} {{ form.include_surname() }}
-    </div>
-    <div>
-        {{ form.include_course.label }} {{ form.include_course() }}
-    </div>
-    <div>
-        {{ form.include_year.label }} {{ form.include_year() }}
-    </div>
-    <div>
-        {{ form.include_faculty.label }} {{ form.include_faculty() }}
-    </div>
-    <div>
-        {{ form.include_test_results.label }} {{ form.include_test_results() }}
-    </div>
-    <div>
-        {{ form.include_exercises_progress.label }} {{ form.include_exercises_progress() }}
-    </div>
+.settings-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
 
-    <div>
-        {{ form.report_format.label }} {{ form.report_format() }}
-    </div>
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  text-align: center;
+}
 
-    <button type="submit">{{ form.submit.label }}</button>
-</form>
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.page-subtitle {
+  color: var(--text-gray);
+  margin: 0;
+}
+
+.settings-form-container {
+  background: var(--white);
+  padding: 2.5rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.settings-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-title {
+  color: var(--dark-gray);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--medium-gray);
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: var(--light-gray);
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  border-color: var(--primary-blue);
+  background: rgba(13, 110, 253, 0.05);
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+}
+
+.checkbox-item label {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin: 0;
+  flex: 1;
+}
+
+.format-section {
+  background: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.format-label {
+  display: block;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radio-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.radio-item input[type="radio"] {
+  display: none;
+}
+
+.radio-label {
+  display: block;
+  padding: 1rem;
+  background: var(--white);
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--dark-gray);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.radio-item input[type="radio"]:checked + .radio-label {
+  background: var(--primary-blue);
+  color: var(--white);
+  border-color: var(--primary-blue);
+}
+
+.radio-label:hover {
+  border-color: var(--primary-blue);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+}
+
+.btn-secondary {
+  background: var(--medium-gray);
+  color: var(--dark-gray);
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+  transform: translateY(-2px);
+}
+
+.info-box {
+  background: rgba(13, 110, 253, 0.1);
+  border-left: 4px solid var(--primary-blue);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.info-box p {
+  margin: 0;
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-form-container {
+    padding: 1.5rem;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-group {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
+</style>
+
+<div class="settings-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Customize Report Settings</h2>
+    <p class="page-subtitle">Select which fields to include in your student reports</p>
+  </div>
+
+  <!-- Settings Form -->
+  <div class="settings-form-container">
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <!-- Student Information Section -->
+      <div class="settings-section">
+        <h3 class="section-title">Student Information</h3>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            {{ form.include_student_email(id="include_student_email") }}
+            {{ form.include_student_email.label(for="include_student_email") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_name(id="include_name") }}
+            {{ form.include_name.label(for="include_name") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_surname(id="include_surname") }}
+            {{ form.include_surname.label(for="include_surname") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_course(id="include_course") }}
+            {{ form.include_course.label(for="include_course") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_year(id="include_year") }}
+            {{ form.include_year.label(for="include_year") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_faculty(id="include_faculty") }}
+            {{ form.include_faculty.label(for="include_faculty") }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Information Section -->
+      <div class="settings-section">
+        <h3 class="section-title">Progress Information</h3>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            {{ form.include_test_results(id="include_test_results") }}
+            {{ form.include_test_results.label(for="include_test_results") }}
+          </div>
+          <div class="checkbox-item">
+            {{ form.include_exercises_progress(id="include_exercises_progress") }}
+            {{ form.include_exercises_progress.label(for="include_exercises_progress") }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Format Section -->
+      <div class="settings-section">
+        <h3 class="section-title">Report Format</h3>
+        <div class="format-section">
+          <label class="format-label">{{ form.report_format.label }}</label>
+          <div class="radio-group">
+            {% for choice in form.report_format %}
+            <div class="radio-item">
+              {{ choice(id="format_" ~ loop.index) }}
+              <label for="format_{{ loop.index }}" class="radio-label">
+                {{ choice.label.text }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <p><strong>Note:</strong> These settings will apply to all future reports generated. You can change these settings at any time.</p>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Make the entire checkbox item clickable
+  const checkboxItems = document.querySelectorAll('.checkbox-item');
+  
+  checkboxItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      if (e.target.tagName !== 'INPUT') {
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+      }
+    });
+  });
+
+  // Highlight selected checkboxes
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  
+  function updateCheckboxStyles() {
+    checkboxes.forEach(checkbox => {
+      const item = checkbox.closest('.checkbox-item');
+      if (checkbox.checked) {
+        item.style.borderColor = 'var(--primary-blue)';
+        item.style.background = 'rgba(13, 110, 253, 0.1)';
+      } else {
+        item.style.borderColor = 'var(--medium-gray)';
+        item.style.background = 'var(--light-gray)';
+      }
+    });
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateCheckboxStyles);
+  });
+
+  // Initialize checkbox styles
+  updateCheckboxStyles();
+
+  // Form submission confirmation
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+    
+    if (checkedCount === 0) {
+      e.preventDefault();
+      alert('Please select at least one field to include in the report.');
+      return false;
+    }
+  });
+});
+</script>
+
 {% endblock %}

@@ -1,37 +1,510 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Review Application</h2>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --warning-yellow: #ffc107;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <p><strong>Student:</strong> {{ proof.student.name }} {{ proof.student.surname }}</p>
-            <p>
-                <strong>Medical Proof:</strong>  
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.review-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.student-info-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.info-row {
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--dark-gray);
+  min-width: 180px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  color: var(--text-gray);
+  flex: 1;
+  font-size: 1rem;
+}
+
+.student-name {
+  color: var(--primary-blue);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.btn-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+.btn-file:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.review-form-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: var(--transition);
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.btn-approve {
+  background: var(--success-green);
+  color: var(--white);
+}
+
+.btn-approve:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-reject {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.btn-reject:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.info-box {
+  background: var(--light-gray);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--warning-yellow);
+}
+
+.info-box p {
+  margin: 0;
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Success Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 2.5rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 500px;
+  margin: 0 20px;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-message {
+  color: var(--dark-gray);
+  font-size: 1.1rem;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+}
+
+.btn-modal {
+  padding: 0.75rem 2.5rem;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-modal:hover {
+  background: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .review-container {
+    padding: 0 15px;
+  }
+
+  .page-header {
+    padding: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .student-info-card,
+  .review-form-card {
+    padding: 1.5rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .info-label {
+    min-width: auto;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .back-btn {
+    bottom: 15px;
+    left: 15px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    padding: 2rem;
+    margin: 0 15px;
+  }
+}
+</style>
+
+<div class="review-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Review Application</h2>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p>Please review the medical proof carefully before making your decision. If rejecting, provide a clear reason for the student.</p>
+    </div>
+
+    <!-- Student Information Card -->
+    <div class="student-info-card">
+        <div class="info-row">
+            <span class="info-label">Student:</span>
+            <span class="info-value student-name">{{ proof.student.name }} {{ proof.student.surname }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Medical Proof:</span>
+            <span class="info-value">
                 <a href="{{ url_for('main.uploaded_file', filename=proof.file_name) }}"  
                    target="_blank"  
-                   class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-file-medical"></i> {{ proof.file_name }}
+                   class="btn-file">
+                    View Document: {{ proof.file_name }}
                 </a>
-            </p>
-            <p><strong>Uploaded At:</strong> {{ proof.uploaded_at.strftime('%d %B %Y, %H:%M') }}</p>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Uploaded At:</span>
+            <span class="info-value">{{ proof.uploaded_at.strftime('%d %B %Y, %H:%M') }}</span>
         </div>
     </div>
 
-    <form method="POST">
-        <div class="mb-3">
-            <label for="reason" class="form-label">Rejection Reason (if rejecting):</label>
-            <textarea name="reason" id="reason" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="d-flex gap-2">
-            <button type="submit" name="action" value="approve" class="btn btn-success">
-                <i class="fas fa-check"></i> Approve
-            </button>
-            <button type="submit" name="action" value="reject" class="btn btn-danger">
-                <i class="fas fa-times"></i> Reject
-            </button>
-        </div>
-    </form>
+    <!-- Review Form -->
+    <div class="review-form-card">
+        <form method="POST" id="reviewForm">
+            <div class="form-group">
+                <label for="reason" class="form-label">Rejection Reason (if rejecting):</label>
+                <textarea name="reason" 
+                          id="reason" 
+                          class="form-textarea" 
+                          placeholder="Provide a clear reason for rejection..."></textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" 
+                        name="action" 
+                        value="approve" 
+                        class="btn btn-approve"
+                        onclick="return confirm('Are you sure you want to APPROVE this medical proof?\n\nStudent: {{ proof.student.name }} {{ proof.student.surname }}');">
+                    Approve
+                </button>
+                <button type="submit" 
+                        name="action" 
+                        value="reject" 
+                        class="btn btn-reject"
+                        id="rejectBtn">
+                    Reject
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <p class="modal-message" id="modalMessage">Application reviewed successfully!</p>
+        <button onclick="closeModal()" class="btn-modal">Close</button>
+    </div>
+</div>
+
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for success message in URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('approved') === 'true') {
+        document.getElementById('modalMessage').textContent = 'Application approved successfully!';
+        showSuccessModal();
+    } else if (urlParams.get('rejected') === 'true') {
+        document.getElementById('modalMessage').textContent = 'Application rejected successfully!';
+        showSuccessModal();
+    }
+
+    // Handle reject button click
+    const rejectBtn = document.getElementById('rejectBtn');
+    const reasonTextarea = document.getElementById('reason');
+    
+    if (rejectBtn) {
+        rejectBtn.addEventListener('click', function(e) {
+            const reason = reasonTextarea.value.trim();
+            
+            if (!reason) {
+                e.preventDefault();
+                alert('Please provide a reason for rejection before submitting.');
+                reasonTextarea.focus();
+                return false;
+            }
+            
+            const confirmed = confirm(
+                'Are you sure you want to REJECT this medical proof?\n\n' +
+                'Student: {{ proof.student.name }} {{ proof.student.surname }}\n\n' +
+                'Reason: ' + reason
+            );
+            
+            if (!confirmed) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+
+    // Character counter for textarea
+    if (reasonTextarea) {
+        reasonTextarea.addEventListener('input', function() {
+            const charCount = this.value.length;
+            if (charCount > 500) {
+                this.style.borderColor = 'var(--warning-yellow)';
+            } else if (charCount > 0) {
+                this.style.borderColor = 'var(--success-green)';
+            } else {
+                this.style.borderColor = 'var(--medium-gray)';
+            }
+        });
+    }
+});
+
+// Show success modal
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Close modal function
+function closeModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'none';
+        window.location.href = "{{ url_for('main.staff_dashboard') }}";
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('successModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+</script>
+
 {% endblock %}

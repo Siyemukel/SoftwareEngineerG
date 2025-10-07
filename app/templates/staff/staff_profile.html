@@ -1,57 +1,450 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="profile-container">
-    <h2>My Profile</h2>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
 
-    <form method="POST" class="profile-form">
-        <div class="form-group">
-            <label for="name">First Name:</label>
-            <input type="text" id="name" name="name" value="{{ user.name }}" required>
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  padding-bottom: 100px;
+}
+
+.settings-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+}
+
+/* Sidebar */
+.settings-sidebar {
+  width: 280px;
+  background: var(--black);
+  border-right: 1px solid var(--medium-gray);
+  padding: 1rem;
+}
+
+.settings-sidebar h5 {
+  margin-bottom: 1rem;
+  color: var(--white);
+}
+
+.settings-nav .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  color: var(--white);
+  transition: var(--transition);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.settings-nav .nav-link.active,
+.settings-nav .nav-link:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+/* Content */
+.settings-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.settings-content h4 {
+  color: var(--primary-blue);
+  margin-bottom: 1.5rem;
+}
+
+.profile-pic {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-pic img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--white);
+  font-weight: 700;
+  border: 3px solid var(--primary-blue);
+}
+
+.form-control:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-gray);
+  margin-bottom: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  border: none;
+  transition: var(--transition);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: #0b5ed7;
+}
+
+.btn-danger {
+  background: #dc3545;
+  border: none;
+  transition: var(--transition);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.info-box {
+  background: var(--light-gray);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--medium-gray);
+  margin-bottom: 1rem;
+}
+
+.role-display {
+  padding: 0.75rem 1rem;
+  background: var(--light-gray);
+  border: 1px solid var(--medium-gray);
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--dark-gray);
+  text-align: center;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.delete-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--medium-gray);
+}
+
+.delete-warning {
+  background: #fff5f5;
+  border-left: 4px solid #dc3545;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.delete-warning p {
+  margin: 0;
+  color: #c92a2a;
+  font-weight: 500;
+}
+
+/* Back button */
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column;
+  }
+  
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--medium-gray);
+  }
+  
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .settings-nav .nav-link {
+    white-space: nowrap;
+  }
+}
+</style>
+
+<div class="settings-container">
+  <!-- Sidebar -->
+  <div class="settings-sidebar">
+    <h5>My Profile</h5>
+    <nav class="nav flex-column settings-nav">
+      <a class="nav-link active" data-tab="personal">Personal Info</a>
+      <a class="nav-link" data-tab="password">Change Password</a>
+      <a class="nav-link" data-tab="privacy">Privacy & Policies</a>
+      {% if not user.is_admin %}
+      <a class="nav-link" data-tab="delete">Delete Account</a>
+      {% endif %}
+    </nav>
+  </div>
+
+  <!-- Content -->
+  <div class="settings-content">
+    
+    <!-- Personal Info Tab -->
+    <div class="tab-pane active" id="personal">
+      <h4>Personal Info</h4>
+      <div class="profile-pic">
+        <div class="profile-avatar">
+          {{ user.name[0].upper() }}{{ user.surname[0].upper() if user.surname else '' }}
+        </div>
+      </div>
+      
+      <form method="POST">
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
+          </div>
+          <div class="col">
+            <label class="form-label">Surname</label>
+            <input type="text" class="form-control" name="surname" value="{{ user.surname }}" required>
+          </div>
         </div>
 
-        <div class="form-group">
-            <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" value="{{ user.surname }}" required>
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
         </div>
 
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" value="{{ user.email or '' }}">
         </div>
 
-        <div class="form-group">
-            <label for="password">New Password (leave blank to keep current):</label>
-            <input type="password" id="password" name="password">
+        <div class="mb-3">
+          <label class="form-label">Role</label>
+          <div class="role-display">
+            {% if user.is_admin %}
+              Administrator
+            {% else %}
+              Staff Member
+            {% endif %}
+          </div>
         </div>
 
-        <div class="form-group">
-            <label for="confirm_password">Confirm New Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password">
-        </div>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+      </form>
+    </div>
 
-        {% if user.is_admin %}
-        <div class="form-group">
-            <label>Role:</label>
-            <span class="role-label">Admin</span>
+    <!-- Change Password Tab -->
+    <div class="tab-pane" id="password">
+      <h4>Change Password</h4>
+      <form method="POST" id="passwordForm">
+        <div class="mb-3">
+          <label class="form-label">New Password</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="Enter new password">
+          <small class="text-muted">Leave blank to keep current password</small>
         </div>
-        {% else %}
-        <div class="form-group">
-            <label>Role:</label>
-            <span class="role-label">Staff</span>
+        <div class="mb-3">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" class="form-control" name="confirm_password" id="confirm_password" placeholder="Confirm new password">
         </div>
-        {% endif %}
+        <button type="submit" class="btn btn-primary w-100">Update Password</button>
+      </form>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Update Profile</button>
-    </form>
+    <!-- Privacy & Policies Tab -->
+    <div class="tab-pane" id="privacy">
+      <h4>Privacy & Policies</h4>
+      
+      <div class="info-box">
+        <strong>Data Retention Summary:</strong>
+        <p class="mb-0">Your academic and personal data is stored securely for the duration of your enrollment and up to 5 years after graduation.</p>
+      </div>
+
+      <div class="info-box">
+        <strong>Policies & Agreements:</strong>
+        <p class="mb-0">By using this system, you agree to the student code of conduct and IT usage policies.</p>
+      </div>
+
+      <div class="info-box">
+        <strong>Country:</strong> <span id="country">Loading...</span>
+      </div>
+
+      <div class="info-box">
+        <strong>Timezone:</strong> <span id="timezone">Loading...</span>
+      </div>
+
+      <div class="info-box">
+        <strong>Login Activity:</strong>
+        <ul class="mb-0" id="login-activity">
+          <li>Loading...</li>
+        </ul>
+      </div>
+    </div>
 
     {% if not user.is_admin %}
-    <form method="POST" action="{{ url_for('main.delete_staff', staff_id=user.id) }}" class="delete-form">
-        <button type="submit" class="btn btn-danger"
-            onclick="return confirm('Are you sure you want to delete your account? This cannot be undone.')">
-            Delete My Account
+    <!-- Delete Account Tab -->
+    <div class="tab-pane" id="delete">
+      <h4>Delete Account</h4>
+      
+      <div class="delete-warning">
+        <p>⚠️ Warning: Deleting your account is permanent and cannot be undone. All your data will be lost.</p>
+      </div>
+
+      <div class="info-box">
+        <strong>What happens when you delete your account:</strong>
+        <ul class="mb-0">
+          <li>All your personal information will be permanently removed</li>
+          <li>Your assigned students will be unassigned</li>
+          <li>All chat history will be deleted</li>
+          <li>This action cannot be reversed</li>
+        </ul>
+      </div>
+
+      <form method="POST" action="{{ url_for('main.delete_staff', staff_id=user.id) }}">
+        <button type="submit" class="btn btn-danger w-100"
+          onclick="return confirm('⚠️ Are you absolutely sure you want to delete your account?\n\nThis action is PERMANENT and cannot be undone.\n\nAll your data will be lost forever.')">
+          Delete My Account
         </button>
-    </form>
+      </form>
+    </div>
     {% endif %}
+
+  </div>
 </div>
+
+<!-- Back to Dashboard Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+
+<script>
+// Tab switching
+document.addEventListener('DOMContentLoaded', function() {
+  const navLinks = document.querySelectorAll('.settings-nav .nav-link');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove active class from all links and panes
+      navLinks.forEach(l => l.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('active'));
+      
+      // Add active class to clicked link
+      this.classList.add('active');
+      
+      // Show corresponding tab pane
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+  
+  // Password validation
+  const passwordForm = document.getElementById('passwordForm');
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', function(e) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      
+      if (password.length > 0) {
+        if (password !== confirmPassword) {
+          e.preventDefault();
+          alert('❌ Passwords do not match! Please try again.');
+          document.getElementById('confirm_password').focus();
+          return false;
+        }
+        
+        if (password.length < 6) {
+          e.preventDefault();
+          alert('❌ Password must be at least 6 characters long!');
+          document.getElementById('password').focus();
+          return false;
+        }
+      }
+    });
+  }
+});
+
+// Fetch real-time profile data
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/api/staff_profile_data')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('country').textContent = data.country;
+      document.getElementById('timezone').textContent = data.timezone;
+
+      const loginUl = document.getElementById('login-activity');
+      loginUl.innerHTML = '';
+      if (data.login_activity.length > 0) {
+        data.login_activity.forEach(activity => {
+          const li = document.createElement('li');
+          li.textContent = `Last login: ${activity.date}, Device: ${activity.device}, IP: ${activity.ip}`;
+          loginUl.appendChild(li);
+        });
+      } else {
+        loginUl.innerHTML = '<li>No login history available.</li>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching profile data:', error);
+      document.getElementById('country').textContent = 'Error loading';
+      document.getElementById('timezone').textContent = 'Error loading';
+      document.getElementById('login-activity').innerHTML = '<li>Error loading login activity.</li>';
+    });
+});
+</script>
+
 {% endblock %}

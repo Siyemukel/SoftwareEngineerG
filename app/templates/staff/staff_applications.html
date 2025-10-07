@@ -1,61 +1,401 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Assigned Medical Proof Applications</h2>
-    
-    <!-- Applications count info -->
-    <div class="alert alert-info d-flex align-items-center">
-        <i class="fas fa-info-circle me-2"></i>
-        <span>You have {{ applications|length }} pending application(s) to review.</span>
+<style>
+:root {
+  --primary-blue: #0d6efd;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --warning-yellow: #ffc107;
+  --info-cyan: #17a2b8;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --text-gray: #555555;
+  --black: #121212;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+body {
+  background: var(--light-gray);
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.applications-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-header h2 {
+  color: var(--primary-blue);
+  margin: 0;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.stats-badge {
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.info-box {
+  background: linear-gradient(135deg, var(--info-cyan), #0d6efd);
+  color: var(--white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.search-section {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--medium-gray);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.applications-table-container {
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.applications-table {
+  width: 100%;
+  margin: 0;
+}
+
+.applications-table thead {
+  background: var(--black);
+  color: var(--white);
+}
+
+.applications-table thead th {
+  padding: 1.2rem 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.applications-table tbody td {
+  padding: 1.5rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--medium-gray);
+}
+
+.applications-table tbody tr {
+  transition: var(--transition);
+}
+
+.applications-table tbody tr:hover {
+  background: var(--light-gray);
+}
+
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.student-name {
+  font-weight: 600;
+  color: var(--dark-gray);
+  font-size: 1.05rem;
+}
+
+.student-email {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.course-badge {
+  display: inline-block;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.course-details {
+  font-size: 0.9rem;
+  color: var(--text-gray);
+}
+
+.date-primary {
+  color: var(--primary-blue);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.date-time {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-pending {
+  background: var(--warning-yellow);
+  color: var(--black);
+}
+
+.badge-approved {
+  background: var(--success-green);
+  color: var(--white);
+}
+
+.badge-rejected {
+  background: var(--danger-red);
+  color: var(--white);
+}
+
+.btn-review {
+  padding: 0.6rem 1.2rem;
+  background: var(--success-green);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.9rem;
+}
+
+.btn-review:hover {
+  background: #218838;
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.empty-state-icon {
+  font-size: 5rem;
+  color: var(--medium-gray);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-gray);
+  font-size: 1.1rem;
+}
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.back-btn:hover {
+  background: #0b5ed7;
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.applications-table tbody tr {
+  animation: fadeIn 0.3s ease-out backwards;
+}
+
+.applications-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.applications-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+.applications-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+.applications-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+.applications-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .applications-container {
+    padding: 0 15px;
+  }
+
+  .applications-table-container {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .info-box {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .back-btn {
+    bottom: 15px;
+    left: 15px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+</style>
+
+<div class="applications-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Assigned Medical Proof Applications</h2>
+        <div class="stats-badge" id="appCount">
+            {{ applications|length }} Pending Applications
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p>You have {{ applications|length }} pending application(s) to review.</p>
     </div>
 
     {% if applications %}
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
+    <!-- Search Section -->
+    <div class="search-section">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by student name, email, course, or faculty...">
+    </div>
+
+    <!-- Applications Table -->
+    <div class="applications-table-container">
+        <table class="applications-table" id="applicationsTable">
+            <thead>
                 <tr>
-                    <th><i class="fas fa-user"></i> Student</th>
-                    <th><i class="fas fa-graduation-cap"></i> Course & Year</th>
-                    <th><i class="fas fa-calendar"></i> Uploaded</th>
-                    <th><i class="fas fa-eye"></i> Status</th>
-                    <th><i class="fas fa-cogs"></i> Actions</th>
+                    <th>STUDENT</th>
+                    <th>COURSE & YEAR</th>
+                    <th>UPLOADED</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
                 {% for app in applications %}
-                <tr>
+                <tr data-name="{{ app.student.name }} {{ app.student.surname }}"
+                    data-email="{{ app.student.student_email }}"
+                    data-course="{{ app.student.course }}"
+                    data-faculty="{{ app.student.faculty }}">
                     <td>
-                        <strong>{{ app.student.name }} {{ app.student.surname }}</strong><br>
-                        <small class="text-muted">{{ app.student.student_email }}</small>
+                        <div class="student-info">
+                            <span class="student-name">{{ app.student.name }} {{ app.student.surname }}</span>
+                            <span class="student-email">{{ app.student.student_email }}</span>
+                        </div>
                     </td>
                     <td>
-                        <span class="badge bg-primary">{{ app.student.course }}</span><br>
-                        <small>Year {{ app.student.year_of_study }} - {{ app.student.faculty }}</small>
+                        <span class="course-badge">{{ app.student.course }}</span>
+                        <div class="course-details">Year {{ app.student.year_of_study }} - {{ app.student.faculty }}</div>
                     </td>
                     <td>
-                        <span class="text-primary">{{ app.uploaded_at.strftime('%d %B %Y') }}</span><br>
-                        <small class="text-muted">{{ app.uploaded_at.strftime('%H:%M') }}</small>
+                        <span class="date-primary">{{ app.uploaded_at.strftime('%d %B %Y') }}</span>
+                        <span class="date-time">{{ app.uploaded_at.strftime('%H:%M') }}</span>
                     </td>
                     <td>
                         {% if app.status == 'pending' %}
-                        <span class="badge bg-warning text-dark">
-                            <i class="fas fa-clock"></i> Pending Review
-                        </span>
+                        <span class="badge badge-pending">Pending Review</span>
                         {% elif app.status == 'approved' %}
-                        <span class="badge bg-success">
-                            <i class="fas fa-check"></i> Approved
-                        </span>
+                        <span class="badge badge-approved">Approved</span>
                         {% elif app.status == 'rejected' %}
-                        <span class="badge bg-danger">
-                            <i class="fas fa-times"></i> Rejected
-                        </span>
+                        <span class="badge badge-rejected">Rejected</span>
                         {% endif %}
                     </td>
                     <td>
                         <a href="{{ url_for('main.review_medical_proof', proof_id=app.id) }}" 
-                           class="btn btn-sm btn-success">
-                            <i class="fas fa-eye"></i> Review
+                           class="btn-review">
+                            Review
                         </a>
                     </td>
                 </tr>
@@ -65,19 +405,60 @@
     </div>
     
     {% else %}
-    <!-- No applications message -->
-    <div class="text-center py-5">
-        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted">No Applications Found</h4>
-        <p class="text-muted">You don't have any medical proof applications assigned to you at the moment.</p>
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <h3>No Applications Found</h3>
+        <p>You don't have any medical proof applications assigned to you at the moment.</p>
     </div>
     {% endif %}
-
-    <!-- Back button -->
-    <div class="mt-4">
-        <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
 </div>
+
+<!-- Back Button -->
+<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('applicationsTable');
+    
+    if (searchInput && table) {
+        const tbody = table.getElementsByTagName('tbody')[0];
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = tbody.getElementsByTagName('tr');
+            let visibleCount = 0;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const name = row.getAttribute('data-name').toLowerCase();
+                const email = row.getAttribute('data-email').toLowerCase();
+                const course = row.getAttribute('data-course').toLowerCase();
+                const faculty = row.getAttribute('data-faculty').toLowerCase();
+                
+                const searchMatch = name.includes(searchText) || 
+                                  email.includes(searchText) || 
+                                  course.includes(searchText) ||
+                                  faculty.includes(searchText);
+                
+                if (searchMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            
+            // Update count badge
+            const countBadge = document.getElementById('appCount');
+            if (countBadge) {
+                countBadge.textContent = visibleCount + ' Pending Applications';
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}
