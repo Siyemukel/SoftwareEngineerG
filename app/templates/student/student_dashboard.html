@@ -6,510 +6,181 @@
 <!-- FontAwesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="dashboard-wrapper" id="app-dashboard">
+<div class="flex min-h-screen" id="app-dashboard">
   <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
     <div class="logo">
-      <h1>Student Dashboard</h1>
+      <h1 class="text-white text-xl pl-4 m-0">Student Dashboard</h1>
     </div>
 
-    <div class="sidebar-profile-compact text-center px-3 mb-3">
-      <div class="avatar-circle">{{ student.name[0]|upper }}{{ student.surname[0]|upper }}</div>
-      <div class="small text-muted">Manage Profile</div>
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ student.name[0]|upper }}{{ student.surname[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
     </div>
-    <hr class="sidebar-separator">
+    <hr class="border-white/20 mx-6 my-4">
 
-    <ul class="nav-links">
-      <li>
-        <a href="#" class="active">
-          <i class="fas fa-home"></i>
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="#" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
           <span>Dashboard</span>
         </a>
       </li>
-      <li>
-        <a href="{{ url_for('main.contact') }}">
-          <i class="fas fa-headset"></i>
+      <li class="mb-2">
+        <a href="{{ url_for('main.contact') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-headset mr-4 w-5 text-center text-white text-lg"></i>
           <span>Contact Support</span>
         </a>
       </li>
-      <li>
-        <a href="{{ url_for('main.student_application') }}">
-          <i class="fas fa-th"></i>
+      <li class="mb-2">
+        <a href="{{ url_for('main.student_application') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-th mr-4 w-5 text-center text-white text-lg"></i>
           <span>Applications</span>
         </a>
       </li>
       {% if assigned_staff_id %}
-      <li>
-        <a href="{{ url_for('main.conversation', student_id=student.id, staff_id=assigned_staff_id) }}">
-          <i class="fas fa-envelope"></i>
+      <li class="mb-2">
+        <a href="{{ url_for('main.conversation', student_id=student.id, staff_id=assigned_staff_id) }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-envelope mr-4 w-5 text-center text-white text-lg"></i>
           <span>Messages</span>
         </a>
       </li>
       {% else %}
-      <li>
-        <span class="nav-link disabled-link" title="No staff assigned">
-          <i class="fas fa-envelope"></i>
+      <li class="mb-2">
+        <span class="flex items-center py-2 px-6 text-white/60 no-underline cursor-not-allowed" title="No staff assigned">
+          <i class="fas fa-envelope mr-4 w-5 text-center text-white/60 text-lg"></i>
           <span>Messages (No staff)</span>
         </span>
       </li>
       {% endif %}
-      <li>
-        <a href="{{ url_for('main.need_to_know') }}">
-          <i class="fas fa-info-circle"></i>
+      <li class="mb-2">
+        <a href="{{ url_for('main.need_to_know') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-info-circle mr-4 w-5 text-center text-white text-lg"></i>
           <span>Need to Know</span>
         </a>
       </li>
-      <li>
-        <a href="{{ url_for('main.student_settings') }}">
-          <i class="fas fa-cog"></i>
+      <li class="mb-2">
+        <a href="{{ url_for('main.student_settings') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-cog mr-4 w-5 text-center text-white text-lg"></i>
           <span>Settings</span>
         </a>
       </li>
     </ul>
 
-    <div class="logout-container">
-      <button class="logout-btn" id="logout-btn">
-        <i class="fas fa-sign-out-alt"></i>
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
         <span>Logout</span>
       </button>
     </div>
   </div>
 
   <!-- Main Content -->
-  <div class="main-content" id="main-content">
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
     <!-- Header with Hamburger -->
-    <div class="mb-3 d-flex align-items-center">
-      <div class="hamburger" id="hamburger">
-        <i class="fas fa-bars"></i>
-        <span class="hamburger-fallback">☰</span>
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+        <span class="hidden">☰</span>
       </div>
     </div>
 
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div class="d-flex align-items-center">
-        <div class="user-icon me-3">
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
           {% if student.profile_image %}
-            <img src="{{ url_for('main.uploaded_file', filename='profile_images/' + student.profile_image) }}" alt="User Icon">
+            <img class="w-12 h-12 rounded-full object-cover" src="{{ url_for('main.uploaded_file', filename='profile_images/' + student.profile_image) }}" alt="User Icon">
           {% else %}
-            <img src="https://static.vecteezy.com/system/resources/previews/047/733/682/non_2x/grey-avatar-icon-user-avatar-photo-icon-social-media-user-icon-vector.jpg" alt="User Icon">
+            <img class="w-12 h-12 rounded-full object-cover" src="https://static.vecteezy.com/system/resources/previews/047/733/682/non_2x/grey-avatar-icon-user-avatar-photo-icon-social-media-user-icon-vector.jpg" alt="User Icon">
           {% endif %}
         </div>
         <div>
-          <h2>{{ student.name }} {{ student.surname }}</h2>
-          <div class="small text-muted">{{ student.course }} (Year {{ student.year_of_study }}) • {{ student.faculty }}</div>
+          <h2 class="m-0">{{ student.name }} {{ student.surname }}</h2>
+          <div class="text-sm text-gray-500">{{ student.course }} (Year {{ student.year_of_study }}) • {{ student.faculty }}</div>
         </div>
       </div>
-      <div class="input-group" style="max-width:300px;">
-        <span class="input-group-text"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Search dashboard..." id="dashboard-search">
+      <div class="input-group max-w-[300px]">
+        <span class="input-group-text bg-white border border-gray-300 border-r-0 rounded-l-lg px-3 py-2"><i class="fas fa-search text-gray-400"></i></span>
+        <input type="text" class="form-control border border-gray-300 border-l-0 rounded-r-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent" placeholder="Search dashboard..." id="dashboard-search">
       </div>
     </div>
 
     <!-- Welcome Section -->
-    <section class="welcome-section">
-      <h1>Welcome {{ student.name }} {{ student.surname }}</h1>
-      <div class="bg-white-25 p-3 rounded mt-3 text-white">
+    <section class="bg-[#4B68A5] text-white p-8 rounded-xl mb-8 shadow-md">
+      <h1 class="m-0 mb-4 text-2xl">Welcome {{ student.name }} {{ student.surname }}</h1>
+      <div class="bg-white/25 p-3 rounded mt-3 text-white">
         <p>Numeraid helps students test for dyscalculia and provides tools and practice to improve their numerical learning skills.</p>
       </div>
     </section>
 
     <!-- Dashboard Cards -->
-    <div class="row g-4 mb-4" id="dashboard-cards">
-      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
-        <div class="card dashboard-card p-3">
-          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
-          <h5>Results</h5>
-          <p>View your progress and performance metrics</p>
-          <a href="{{ url_for('main.test_results') }}" class="btn btn-sm btn-outline-primary">View</a>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="dashboard-cards">
+      <div class="dashboard-card-wrapper">
+        <div class="card bg-white border-t-4 border-[#4B68A5] p-3 rounded-lg shadow-sm transition-all duration-300 cursor-pointer text-center hover:-translate-y-1 hover:shadow-md">
+          <div class="text-[#4B68A5] text-4xl mb-4"><i class="fas fa-chart-line"></i></div>
+          <h5 class="font-bold">Results</h5>
+          <p class="text-gray-600">View your progress and performance metrics</p>
+          <a href="{{ url_for('main.test_results') }}" class="btn btn-sm btn-outline-primary border border-[#4B68A5] text-[#4B68A5] px-3 py-1 rounded text-sm no-underline inline-block mt-2 hover:bg-[#4B68A5] hover:text-white">View</a>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
-        <div class="card dashboard-card p-3">
-          <div class="card-icon"><i class="fas fa-brain"></i></div>
-          <h5>Tests for Dyscalculia</h5>
-          <p>Assess your numerical learning abilities</p>
-          <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-sm btn-outline-primary">Start Test</a>
+      <div class="dashboard-card-wrapper">
+        <div class="card bg-white border-t-4 border-[#4B68A5] p-3 rounded-lg shadow-sm transition-all duration-300 cursor-pointer text-center hover:-translate-y-1 hover:shadow-md">
+          <div class="text-[#4B68A5] text-4xl mb-4"><i class="fas fa-brain"></i></div>
+          <h5 class="font-bold">Tests for Dyscalculia</h5>
+          <p class="text-gray-600">Assess your numerical learning abilities</p>
+          <a href="{{ url_for('main.test_part', part='numbers', difficulty='easy', q_num=1) }}" class="btn btn-sm btn-outline-primary border border-[#4B68A5] text-[#4B68A5] px-3 py-1 rounded text-sm no-underline inline-block mt-2 hover:bg-[#4B68A5] hover:text-white">Start Test</a>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
-        <div class="card dashboard-card p-3">
-          <div class="card-icon"><i class="fas fa-book"></i></div>
-          <h5>Study Material</h5>
-          <p>Access lecture notes, guides, and resources</p>
-          <a href="{{ url_for('main.student_study_material') }}" class="btn btn-sm btn-outline-primary">Open</a>
+      <div class="dashboard-card-wrapper">
+        <div class="card bg-white border-t-4 border-[#4B68A5] p-3 rounded-lg shadow-sm transition-all duration-300 cursor-pointer text-center hover:-translate-y-1 hover:shadow-md">
+          <div class="text-[#4B68A5] text-4xl mb-4"><i class="fas fa-book"></i></div>
+          <h5 class="font-bold">Study Material</h5>
+          <p class="text-gray-600">Access lecture notes, guides, and resources</p>
+          <a href="{{ url_for('main.student_study_material') }}" class="btn btn-sm btn-outline-primary border border-[#4B68A5] text-[#4B68A5] px-3 py-1 rounded text-sm no-underline inline-block mt-2 hover:bg-[#4B68A5] hover:text-white">Open</a>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 col-6 dashboard-card-wrapper">
-        <div class="card dashboard-card p-3">
-          <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
-          <h5>Practice Tests</h5>
-          <p>Test your knowledge with practice exams</p>
-          <a href="{{ url_for('main.exercises', part='numbers') }}" class="btn btn-sm btn-outline-primary">Practice</a>
+      <div class="dashboard-card-wrapper">
+        <div class="card bg-white border-t-4 border-[#4B68A5] p-3 rounded-lg shadow-sm transition-all duration-300 cursor-pointer text-center hover:-translate-y-1 hover:shadow-md">
+          <div class="text-[#4B68A5] text-4xl mb-4"><i class="fas fa-clipboard-check"></i></div>
+          <h5 class="font-bold">Practice Tests</h5>
+          <p class="text-gray-600">Test your knowledge with practice exams</p>
+          <a href="{{ url_for('main.exercises', part='numbers') }}" class="btn btn-sm btn-outline-primary border border-[#4B68A5] text-[#4B68A5] px-3 py-1 rounded text-sm no-underline inline-block mt-2 hover:bg-[#4B68A5] hover:text-white">Practice</a>
         </div>
       </div>
     </div>
 
     <!-- Motivation Section -->
-    <section class="motivation-section">
-      <h2>Daily Motivation</h2>
-      <div class="motivation-slider">
-        <div class="motivation-slide">
-          <div class="motivation-image">
-            <img src="https://i.pinimg.com/1200x/e6/f1/c0/e6f1c0568c0d77f75c3450f9da15a820.jpg" alt="Motivation 1">
+    <section class="bg-white rounded-xl p-6 shadow-md overflow-hidden">
+      <h2 class="text-[#4B68A5] text-center mb-6">Daily Motivation</h2>
+      <div class="motivation-slider flex transition-transform duration-500">
+        <div class="motivation-slide min-w-full p-4 text-center flex flex-col items-center">
+          <div class="w-full max-w-[600px] h-[300px] rounded-xl mb-4 overflow-hidden shadow-lg">
+            <img class="w-full h-full object-cover object-center" src="https://i.pinimg.com/1200x/e6/f1/c0/e6f1c0568c0d77f75c3450f9da15a820.jpg" alt="Motivation 1">
           </div>
-          <p class="motivation-text">"Your learning difference is your superpower. It allows you to see the world in ways others can't."</p>
+          <p class="italic text-gray-600 max-w-[600px] m-0 text-lg">"Your learning difference is your superpower. It allows you to see the world in ways others can't."</p>
         </div>
-        <div class="motivation-slide">
-          <div class="motivation-image">
-            <img src="https://i.pinimg.com/736x/fa/86/22/fa8622eb54b2f0a262ccebee6fdf195a.jpg" alt="Progress Motivation">
+        <div class="motivation-slide min-w-full p-4 text-center flex flex-col items-center">
+          <div class="w-full max-w-[600px] h-[300px] rounded-xl mb-4 overflow-hidden shadow-lg">
+            <img class="w-full h-full object-cover object-center" src="https://i.pinimg.com/736x/fa/86/22/fa8622eb54b2f0a262ccebee6fdf195a.jpg" alt="Progress Motivation">
           </div>
-          <p class="motivation-text">"Progress is progress, no matter how small. Every step forward is a victory worth celebrating."</p>
+          <p class="italic text-gray-600 max-w-[600px] m-0 text-lg">"Progress is progress, no matter how small. Every step forward is a victory worth celebrating."</p>
         </div>
-        <div class="motivation-slide">
-          <div class="motivation-image">
-            <img src="https://i.pinimg.com/1200x/2b/2e/a7/2b2ea7d85d2b6c96947497e9b8aba39b.jpg" alt="Different Thinking">
+        <div class="motivation-slide min-w-full p-4 text-center flex flex-col items-center">
+          <div class="w-full max-w-[600px] h-[300px] rounded-xl mb-4 overflow-hidden shadow-lg">
+            <img class="w-full h-full object-cover object-center" src="https://i.pinimg.com/1200x/2b/2e/a7/2b2ea7d85d2b6c96947497e9b8aba39b.jpg" alt="Different Thinking">
           </div>
-          <p class="motivation-text">"Different thinking leads to innovative solutions. Your unique perspective is valuable."</p>
+          <p class="italic text-gray-600 max-w-[600px] m-0 text-lg">"Different thinking leads to innovative solutions. Your unique perspective is valuable."</p>
         </div>
       </div>
-      <div class="d-flex justify-content-center mt-3">
-        <div class="slider-dot active" data-index="0"></div>
-        <div class="slider-dot" data-index="1"></div>
-        <div class="slider-dot" data-index="2"></div>
+      <div class="flex justify-center mt-3">
+        <div class="slider-dot w-3 h-3 rounded-full bg-gray-300 mx-1 cursor-pointer transition-all duration-300 active bg-[#4B68A5]" data-index="0"></div>
+        <div class="slider-dot w-3 h-3 rounded-full bg-gray-300 mx-1 cursor-pointer transition-all duration-300" data-index="1"></div>
+        <div class="slider-dot w-3 h-3 rounded-full bg-gray-300 mx-1 cursor-pointer transition-all duration-300" data-index="2"></div>
       </div>
     </section>
   </div>
 </div>
-
-<style>
-:root {
-    --color-blue: #4B68A5;
-    --white: #ffffff;
-    --primary-blue: var(--color-blue);
-    --light-blue: rgba(75, 104, 165, 0.08);
-    --light-gray: #f5f5f5;
-    --medium-gray: #e0e0e0;
-    --dark-gray: #333333;
-    --text-gray: #5f6368;
-    --shadow: 0 2px 12px rgba(0,0,0,0.06);
-    --transition: all 0.3s ease;
-}
-
-body {
-    background-color: var(--light-gray);
-    color: var(--dark-gray);
-    line-height: 1.6;
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-.dashboard-wrapper {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background-color: var(--primary-blue);
-    color: var(--white);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 1.5rem 0;
-    transition: transform 0.3s ease;
-    z-index: 999;
-}
-
-.sidebar.collapsed { 
-    transform: translateX(-100%); 
-}
-
-.logo h1 { 
-    color: var(--white); 
-    font-size: 1.5rem; 
-    padding-left: 1rem; 
-    margin: 0;
-}
-
-.sidebar-profile-compact .avatar-circle {
-    width: 64px; 
-    height: 64px; 
-    border-radius: 50%; 
-    background: rgba(255,255,255,0.12);
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-weight: 700; 
-    font-size: 1.2rem; 
-    color: #fff;
-    margin-bottom: 0.5rem;
-}
-
-.sidebar-separator {
-    border-color: rgba(255,255,255,0.2);
-    margin: 1rem 1.5rem;
-}
-
-.nav-links { 
-    list-style: none; 
-    padding-left: 0; 
-    flex-grow: 1; 
-    margin: 0;
-}
-
-.nav-links li { 
-    margin-bottom: 0.5rem; 
-}
-
-.nav-links a {
-    display: flex;
-    align-items: center;
-    padding: 0.8rem 1.5rem;
-    color: var(--white);
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.nav-links a:hover, 
-.nav-links a.active {
-    background-color: rgba(255,255,255,0.08);
-    border-left: 4px solid var(--white);
-    color: var(--white);
-    text-decoration: none;
-}
-
-.nav-links i { 
-    margin-right: 1rem; 
-    width: 20px; 
-    text-align: center; 
-}
-
-.disabled-link { 
-    display: flex;
-    align-items: center;
-    padding: 0.8rem 1.5rem;
-    color: rgba(255,255,255,0.6);
-    cursor: not-allowed;
-}
-
-/* Logout Button */
-.logout-container { 
-    margin-top: auto; 
-    padding: 1.5rem; 
-}
-
-.logout-btn {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 0.8rem;
-    background-color: #3A528F;
-    border: none;
-    color: var(--white);
-    border-radius: 12px;
-    cursor: pointer;
-    justify-content: center;
-    transition: var(--transition);
-    font-family: inherit;
-}
-
-.logout-btn:hover { 
-    background-color: #2D3E75; 
-}
-
-.logout-btn i { 
-    margin-right: 0.5rem; 
-}
-
-/* Main Content */
-.main-content { 
-    margin-left: 250px; 
-    padding: 1.5rem; 
-    transition: margin-left 0.3s ease; 
-    flex: 1;
-    min-height: 100vh;
-}
-
-.main-content.full-width { 
-    margin-left: 0; 
-}
-
-.user-icon img { 
-    width: 50px; 
-    height: 50px; 
-    border-radius: 50%; 
-    object-fit: cover; 
-}
-
-/* Hamburger Button */
-.hamburger {
-    display: block !important;
-    width: 40px;
-    height: 40px;
-    background: var(--primary-blue);
-    color: var(--white);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-}
-
-.hamburger:hover {
-    background: #3a5588;
-    transform: scale(1.05);
-}
-
-.hamburger .fas {
-    color: var(--white);
-}
-
-.hamburger-fallback {
-    display: none;
-}
-
-/* Sidebar Icons */
-.nav-links i {
-    margin-right: 1rem;
-    width: 20px;
-    text-align: center;
-    color: var(--white);
-    font-size: 1.1rem;
-}
-
-@media (max-width: 992px) {
-    .main-content { margin-left: 0; }
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.show { transform: translateX(0); }
-}
-
-/* Welcome Section */
-.welcome-section {
-    background-color: var(--primary-blue);
-    color: var(--white);
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow);
-}
-
-.welcome-section h1 {
-    margin: 0 0 1rem 0;
-    font-size: 2rem;
-}
-
-.bg-white-25 {
-    background-color: rgba(255,255,255,0.25);
-}
-
-/* Dashboard Cards */
-.dashboard-card { 
-    border-top: 4px solid var(--primary-blue); 
-    transition: var(--transition); 
-    cursor: pointer; 
-    text-align: center; 
-}
-
-.dashboard-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
-}
-
-.card-icon { 
-    font-size: 2.5rem; 
-    margin-bottom: 1rem; 
-    color: var(--primary-blue); 
-}
-
-/* Motivation Section */
-.motivation-section { 
-    background-color: var(--white); 
-    border-radius: 12px; 
-    padding: 1.5rem; 
-    box-shadow: var(--shadow); 
-    overflow: hidden; 
-}
-
-.motivation-section h2 { 
-    color: var(--primary-blue); 
-    text-align: center; 
-    margin-bottom: 1.5rem; 
-}
-
-.motivation-slider { 
-    display: flex; 
-    transition: transform 0.5s ease; 
-}
-
-.motivation-slide { 
-    min-width: 100%; 
-    padding: 1rem; 
-    text-align: center; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-}
-
-.motivation-image { 
-    width: 100%; 
-    max-width: 600px; 
-    height: 300px; 
-    border-radius: 12px; 
-    margin-bottom: 1rem; 
-    overflow: hidden; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-}
-
-.motivation-image img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    object-position: center; 
-}
-
-.motivation-text { 
-    font-style: italic; 
-    color: var(--text-gray); 
-    max-width: 600px; 
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.slider-dot { 
-    width: 12px; 
-    height: 12px; 
-    border-radius: 50%; 
-    background-color: var(--medium-gray); 
-    margin: 0 5px; 
-    cursor: pointer; 
-    transition: var(--transition); 
-}
-
-.slider-dot.active { 
-    background-color: var(--primary-blue); 
-}
-
-/* Responsive Design */
-@media (max-width: 992px) { 
-    .col-lg-3 { flex: 0 0 50%; max-width: 50%; } 
-}
-
-@media (max-width: 576px) { 
-    .col-lg-3 { flex: 0 0 100%; max-width: 100%; } 
-    .main-content { padding: 1rem; }
-}
-</style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -518,8 +189,9 @@ const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('main-content');
 const hamburger = document.getElementById('hamburger');
 hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('full-width');
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
 });
 
 // Motivation slider
@@ -531,8 +203,8 @@ function showSlide(index) {
     if(index < 0) index = slideCount - 1;
     if(index >= slideCount) index = 0;
     slider.style.transform = `translateX(-${index * 100}%)`;
-    dots.forEach(dot => dot.classList.remove('active'));
-    dots[index].classList.add('active');
+    dots.forEach(dot => dot.classList.remove('bg-[#4B68A5]'));
+    dots[index].classList.add('bg-[#4B68A5]');
     currentSlide = index;
 }
 dots.forEach(dot => {
@@ -554,8 +226,10 @@ document.querySelectorAll('.nav-links a').forEach(link => {
         if (this.getAttribute('href') === '#') {
             e.preventDefault();
         }
-        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
+        document.querySelectorAll('.nav-links a').forEach(l => {
+            l.classList.remove('bg-white/8', 'border-l-4', 'border-white');
+        });
+        this.classList.add('bg-white/8', 'border-l-4', 'border-white');
     });
 });
 

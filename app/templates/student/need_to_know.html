@@ -3,468 +3,179 @@
 {% block title %}Need to Know | Dyscalculia Info{% endblock %}
 
 {% block content %}
-<style>
-    :root {
-      --primary-blue: #4B68A5;
-      --light-blue: #d6ecff;
-      --white: #ffffff;
-      --text-dark: #333;
-      --text-light: #666;
-      --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-      --border-radius: 12px;
-    }
+<div class="min-h-screen bg-blue-50 pb-20 font-sans">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-[#4B68A5] text-white rounded-2xl p-8 md:p-12 text-center mb-8 shadow-lg">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase tracking-wide mb-4">NEED TO KNOW</h1>
+      <p class="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
+        Learn about dyscalculia: its causes, effects, and strategies to overcome challenges.
+      </p>
+    </div>
 
-    body {
-      background: var(--light-blue);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding-bottom: 80px;
-      margin: 0;
-      min-height: 100vh;
-    }
+    <!-- Carousel Wrapper -->
+    <div class="relative max-w-5xl mx-auto px-12 md:px-16 lg:px-20 flex items-center justify-center">
+      <!-- Previous Button -->
+      <button class="carousel-prev absolute left-0 z-10 w-12 h-12 md:w-14 md:h-14 bg-[#4B68A5] hover:bg-[#3A528F] rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-x-1" aria-label="Previous">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .page-header {
-      text-align: center;
-      padding: 3rem 2rem;
-      background: var(--primary-blue);
-      color: var(--white);
-      border-radius: var(--border-radius);
-      margin-bottom: 3rem;
-      box-shadow: var(--shadow);
-    }
-
-    .page-header h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin: 0 0 1rem 0;
-      letter-spacing: 2px;
-    }
-
-    .page-header p {
-      font-size: 1.2rem;
-      margin: 0;
-      opacity: 0.9;
-      font-weight: 400;
-    }
-
-    /* Carousel Container */
-    .carousel-wrapper {
-      position: relative;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .carousel {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--border-radius);
-      width: 100%;
-    }
-
-    .carousel-inner {
-      display: flex;
-      transition: transform 0.6s ease-in-out;
-      border-radius: var(--border-radius);
-    }
-
-    .carousel-item {
-      flex: 0 0 100%;
-      width: 100%;
-    }
-
-    .carousel-card {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 3rem;
-      min-height: 500px;
-      box-shadow: var(--shadow-light);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      margin: 0 10px;
-    }
-
-    .carousel-card h3 {
-      color: var(--primary-blue);
-      font-size: 2rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-      letter-spacing: 1px;
-    }
-
-    .carousel-card p {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--text-dark);
-      text-align: justify;
-      margin-bottom: 2rem;
-      flex-grow: 1;
-    }
-
-    /* Fun Fact Button */
-    .fun-fact-btn {
-      align-self: flex-start;
-      background: var(--primary-blue);
-      color: var(--white);
-      border: none;
-      border-radius: 25px;
-      padding: 0.75rem 1.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: var(--transition);
-      box-shadow: var(--shadow-light);
-    }
-
-    .fun-fact-btn:hover {
-      background: #3a5588;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    /* Carousel Controls moved outside the card */
-    .carousel-control-prev,
-    .carousel-control-next {
-      width: 50px;
-      height: 50px;
-      background: rgba(75, 104, 165, 0.9);
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .carousel-control-prev:hover,
-    .carousel-control-next:hover {
-      background: rgba(75, 104, 165, 0.7);
-    }
-
-    .carousel-control-prev {
-      margin-right: 20px;
-      order: -1;
-    }
-
-    .carousel-control-next {
-      margin-left: 20px;
-    }
-
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-      width: 20px;
-      height: 20px;
-      background-color: var(--white);
-      border-radius: 50%;
-      background-size: 60%;
-    }
-
-    /* Carousel Indicators */
-    .carousel-indicators {
-      bottom: -50px;
-      margin-bottom: 0;
-    }
-
-    .carousel-indicators [data-bs-target] {
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      background-color: rgba(75, 104, 165, 0.3);
-      border: none;
-      margin: 0 8px;
-      transition: var(--transition);
-    }
-
-    .carousel-indicators .active {
-      background-color: var(--primary-blue);
-      transform: scale(1.2);
-    }
-
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1050;
-      backdrop-filter: blur(5px);
-    }
-
-    .modal-content-custom {
-      background: var(--white);
-      padding: 2.5rem;
-      border-radius: var(--border-radius);
-      max-width: 500px;
-      margin: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow);
-      transform: scale(0.9);
-      transition: var(--transition);
-    }
-
-    .modal-overlay.show .modal-content-custom {
-      transform: scale(1);
-    }
-
-    .modal-content-custom p {
-      font-size: 1.1rem;
-      color: var(--text-dark);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .close-btn {
-      background: var(--primary-blue);
-      color: var(--white);
-      border: none;
-      border-radius: 25px;
-      padding: 0.75rem 2rem;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-
-    .close-btn:hover {
-      background: #3a5588;
-      transform: translateY(-2px);
-    }
-
-    /* Back Button */
-    .back-btn {
-      position: fixed;
-      bottom: 30px;
-      left: 30px;
-      background: var(--primary-blue);
-      color: var(--white);
-      padding: 1rem 2rem;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      box-shadow: var(--shadow);
-      z-index: 1000;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .back-btn:hover {
-      background: #3a5588;
-      color: var(--white);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 992px) {
-      .carousel-wrapper {
-        padding: 0 60px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .page-header {
-        padding: 2rem 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .page-header h1 {
-        font-size: 2rem;
-      }
-
-      .page-header p {
-        font-size: 1rem;
-      }
-
-      .carousel-card {
-        padding: 2rem;
-        min-height: 450px;
-      }
-
-      .carousel-control-prev,
-      .carousel-control-next {
-        width: 40px;
-        height: 40px;
-      }
-
-      .carousel-control-prev-icon,
-      .carousel-control-next-icon {
-        width: 15px;
-        height: 15px;
-      }
-
-      .back-btn {
-        bottom: 20px;
-        left: 20px;
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-      }
-
-      .modal-content-custom {
-        margin: 1rem;
-        padding: 2rem;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .carousel-card {
-        padding: 1.5rem;
-        min-height: 400px;
-      }
-
-      .carousel-indicators {
-        bottom: -40px;
-      }
-    }
-
-    /* Animation for carousel transitions */
-    .carousel-item {
-      transition: transform 0.6s ease-in-out;
-    }
-
-    /* Smooth scrolling for better UX */
-    html {
-      scroll-behavior: smooth;
-    }
-</style>
-
-<div class="container">
-  <!-- Header -->
-  <div class="page-header">
-    <h1>NEED TO KNOW</h1>
-    <p>Learn about dyscalculia: its causes, effects, and strategies to overcome challenges.</p>
-  </div>
-
-  <!-- Carousel Wrapper with buttons outside -->
-  <div class="carousel-wrapper">
-    <button class="carousel-control-prev" type="button" aria-label="Previous">
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-
-    <div class="carousel" id="needToKnowCarousel">
-      <div class="carousel-inner">
-        <!-- Slide 1 -->
-        <div class="carousel-item active">
-          <div class="carousel-card">
-            <div>
-              <h3>WHY DYSCALCULIA HAPPENS</h3>
-              <p>Dyscalculia is a neurodevelopmental learning difficulty that primarily affects the understanding of numbers and mathematical concepts. It is not due to intelligence or effort; rather, it is the result of differences in the brain regions responsible for numerical processing. People with dyscalculia may find it hard to estimate quantities, memorize arithmetic facts, or recognize numerical patterns. Everyday tasks, such as comparing prices, telling time, or interpreting charts, can be difficult. Understanding the neurological basis of dyscalculia helps reduce stigma and encourages supportive learning strategies. With proper interventions, individuals can develop alternative problem-solving approaches and strengthen areas like visual-spatial and verbal reasoning.</p>
+      <!-- Carousel -->
+      <div class="carousel-container w-full overflow-hidden rounded-2xl">
+        <div class="carousel-inner flex transition-transform duration-500 ease-in-out">
+          <!-- Slide 1 -->
+          <div class="carousel-item flex-shrink-0 w-full">
+            <div class="bg-white rounded-2xl p-6 md:p-8 lg:p-12 min-h-[500px] shadow-lg flex flex-col justify-between mx-2">
+              <div>
+                <h3 class="text-2xl md:text-3xl font-bold text-[#4B68A5] uppercase tracking-wide mb-6">WHY DYSCALCULIA HAPPENS</h3>
+                <p class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                  Dyscalculia is a neurodevelopmental learning difficulty that primarily affects the understanding of numbers and mathematical concepts. It is not due to intelligence or effort; rather, it is the result of differences in the brain regions responsible for numerical processing. People with dyscalculia may find it hard to estimate quantities, memorize arithmetic facts, or recognize numerical patterns. Everyday tasks, such as comparing prices, telling time, or interpreting charts, can be difficult. Understanding the neurological basis of dyscalculia helps reduce stigma and encourages supportive learning strategies. With proper interventions, individuals can develop alternative problem-solving approaches and strengthen areas like visual-spatial and verbal reasoning.
+                </p>
+              </div>
+              <button class="fun-fact-btn w-fit bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 mt-6"
+                      onclick="showModal('Approximately 5-7% of people have dyscalculia, making it as common as dyslexia.')">
+                Fun Fact
+              </button>
             </div>
-            <button class="fun-fact-btn" onclick="showModal('Approximately 5-7% of people have dyscalculia, making it as common as dyslexia.')">Fun Fact</button>
           </div>
-        </div>
 
-        <!-- Slide 2 -->
-        <div class="carousel-item">
-          <div class="carousel-card">
-            <div>
-              <h3>CAUSES</h3>
-              <p>Dyscalculia can be caused by genetic, neurological, and environmental factors. It often runs in families, suggesting a genetic link. Prenatal brain development issues, early childhood injuries, or oxygen deprivation can also contribute. Limited exposure to numerical experiences in early childhood may worsen challenges, though it does not cause dyscalculia by itself. Children with delayed number sense often struggle with arithmetic, measurement, and mathematical symbols. Understanding the causes allows early intervention using multi-sensory teaching and technology-assisted learning, helping children gradually build confidence and competence in mathematics.</p>
+          <!-- Slide 2 -->
+          <div class="carousel-item flex-shrink-0 w-full">
+            <div class="bg-white rounded-2xl p-6 md:p-8 lg:p-12 min-h-[500px] shadow-lg flex flex-col justify-between mx-2">
+              <div>
+                <h3 class="text-2xl md:text-3xl font-bold text-[#4B68A5] uppercase tracking-wide mb-6">CAUSES</h3>
+                <p class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                  Dyscalculia can be caused by genetic, neurological, and environmental factors. It often runs in families, suggesting a genetic link. Prenatal brain development issues, early childhood injuries, or oxygen deprivation can also contribute. Limited exposure to numerical experiences in early childhood may worsen challenges, though it does not cause dyscalculia by itself. Children with delayed number sense often struggle with arithmetic, measurement, and mathematical symbols. Understanding the causes allows early intervention using multi-sensory teaching and technology-assisted learning, helping children gradually build confidence and competence in mathematics.
+                </p>
+              </div>
+              <button class="fun-fact-btn w-fit bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 mt-6"
+                      onclick="showModal('Children with a strong number sense before age 6 are more likely to excel in mathematics later. Early exposure matters.')">
+                Question
+              </button>
             </div>
-            <button class="fun-fact-btn" onclick="showModal('Children with a strong number sense before age 6 are more likely to excel in mathematics later. Early exposure matters.')">Question</button>
           </div>
-        </div>
 
-        <!-- Slide 3 -->
-        <div class="carousel-item">
-          <div class="carousel-card">
-            <div>
-              <h3>EFFECTS</h3>
-              <p>Dyscalculia can affect both academic performance and daily life. In school, students may struggle with memorizing math facts, following multi-step problems, or interpreting graphs, leading to frustration and anxiety. Everyday tasks such as handling money, estimating costs, or cooking can be challenging. Adults with dyscalculia often rely on calculators or other aids to complete numerical tasks. Beyond mathematics, dyscalculia can impact time management, organization, and logical reasoning. Early recognition helps parents and educators provide support, enabling students to compensate for difficulties and leverage strengths in other areas of learning.</p>
+          <!-- Slide 3 -->
+          <div class="carousel-item flex-shrink-0 w-full">
+            <div class="bg-white rounded-2xl p-6 md:p-8 lg:p-12 min-h-[500px] shadow-lg flex flex-col justify-between mx-2">
+              <div>
+                <h3 class="text-2xl md:text-3xl font-bold text-[#4B68A5] uppercase tracking-wide mb-6">EFFECTS</h3>
+                <p class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                  Dyscalculia can affect both academic performance and daily life. In school, students may struggle with memorizing math facts, following multi-step problems, or interpreting graphs, leading to frustration and anxiety. Everyday tasks such as handling money, estimating costs, or cooking can be challenging. Adults with dyscalculia often rely on calculators or other aids to complete numerical tasks. Beyond mathematics, dyscalculia can impact time management, organization, and logical reasoning. Early recognition helps parents and educators provide support, enabling students to compensate for difficulties and leverage strengths in other areas of learning.
+                </p>
+              </div>
+              <button class="fun-fact-btn w-fit bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 mt-6"
+                      onclick="showModal('Visual aids like number lines and color-coded charts can help students understand numerical relationships and solve problems effectively.')">
+                Tip
+              </button>
             </div>
-            <button class="fun-fact-btn" onclick="showModal('Visual aids like number lines and color-coded charts can help students understand numerical relationships and solve problems effectively.')">Tip</button>
           </div>
-        </div>
 
-        <!-- Slide 4 -->
-        <div class="carousel-item">
-          <div class="carousel-card">
-            <div>
-              <h3>HOW IT CAN BE ADDRESSED</h3>
-              <p>Addressing dyscalculia involves early detection, tailored interventions, and consistent practice. Individualized education plans and multi-sensory teaching strategies help improve mathematical skills. Technology-assisted tools like Numeraid provide exercises and feedback for students to practice at their own pace. Gamified learning can reduce anxiety and increase engagement. Coping strategies such as calculators, visual reminders, mnemonic devices, and checklists support everyday tasks. With patience, support, and targeted strategies, individuals with dyscalculia can overcome challenges, build confidence, and achieve success academically and in daily life.</p>
+          <!-- Slide 4 -->
+          <div class="carousel-item flex-shrink-0 w-full">
+            <div class="bg-white rounded-2xl p-6 md:p-8 lg:p-12 min-h-[500px] shadow-lg flex flex-col justify-between mx-2">
+              <div>
+                <h3 class="text-2xl md:text-3xl font-bold text-[#4B68A5] uppercase tracking-wide mb-6">HOW IT CAN BE ADDRESSED</h3>
+                <p class="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                  Addressing dyscalculia involves early detection, tailored interventions, and consistent practice. Individualized education plans and multi-sensory teaching strategies help improve mathematical skills. Technology-assisted tools like Numeraid provide exercises and feedback for students to practice at their own pace. Gamified learning can reduce anxiety and increase engagement. Coping strategies such as calculators, visual reminders, mnemonic devices, and checklists support everyday tasks. With patience, support, and targeted strategies, individuals with dyscalculia can overcome challenges, build confidence, and achieve success academically and in daily life.
+                </p>
+              </div>
+              <button class="fun-fact-btn w-fit bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1 mt-6"
+                      onclick="showModal('Short, regular math exercises can improve understanding and retention, making learning more effective and enjoyable.')">
+                Did You Know
+              </button>
             </div>
-            <button class="fun-fact-btn" onclick="showModal('Short, regular math exercises can improve understanding and retention, making learning more effective and enjoyable.')">Did You Know</button>
           </div>
         </div>
       </div>
+
+      <!-- Next Button -->
+      <button class="carousel-next absolute right-0 z-10 w-12 h-12 md:w-14 md:h-14 bg-[#4B68A5] hover:bg-[#3A528F] rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:translate-x-1" aria-label="Next">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
     </div>
 
-    <button class="carousel-control-next" type="button" aria-label="Next">
-      <span class="carousel-control-next-icon"></span>
-    </button>
+    <!-- Carousel Indicators -->
+    <div class="flex justify-center gap-3 mt-8">
+      {% for i in range(4) %}
+      <button class="carousel-indicator w-4 h-4 rounded-full bg-[#4B68A5]/30 transition-all duration-300 {{ 'bg-[#4B68A5] scale-125' if i == 0 else '' }}"
+              data-slide="{{ i }}"></button>
+      {% endfor %}
+    </div>
   </div>
 </div>
 
 <!-- Modal Overlay -->
-<div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
-  <div class="modal-content-custom" onclick="event.stopPropagation()">
-    <p id="modalText"></p>
-    <button class="close-btn" onclick="closeModal()">Close</button>
+<div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity duration-300">
+  <div class="modal-content bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl transform transition-transform duration-300 scale-95">
+    <p id="modalText" class="text-gray-700 text-lg leading-relaxed mb-6 text-center"></p>
+    <button class="close-btn w-full bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            onclick="closeModal()">
+      Close
+    </button>
   </div>
 </div>
 
 <!-- Back Button -->
-<a href="{{ url_for('main.student_dashboard') }}" class="back-btn">
+<a href="{{ url_for('main.student_dashboard') }}" class="fixed bottom-5 left-5 bg-[#4B68A5] text-white py-3 px-6 rounded-full no-underline font-semibold shadow-lg transition-all duration-300 hover:bg-[#3A528F] hover:-translate-y-1 z-40 flex items-center gap-2">
   ← Back to Dashboard
 </a>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   let currentSlide = 0;
   const totalSlides = 4;
 
   function showModal(text) {
     const overlay = document.getElementById('modalOverlay');
-    document.getElementById('modalText').innerText = text;
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.classList.add('show'), 10);
+    const modalText = document.getElementById('modalText');
+    const modalContent = overlay.querySelector('.modal-content');
+
+    modalText.textContent = text;
+    overlay.classList.remove('hidden');
+
+    // Trigger animation
+    setTimeout(() => {
+      overlay.classList.add('flex');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95');
+        modalContent.classList.add('scale-100');
+      }, 10);
+    }, 10);
   }
 
   function closeModal() {
     const overlay = document.getElementById('modalOverlay');
-    overlay.classList.remove('show');
-    setTimeout(() => overlay.style.display = 'none', 300);
+    const modalContent = overlay.querySelector('.modal-content');
+
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+
+    setTimeout(() => {
+      overlay.classList.remove('flex');
+      overlay.classList.add('hidden');
+    }, 300);
   }
 
   function updateCarousel() {
     const carouselInner = document.querySelector('.carousel-inner');
-    const indicators = document.querySelectorAll('.carousel-indicators [data-bs-target]');
-    
+    const indicators = document.querySelectorAll('.carousel-indicator');
+
+    // Update carousel position
     carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
-    
+
+    // Update indicators
     indicators.forEach((indicator, index) => {
-      indicator.classList.toggle('active', index === currentSlide);
-    });
-    
-    const items = document.querySelectorAll('.carousel-item');
-    items.forEach((item, index) => {
-      item.classList.toggle('active', index === currentSlide);
+      if (index === currentSlide) {
+        indicator.classList.add('bg-[#4B68A5]', 'scale-125');
+        indicator.classList.remove('bg-[#4B68A5]/30');
+      } else {
+        indicator.classList.remove('bg-[#4B68A5]', 'scale-125');
+        indicator.classList.add('bg-[#4B68A5]/30');
+      }
     });
   }
 
@@ -484,32 +195,36 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    const nextBtn = document.querySelector('.carousel-control-next');
-    const prevBtn = document.querySelector('.carousel-control-prev');
-    
+    const nextBtn = document.querySelector('.carousel-next');
+    const prevBtn = document.querySelector('.carousel-prev');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+
+    // Button event listeners
     if (nextBtn) nextBtn.addEventListener('click', nextSlide);
     if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-    
-    const indicators = document.querySelectorAll('.carousel-indicators [data-bs-target]');
+
+    // Indicator event listeners
     indicators.forEach((indicator, index) => {
       indicator.addEventListener('click', () => goToSlide(index));
     });
-    
+
+    // Keyboard navigation
     document.addEventListener('keydown', function(event) {
       if (event.key === 'ArrowLeft') prevSlide();
       else if (event.key === 'ArrowRight') nextSlide();
       else if (event.key === 'Escape') closeModal();
     });
 
+    // Touch swipe support
     let startX = 0;
     let endX = 0;
-    
-    const carouselElement = document.querySelector('.carousel');
-    
+
+    const carouselElement = document.querySelector('.carousel-container');
+
     carouselElement.addEventListener('touchstart', function(e) {
       startX = e.touches[0].clientX;
     });
-    
+
     carouselElement.addEventListener('touchend', function(e) {
       endX = e.changedTouches[0].clientX;
       const diff = startX - endX;
@@ -518,11 +233,11 @@
         else prevSlide();
       }
     });
-  });
 
-  document.addEventListener('click', function(event) {
-    const overlay = document.getElementById('modalOverlay');
-    if (event.target === overlay) closeModal();
+    // Close modal when clicking outside
+    document.getElementById('modalOverlay').addEventListener('click', function(event) {
+      if (event.target === this) closeModal();
+    });
   });
 </script>
 {% endblock %}

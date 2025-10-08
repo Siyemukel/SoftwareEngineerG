@@ -61,9 +61,10 @@ class StaffLoginForm(FlaskForm):
 
 
 class AssignStaffForm(FlaskForm):
-    staff = SelectField('Select Staff', coerce=int)
-    students = SelectMultipleField('Select Students', coerce=int)
-    submit = SubmitField('Assign')
+    staff = SelectField("Staff", coerce=int, validators=[DataRequired()])
+    role = SelectField("Role", choices=[('advisor', 'Advisor'), ('reviewer', 'Reviewer')], validators=[DataRequired()])
+    students = SelectMultipleField("Students", coerce=int, validators=[DataRequired()])
+    submit = SubmitField("Assign")
 
 
 

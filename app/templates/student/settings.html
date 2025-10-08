@@ -3,432 +3,127 @@
 {% block title %}Student Settings{% endblock %}
 
 {% block content %}
-<style>
-    :root {
-      --primary-blue: #4B68A5;
-      --white: #ffffff;
-      --pastel-blue: #d6ecff;
-      --light-gray: #f8f9fa;
-      --medium-gray: #e0e0e0;
-      --dark-gray: #333333;
-      --text-gray: #555555;
-      --border-color: #dee2e6;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --transition: all 0.3s ease;
-    }
+<div class="bg-gray-50 min-h-screen pb-24 font-sans text-gray-800">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      <!-- Sidebar -->
+      <div class="w-full md:w-80 bg-white border-r border-gray-200 py-8">
+        <h5 class="text-xl font-semibold text-gray-800 mb-8 px-8">Settings</h5>
+        <nav class="flex flex-col space-y-1">
+          <a class="nav-link py-3 px-8 text-gray-600 font-medium hover:bg-gray-50 hover:text-[#4B68A5] transition-all duration-300 rounded-lg mx-2 active:bg-[#4B68A5] active:text-white" data-bs-toggle="tab" href="#personal">Personal info</a>
+          <a class="nav-link py-3 px-8 text-gray-600 font-medium hover:bg-gray-50 hover:text-[#4B68A5] transition-all duration-300 rounded-lg mx-2" data-bs-toggle="tab" href="#password">Change Password</a>
+          <a class="nav-link py-3 px-8 text-gray-600 font-medium hover:bg-gray-50 hover:text-[#4B68A5] transition-all duration-300 rounded-lg mx-2" data-bs-toggle="tab" href="#privacy">Privacy & Policies</a>
+        </nav>
+      </div>
 
-    body {
-      background: var(--light-gray);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding-bottom: 100px;
-      color: var(--dark-gray);
-    }
+      <!-- Content -->
+      <div class="flex-1 p-10 bg-white tab-content">
+        <!-- Personal info -->
+        <div class="tab-pane fade show active" id="personal">
+          <h4 class="text-2xl font-semibold text-[#4B68A5] mb-8">Personal Info</h4>
 
-    .settings-container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      min-height: 600px;
-    }
+          <form method="POST" enctype="multipart/form-data">
+            <!-- Profile Picture Section -->
+            <div class="text-center mb-8 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+              {% if current_user.profile_image %}
+                <img id="profileImage" class="w-24 h-24 rounded-full border-2 border-[#4B68A5] object-cover mx-auto mb-4" src="{{ url_for('uploaded_file', filename='profile_images/' + current_user.profile_image) }}" alt="Profile Picture">
+              {% else %}
+                <div class="profile-pic-placeholder w-24 h-24 rounded-full border-2 border-[#4B68A5] flex items-center justify-center text-[#4B68A5] text-sm mx-auto mb-4 bg-white" id="profilePlaceholder">
+                  Profile Picture
+                </div>
+              {% endif %}
 
-    /* Sidebar */
-    .settings-sidebar {
-      width: 300px;
-      background: var(--white);
-      border-right: 1px solid var(--border-color);
-      padding: 2rem 0;
-    }
-
-    .settings-sidebar h5 {
-      margin-bottom: 2rem;
-      color: var(--dark-gray);
-      font-size: 1.5rem;
-      font-weight: 600;
-      padding: 0 2rem;
-    }
-
-    .settings-nav {
-      margin: 0;
-      padding: 0;
-    }
-
-    .settings-nav .nav-link {
-      display: block;
-      padding: 1rem 2rem;
-      color: var(--text-gray);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1rem;
-      border: none;
-      border-radius: 0;
-      transition: var(--transition);
-      margin: 0;
-    }
-
-    .settings-nav .nav-link:hover {
-      background: var(--light-gray);
-      color: var(--primary-blue);
-    }
-
-    .settings-nav .nav-link.active {
-      background: var(--primary-blue);
-      color: var(--white);
-      border-radius: 8px;
-      margin: 0 1rem;
-    }
-
-    /* Content */
-    .settings-content {
-      flex: 1;
-      padding: 2.5rem;
-      background: var(--white);
-    }
-
-    .settings-content h4 {
-      color: var(--primary-blue);
-      margin-bottom: 2rem;
-      font-size: 1.75rem;
-      font-weight: 600;
-    }
-
-    /* Profile Picture Section */
-    .profile-pic {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      border: 2px dashed var(--border-color);
-      border-radius: 12px;
-      background: #fafbfc;
-    }
-
-    .profile-pic-placeholder {
-      width: 100px;
-      height: 100px;
-      border: 2px solid var(--primary-blue);
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-blue);
-      font-size: 0.875rem;
-      margin-bottom: 1rem;
-      background: var(--white);
-    }
-
-    .profile-pic img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 2px solid var(--primary-blue);
-      margin-bottom: 1rem;
-    }
-
-    .file-input-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    .file-input-button {
-      background: var(--light-gray);
-      border: 1px solid var(--border-color);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.875rem;
-      color: var(--text-gray);
-      transition: var(--transition);
-    }
-
-    .file-input-button:hover {
-      background: var(--medium-gray);
-    }
-
-    .file-status {
-      font-size: 0.875rem;
-      color: var(--text-gray);
-    }
-
-    /* Form Styling */
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-      font-weight: 600;
-      color: var(--dark-gray);
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .form-control {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      transition: var(--transition);
-      background: var(--white);
-    }
-
-    .form-control:focus {
-      border-color: var(--primary-blue);
-      box-shadow: 0 0 0 3px rgba(75, 104, 165, 0.1);
-      outline: none;
-    }
-
-    .form-control::placeholder {
-      color: #999;
-    }
-
-    /* Row layout for names */
-    .name-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Buttons */
-    .btn-primary {
-      background: var(--primary-blue);
-      border: none;
-      padding: 0.75rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: var(--transition);
-      width: 100%;
-      margin-top: 1rem;
-    }
-
-    .btn-primary:hover {
-      background: #3a5588;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: var(--light-gray);
-      border: 1px solid var(--border-color);
-      color: var(--text-gray);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      transition: var(--transition);
-    }
-
-    .btn-secondary:hover {
-      background: var(--medium-gray);
-    }
-
-    /* Additional Email Button */
-    .add-email-btn {
-      background: var(--primary-blue);
-      color: var(--white);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-top: 0.5rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .add-email-btn:hover {
-      background: #3a5588;
-    }
-
-    /* Info boxes for privacy tab */
-    .info-box {
-      background: var(--light-gray);
-      padding: 1.25rem;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 1.5rem;
-    }
-
-    .info-box strong {
-      color: var(--dark-gray);
-    }
-
-    .info-box p, .info-box ul {
-      margin-bottom: 0;
-      margin-top: 0.5rem;
-      color: var(--text-gray);
-    }
-
-    /* Back button */
-    .back-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: var(--primary-blue);
-      color: var(--white);
-      padding: 0.8rem 1.2rem;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: 500;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .back-btn:hover {
-      background: #3a5588;
-      color: var(--white);
-      transform: translateY(-2px);
-    }
-
-    /* Phone number field */
-    .phone-group {
-      margin-bottom: 2rem;
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .settings-container {
-        flex-direction: column;
-        margin: 1rem;
-      }
-      
-      .settings-sidebar {
-        width: 100%;
-      }
-      
-      .name-row {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-    }
-</style>
-
-<div class="settings-container">
-  <!-- Sidebar -->
-  <div class="settings-sidebar">
-    <h5>Settings</h5>
-    <nav class="nav flex-column settings-nav">
-      <a class="nav-link active" data-bs-toggle="tab" href="#personal">Personal info</a>
-      <a class="nav-link" data-bs-toggle="tab" href="#password">Change Password</a>
-      <a class="nav-link" data-bs-toggle="tab" href="#privacy">Privacy & Policies</a>
-    </nav>
-  </div>
-
-  <!-- Content -->
-  <div class="settings-content tab-content">
-    
-    <!-- Personal info -->
-    <div class="tab-pane fade show active" id="personal">
-      <h4>Personal Info</h4>
-      
-      <form method="POST" enctype="multipart/form-data">
-        <!-- Profile Picture Section -->
-        <div class="profile-pic">
-          {% if current_user.profile_image %}
-            <img id="profileImage" src="{{ url_for('uploaded_file', filename='profile_images/' + current_user.profile_image) }}" alt="Profile Picture">
-          {% else %}
-            <div class="profile-pic-placeholder" id="profilePlaceholder">
-              Profile Picture
+              <div class="flex items-center justify-center gap-4">
+                <label for="profile_image" class="bg-gray-50 border border-gray-300 py-2 px-4 rounded-lg cursor-pointer text-gray-600 text-sm transition-all duration-300 hover:bg-gray-100">Choose File</label>
+                <span class="file-status text-gray-600 text-sm" id="fileStatus">No file chosen</span>
+                <input type="file" class="hidden" id="profile_image" name="profile_image" accept="image/*">
+              </div>
             </div>
-          {% endif %}
-          
-          <div class="file-input-container">
-            <label for="profile_image" class="file-input-button">Choose File</label>
-            <span class="file-status" id="fileStatus">No file chosen</span>
-            <input type="file" class="d-none" id="profile_image" name="profile_image" accept="image/*">
+
+            <!-- Name Fields -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div class="form-group">
+                <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">First Name</label>
+                <input type="text" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="name" value="{{ current_user.name }}" placeholder="Enter first name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">Last Name</label>
+                <input type="text" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="surname" value="{{ current_user.surname }}" placeholder="Enter last name" required>
+              </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group mb-6">
+              <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">Email</label>
+              <input type="email" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="email" value="{{ current_user.student_email }}" placeholder="Enter email" required>
+              <button type="button" class="add-email-btn bg-[#4B68A5] text-white border-none py-2 px-4 rounded-lg text-sm font-medium mt-2 cursor-pointer transition-all duration-300 hover:bg-[#3A528F]">+ Add Another Email</button>
+            </div>
+
+            <!-- Phone Number Field -->
+            <div class="form-group mb-8">
+              <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">Phone Number</label>
+              <input type="tel" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="phone" value="{{ current_user.phone if current_user.phone else '' }}" placeholder="Enter phone number">
+            </div>
+
+            <button type="submit" class="btn-primary w-full bg-[#4B68A5] border-none py-3 px-8 rounded-lg font-semibold text-white text-lg transition-all duration-300 hover:bg-[#3A528F] hover:-translate-y-1 mt-4">Save Changes</button>
+          </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="tab-pane fade" id="password">
+          <h4 class="text-2xl font-semibold text-[#4B68A5] mb-8">Change Password</h4>
+          <form method="POST">
+            <div class="form-group mb-6">
+              <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">New Password</label>
+              <input type="password" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="new_password" placeholder="Enter new password" required>
+            </div>
+            <div class="form-group mb-8">
+              <label class="form-label block font-semibold text-gray-800 mb-2 text-sm">Confirm Password</label>
+              <input type="password" class="form-control w-full border border-gray-300 rounded-lg py-3 px-4 text-gray-800 transition-all duration-300 focus:border-[#4B68A5] focus:ring-3 focus:ring-[#4B68A5]/20 outline-none" name="confirm_password" placeholder="Confirm new password" required>
+            </div>
+            <button type="submit" class="btn-primary w-full bg-[#4B68A5] border-none py-3 px-8 rounded-lg font-semibold text-white text-lg transition-all duration-300 hover:bg-[#3A528F] hover:-translate-y-1">Update Password</button>
+          </form>
+        </div>
+
+        <!-- Privacy & Policies -->
+        <div class="tab-pane fade" id="privacy">
+          <h4 class="text-2xl font-semibold text-[#4B68A5] mb-8">Privacy & Policies</h4>
+
+          <div class="info-box bg-gray-50 p-5 rounded-xl border border-gray-300 mb-6">
+            <strong class="text-gray-800">Data Retention Summary:</strong>
+            <p class="text-gray-600 mt-2">Your academic and personal data is stored securely for the duration of your enrollment and up to 5 years after graduation.</p>
+          </div>
+
+          <div class="info-box bg-gray-50 p-5 rounded-xl border border-gray-300 mb-6">
+            <strong class="text-gray-800">Policies & Agreements:</strong>
+            <p class="text-gray-600 mt-2">By using this system, you agree to the student code of conduct and IT usage policies.</p>
+          </div>
+
+          <div class="info-box bg-gray-50 p-5 rounded-xl border border-gray-300 mb-6">
+            <strong class="text-gray-800">Country:</strong> <span id="country">Detecting...</span>
+          </div>
+
+          <div class="info-box bg-gray-50 p-5 rounded-xl border border-gray-300 mb-6">
+            <strong class="text-gray-800">Timezone:</strong> <span id="timezone">{{ current_user.last_login.strftime('%Z') if current_user.last_login else 'Unknown' }}</span>
+          </div>
+
+          <div class="info-box bg-gray-50 p-5 rounded-xl border border-gray-300 mb-6">
+            <strong class="text-gray-800">Login Activity:</strong>
+            <ul class="mt-2 text-gray-600">
+              <li>Last login: {{ current_user.last_login.strftime('%d %b %Y, %H:%M') if current_user.last_login else 'Never' }}</li>
+              {% for history in login_histories %}
+              <li>{{ history.login_time.strftime('%d %b %Y, %H:%M') }} - Device: <span id="device-{{ loop.index }}">Detecting...</span> - IP: {{ history.ip_address }}</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
-
-        <!-- Name Fields -->
-        <div class="name-row">
-          <div class="form-group">
-            <label class="form-label">First Name</label>
-            <input type="text" class="form-control" name="name" value="{{ current_user.name }}" placeholder="Enter first name" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <input type="text" class="form-control" name="surname" value="{{ current_user.surname }}" placeholder="Enter last name" required>
-          </div>
-        </div>
-
-        <!-- Email Field -->
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" value="{{ current_user.student_email }}" placeholder="Enter email" required>
-          <button type="button" class="add-email-btn">+ Add Another Email</button>
-        </div>
-
-        <!-- Phone Number Field -->
-        <div class="form-group phone-group">
-          <label class="form-label">Phone Number</label>
-          <input type="tel" class="form-control" name="phone" value="{{ current_user.phone if current_user.phone else '' }}" placeholder="Enter phone number">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-      </form>
-    </div>
-
-    <!-- Change Password -->
-    <div class="tab-pane fade" id="password">
-      <h4>Change Password</h4>
-      <form method="POST">
-        <div class="form-group">
-          <label class="form-label">New Password</label>
-          <input type="password" class="form-control" name="new_password" placeholder="Enter new password" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password</label>
-          <input type="password" class="form-control" name="confirm_password" placeholder="Confirm new password" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Password</button>
-      </form>
-    </div>
-
-    <!-- Privacy & Policies -->
-    <div class="tab-pane fade" id="privacy">
-      <h4>Privacy & Policies</h4>
-      
-      <div class="info-box">
-        <strong>Data Retention Summary:</strong>
-        <p>Your academic and personal data is stored securely for the duration of your enrollment and up to 5 years after graduation.</p>
-      </div>
-
-      <div class="info-box">
-        <strong>Policies & Agreements:</strong>
-        <p>By using this system, you agree to the student code of conduct and IT usage policies.</p>
-      </div>
-
-      <div class="info-box">
-        <strong>Country:</strong> <span id="country">Detecting...</span>
-      </div>
-
-      <div class="info-box">
-        <strong>Timezone:</strong> <span id="timezone">{{ current_user.last_login.strftime('%Z') if current_user.last_login else 'Unknown' }}</span>
-      </div>
-
-      <div class="info-box">
-        <strong>Login Activity:</strong>
-        <ul>
-          <li>Last login: {{ current_user.last_login.strftime('%d %b %Y, %H:%M') if current_user.last_login else 'Never' }}</li>
-          {% for history in login_histories %}
-          <li>{{ history.login_time.strftime('%d %b %Y, %H:%M') }} - Device: <span id="device-{{ loop.index }}">Detecting...</span> - IP: {{ history.ip_address }}</li>
-          {% endfor %}
-        </ul>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- Back to Dashboard Button -->
-<a href="{{ url_for('main.student_dashboard') }}" class="back-btn">
+<a href="{{ url_for('main.student_dashboard') }}" class="fixed bottom-5 left-5 bg-[#4B68A5] text-white py-3 px-5 rounded-full no-underline font-medium shadow-lg transition-all duration-300 hover:bg-[#3A528F] hover:-translate-y-1 flex items-center gap-2">
   ⬅ Back to Dashboard
 </a>
 
@@ -438,16 +133,16 @@
   document.getElementById("profile_image").addEventListener("change", function(){
     const file = this.files[0];
     const fileStatus = document.getElementById('fileStatus');
-    
+
     if(file){
       fileStatus.textContent = file.name;
-      
+
       const reader = new FileReader();
       reader.onload = function(e){
         const placeholder = document.getElementById('profilePlaceholder');
         if(placeholder) {
           // Replace placeholder with image
-          placeholder.outerHTML = `<img id="profileImage" src="${e.target.result}" alt="Profile Picture">`;
+          placeholder.outerHTML = `<img id="profileImage" class="w-24 h-24 rounded-full border-2 border-[#4B68A5] object-cover mx-auto mb-4" src="${e.target.result}" alt="Profile Picture">`;
         } else {
           // Update existing image
           document.getElementById("profileImage").src = e.target.result;

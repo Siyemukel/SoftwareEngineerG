@@ -192,6 +192,7 @@ class StaffStudentLink(db.Model):
     status = db.Column(db.String(50), default="active")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    role = db.Column(db.String(50), nullable=False)
 
     # Unique constraint to prevent duplicate links
     __table_args__ = (db.UniqueConstraint('staff_id', 'student_id', name='unique_staff_student_link'),)

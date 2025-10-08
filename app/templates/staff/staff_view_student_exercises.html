@@ -1,35 +1,339 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="student-exercises-container">
-    <h2>{{ student.name }}'s Exercises</h2>
-    <p class="student-details">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    {% if exercises %}
-    <div class="exercise-list-group">
-        {% for exercise in exercises %}
-        <div class="exercise-list-item">
-            <div>
-                <h6>{{ exercise.title }} <small class="text-muted">({{ exercise.part }})</small></h6>
-                <p class="mb-1">{{ exercise.description }}</p>
-                {% if exercise.video_link %}
-                    <a href="{{ exercise.video_link }}" target="_blank">Watch Video</a>
-                {% endif %}
-            </div>
-            <div>
-                {% if exercise.id in completed_ex_ids %}
-                    <span class="badge bg-success">Completed</span>
-                {% else %}
-                    <span class="badge bg-warning text-dark">Not Completed</span>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
     </div>
-    {% else %}
-        <p class="student-details">No exercises available.</p>
+
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
+
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_students') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-users mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Students</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_applications') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-file-alt mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Applications</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
+        </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}"
+         class="bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+        <i class="fas fa-arrow-left"></i>
+        Back to Student
+      </a>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="m-0 mb-2 text-2xl">Exercise Progress</h1>
+          <div class="bg-white/25 p-3 rounded text-white">
+            <p class="m-0">Tracking exercise completion for <strong>{{ student.name }} {{ student.surname }}</strong></p>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="bg-white/25 px-4 py-2 rounded-lg">
+            <div class="text-sm opacity-90">Student ID</div>
+            <div class="font-bold">#{{ student.id }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Info & Progress Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Student</div>
+            <div class="font-semibold text-gray-800">{{ student.name }} {{ student.surname }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Email</div>
+            <div class="font-semibold text-gray-800 text-sm">{{ student.student_email }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+            <i class="fas fa-dumbbell"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Total Exercises</div>
+            <div class="font-semibold text-gray-800 text-xl">{{ exercises|length }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Completed</div>
+            <div class="font-semibold text-gray-800 text-xl">{{ completed_ex_ids|length }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    {% if exercises %}
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-semibold text-gray-800">Overall Progress</h3>
+        <span class="text-sm font-semibold text-[#4B68A5]">
+          {{ completed_ex_ids|length }}/{{ exercises|length }} completed
+        </span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-3">
+        <div class="bg-green-500 h-3 rounded-full transition-all duration-500"
+             style="width: {{ (completed_ex_ids|length / exercises|length * 100) if exercises|length > 0 else 0 }}%">
+        </div>
+      </div>
+    </div>
     {% endif %}
 
-    <a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
+    {% if exercises %}
+    <!-- Exercises List -->
+    <div class="space-y-4">
+      {% for exercise in exercises %}
+      <div class="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg animate-fadeIn">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <!-- Exercise Content -->
+          <div class="flex-1">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-lg bg-[#4B68A5] flex items-center justify-center text-white text-lg flex-shrink-0">
+                <i class="fas fa-dumbbell"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h4 class="text-xl font-bold text-gray-800">{{ exercise.title }}</h4>
+                  <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold capitalize">
+                    {{ exercise.part }}
+                  </span>
+                </div>
+                <p class="text-gray-600 mb-3">{{ exercise.description }}</p>
+
+                {% if exercise.video_link %}
+                <a href="{{ exercise.video_link }}" target="_blank"
+                   class="inline-flex items-center gap-2 text-[#4B68A5] hover:text-[#3A528F] font-semibold transition-colors duration-300">
+                  <i class="fas fa-play-circle"></i>
+                  Watch Instructional Video
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="flex-shrink-0">
+            {% if exercise.id in completed_ex_ids %}
+            <div class="flex items-center gap-2 bg-green-50 border border-green-200 px-4 py-3 rounded-lg">
+              <i class="fas fa-check-circle text-green-500 text-lg"></i>
+              <span class="text-green-800 font-semibold">Completed</span>
+            </div>
+            {% else %}
+            <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-4 py-3 rounded-lg">
+              <i class="fas fa-clock text-yellow-500 text-lg"></i>
+              <span class="text-yellow-800 font-semibold">Not Completed</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Completion Stats -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-chart-pie text-[#4B68A5]"></i>
+          Progress by Category
+        </h4>
+        <div class="space-y-3">
+          {% set parts = exercises|map(attribute='part')|unique %}
+          {% for part in parts %}
+          {% set part_exercises = exercises|selectattr('part', 'equalto', part)|list %}
+          {% set completed_part = part_exercises|selectattr('id', 'in', completed_ex_ids)|list %}
+          <div class="flex justify-between items-center">
+            <span class="text-gray-700 font-medium capitalize">{{ part }}</span>
+            <span class="text-sm text-gray-500">
+              {{ completed_part|length }}/{{ part_exercises|length }}
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-[#4B68A5] h-2 rounded-full transition-all duration-500"
+                 style="width: {{ (completed_part|length / part_exercises|length * 100) if part_exercises|length > 0 else 0 }}%">
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-trophy text-[#4B68A5]"></i>
+          Quick Actions
+        </h4>
+        <div class="space-y-3">
+          <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
+             class="w-full bg-[#4B68A5] hover:bg-[#3A528F] text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2 justify-center">
+            <i class="fas fa-file-pdf"></i>
+            Generate Progress Report
+          </a>
+          <a href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}"
+             class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2 justify-center">
+            <i class="fas fa-chart-line"></i>
+            View Test Results
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-xl shadow-md p-12 text-center">
+      <div class="text-6xl text-gray-300 mb-4">💪</div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No Exercises Available</h3>
+      <p class="text-gray-500 text-lg mb-6">There are no exercises assigned to this student yet.</p>
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg max-w-md mx-auto">
+        <div class="flex items-start">
+          <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+          <div class="text-left">
+            <p class="text-blue-700 text-sm">
+              Exercises will become available as the student progresses through their learning journey.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out backwards;
+    }
+
+    .exercise-item:nth-child(1) { animation-delay: 0.1s; }
+    .exercise-item:nth-child(2) { animation-delay: 0.15s; }
+    .exercise-item:nth-child(3) { animation-delay: 0.2s; }
+    .exercise-item:nth-child(4) { animation-delay: 0.25s; }
+    .exercise-item:nth-child(5) { animation-delay: 0.3s; }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock %}

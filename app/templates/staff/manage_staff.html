@@ -1,497 +1,274 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-:root {
-  --primary-blue: #0d6efd;
-  --success-green: #28a745;
-  --danger-red: #dc3545;
-  --warning-yellow: #ffc107;
-  --white: #ffffff;
-  --light-gray: #f8f9fa;
-  --medium-gray: #e0e0e0;
-  --dark-gray: #333333;
-  --text-gray: #555555;
-  --black: #121212;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
-}
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-body {
-  background: var(--light-gray);
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-}
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
+    </div>
 
-.manage-staff-container {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 20px;
-}
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
 
-.page-header {
-  background: var(--white);
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.add_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-plus mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Add Staff</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-user-cog mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Staff</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
 
-.page-header h2 {
-  color: var(--primary-blue);
-  margin: 0;
-  font-weight: 700;
-  font-size: 2rem;
-}
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
 
-.header-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
 
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  text-decoration: none;
-  display: inline-block;
-  font-size: 0.95rem;
-}
-
-.btn-add {
-  background: var(--success-green);
-  color: var(--white);
-}
-
-.btn-add:hover {
-  background: #218838;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.stats-badge {
-  background: var(--primary-blue);
-  color: var(--white);
-  padding: 0.5rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-.search-section {
-  background: var(--white);
-  padding: 1.5rem;
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  margin-bottom: 2rem;
-}
-
-.search-input {
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--medium-gray);
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: var(--transition);
-  width: 100%;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.staff-table-container {
-  background: var(--white);
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.staff-table {
-  width: 100%;
-  margin: 0;
-}
-
-.staff-table thead {
-  background: var(--black);
-  color: var(--white);
-}
-
-.staff-table thead th {
-  padding: 1.2rem 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
-  border: none;
-}
-
-.staff-table tbody td {
-  padding: 1.2rem 1rem;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--medium-gray);
-}
-
-.staff-table tbody tr {
-  transition: var(--transition);
-}
-
-.staff-table tbody tr:hover {
-  background: var(--light-gray);
-}
-
-.staff-id {
-  font-weight: 700;
-  color: var(--primary-blue);
-  font-size: 1.1rem;
-}
-
-.staff-name {
-  font-weight: 600;
-  color: var(--dark-gray);
-}
-
-.badge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-admin-yes {
-  background: var(--success-green);
-  color: var(--white);
-}
-
-.badge-admin-no {
-  background: var(--medium-gray);
-  color: var(--text-gray);
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-}
-
-.btn-edit {
-  background: var(--primary-blue);
-  color: var(--white);
-}
-
-.btn-edit:hover {
-  background: #0b5ed7;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-}
-
-.btn-delete {
-  background: var(--danger-red);
-  color: var(--white);
-}
-
-.btn-delete:hover {
-  background: #c82333;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: var(--white);
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-}
-
-.empty-state-icon {
-  font-size: 5rem;
-  color: var(--medium-gray);
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  color: var(--dark-gray);
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  color: var(--text-gray);
-  font-size: 1.1rem;
-}
-
-.back-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: var(--primary-blue);
-  color: var(--white);
-  padding: 0.8rem 1.2rem;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: 500;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  z-index: 1000;
-}
-
-.back-btn:hover {
-  background: #0b5ed7;
-  color: var(--white);
-  transform: translateY(-2px);
-}
-
-/* Success Modal */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.modal-content {
-  background: var(--white);
-  padding: 2.5rem 3rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  max-width: 500px;
-  margin: 0 20px;
-  animation: slideUp 0.3s ease-out;
-}
-
-.modal-message {
-  color: var(--dark-gray);
-  font-size: 1.1rem;
-  margin: 0 0 2rem 0;
-  line-height: 1.6;
-}
-
-.btn-modal {
-  padding: 0.75rem 2.5rem;
-  background: var(--primary-blue);
-  color: var(--white);
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-.btn-modal:hover {
-  background: #0b5ed7;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.staff-table tbody tr {
-  animation: fadeIn 0.3s ease-out backwards;
-}
-
-.staff-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.staff-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
-.staff-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
-.staff-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
-.staff-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .manage-staff-container {
-    padding: 0 15px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 1.5rem;
-  }
-
-  .page-header h2 {
-    font-size: 1.5rem;
-    text-align: center;
-  }
-
-  .header-actions {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-    text-align: center;
-  }
-
-  .staff-table-container {
-    overflow-x: auto;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .btn-sm {
-    width: 100%;
-  }
-
-  .back-btn {
-    bottom: 15px;
-    left: 15px;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .modal-content {
-    padding: 2rem;
-    margin: 0 15px;
-  }
-}
-</style>
-
-<div class="manage-staff-container">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h2> Manage Staff</h2>
-        <div class="header-actions">
-            <div class="stats-badge" id="staffCount">
-                {{ staff_list|length }} Staff Members
-            </div>
-            <a href="{{ url_for('main.add_staff') }}" class="btn btn-add">➕ Add New Staff</a>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
         </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="input-group max-w-[300px]">
+        <span class="input-group-text bg-white border border-gray-300 border-r-0 rounded-l-lg px-3 py-2"><i class="fas fa-search text-gray-400"></i></span>
+        <input type="text" class="form-control border border-gray-300 border-l-0 rounded-r-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent" placeholder="Search staff..." id="dashboard-search">
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <h1 class="m-0 mb-2 text-2xl">Manage Staff Members</h1>
+      <div class="bg-white/25 p-3 rounded text-white">
+        <p>View and manage all staff accounts in the system.</p>
+      </div>
+    </section>
+
+    <!-- Page Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+      <div class="flex items-center gap-4">
+        <div class="bg-[#4B68A5] text-white px-6 py-3 rounded-xl font-bold text-lg">
+          {{ staff_list|length }} Staff Members
+        </div>
+      </div>
+      <a href="{{ url_for('main.add_staff') }}" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+        <i class="fas fa-user-plus"></i>
+        Add New Staff
+      </a>
     </div>
 
     {% if staff_list %}
     <!-- Search Section -->
-    <div class="search-section">
-        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by name, surname, or username...">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="relative">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, surname, or username..."
+               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300">
+      </div>
     </div>
 
     <!-- Staff Table -->
-    <div class="staff-table-container">
-        <table class="staff-table" id="staffTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>NAME</th>
-                    <th>SURNAME</th>
-                    <th>USERNAME</th>
-                    <th>ADMIN</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for staff in staff_list %}
-                <tr data-name="{{ staff.name }}"
-                    data-surname="{{ staff.surname }}"
-                    data-username="{{ staff.username }}">
-                    <td>
-                        <span class="staff-id">#{{ staff.id }}</span>
-                    </td>
-                    <td>
-                        <span class="staff-name">{{ staff.name }}</span>
-                    </td>
-                    <td>
-                        <span class="staff-name">{{ staff.surname }}</span>
-                    </td>
-                    <td>{{ staff.username }}</td>
-                    <td>
-                        {% if staff.is_admin %}
-                            <span class="badge badge-admin-yes">Yes</span>
-                        {% else %}
-                            <span class="badge badge-admin-no">No</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="{{ url_for('main.edit_staff', staff_id=staff.id) }}"
-                               class="btn btn-edit btn-sm"> Edit</a>
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full" id="staffTable">
+          <thead>
+            <tr class="bg-[#4B68A5] text-white">
+              <th class="p-4 text-left font-semibold">ID</th>
+              <th class="p-4 text-left font-semibold">NAME</th>
+              <th class="p-4 text-left font-semibold">SURNAME</th>
+              <th class="p-4 text-left font-semibold">USERNAME</th>
+              <th class="p-4 text-left font-semibold">ADMIN</th>
+              <th class="p-4 text-left font-semibold">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for staff in staff_list %}
+            <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-300 animate-fadeIn"
+                data-name="{{ staff.name }}"
+                data-surname="{{ staff.surname }}"
+                data-username="{{ staff.username }}">
+              <td class="p-4">
+                <span class="font-bold text-[#4B68A5] text-lg">#{{ staff.id }}</span>
+              </td>
+              <td class="p-4">
+                <span class="font-semibold text-gray-800">{{ staff.name }}</span>
+              </td>
+              <td class="p-4">
+                <span class="font-semibold text-gray-800">{{ staff.surname }}</span>
+              </td>
+              <td class="p-4 text-gray-600">{{ staff.username }}</td>
+              <td class="p-4">
+                {% if staff.is_admin %}
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Yes</span>
+                {% else %}
+                  <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-semibold">No</span>
+                {% endif %}
+              </td>
+              <td class="p-4">
+                <div class="flex gap-2 flex-wrap">
+                  <a href="{{ url_for('main.edit_staff', staff_id=staff.id) }}"
+                     class="bg-[#4B68A5] hover:bg-[#3A528F] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+                    <i class="fas fa-edit text-xs"></i>
+                    Edit
+                  </a>
 
-                            {% if current_user.is_admin %}
-                            <form method="POST" action="{{ url_for('main.delete_staff', staff_id=staff.id) }}" style="display: inline;">
-                                <button type="submit" class="btn btn-delete btn-sm"
-                                        onclick="return confirm(' Are you sure you want to delete this staff member?\n\nName: {{ staff.name }} {{ staff.surname }}\nUsername: {{ staff.username }}\n\nThis action cannot be undone!');">
-                                     Delete
-                                </button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                  {% if current_user.is_admin %}
+                  <form method="POST" action="{{ url_for('main.delete_staff', staff_id=staff.id) }}" class="m-0">
+                    <button type="submit"
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2"
+                            onclick="return confirm('Are you sure you want to delete this staff member?\n\nName: {{ staff.name }} {{ staff.surname }}\nUsername: {{ staff.username }}\n\nThis action cannot be undone!');">
+                      <i class="fas fa-trash text-xs"></i>
+                      Delete
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
+      </div>
     </div>
     {% else %}
     <!-- Empty State -->
-    <div class="empty-state">
-        <div class="empty-state-icon">👥</div>
-        <h3>No Staff Members Found</h3>
-        <p>Start by adding your first staff member to the system.</p>
-        <a href="{{ url_for('main.add_staff') }}" class="btn btn-add" style="margin-top: 1.5rem;"> Add New Staff</a>
+    <div class="bg-white rounded-xl shadow-md p-12 text-center">
+      <div class="text-6xl text-gray-300 mb-4">👥</div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No Staff Members Found</h3>
+      <p class="text-gray-500 text-lg mb-6">Start by adding your first staff member to the system.</p>
+      <a href="{{ url_for('main.add_staff') }}" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+        <i class="fas fa-user-plus"></i>
+        Add New Staff
+      </a>
     </div>
     {% endif %}
+  </div>
 </div>
 
 <!-- Success Modal -->
-<div id="successModal" class="modal">
-    <div class="modal-content">
-        <p class="modal-message" id="modalMessage">Staff member deleted successfully!</p>
-        <button onclick="closeModal()" class="btn-modal">Close</button>
-    </div>
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+  <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4 transform transition-all duration-300 scale-95 animate-slideUp">
+    <p class="text-gray-700 text-lg text-center mb-6" id="modalMessage">Staff member deleted successfully!</p>
+    <button onclick="closeModal()" class="w-full bg-[#4B68A5] hover:bg-[#3A528F] text-white py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5">
+      Close
+    </button>
+  </div>
 </div>
 
-<!-- Back Button -->
-<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">← Back to Dashboard</a>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
+
+// Dashboard search
+const searchInput = document.getElementById('dashboard-search');
+searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    // Implement dashboard-wide search if needed
+});
+
+// Staff table search functionality
+const staffSearchInput = document.getElementById('searchInput');
+const staffTable = document.getElementById('staffTable');
+
+if (staffSearchInput && staffTable) {
+    const tbody = staffTable.getElementsByTagName('tbody')[0];
+
+    staffSearchInput.addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = tbody.getElementsByTagName('tr');
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const name = row.getAttribute('data-name').toLowerCase();
+            const surname = row.getAttribute('data-surname').toLowerCase();
+            const username = row.getAttribute('data-username').toLowerCase();
+
+            const searchMatch = name.includes(searchText) ||
+                              surname.includes(searchText) ||
+                              username.includes(searchText);
+
+            if (searchMatch) {
+                row.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden');
+            }
+        }
+
+        // Update count badge
+        const countBadge = document.querySelector('.bg-\\[\\#4B68A5\\]');
+        if (countBadge) {
+            countBadge.textContent = visibleCount + ' Staff Members';
+        }
+    });
+}
+
+// Check for success/delete messages in URL parameters
 document.addEventListener('DOMContentLoaded', function() {
-    // Check for success/delete messages in URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('deleted') === 'true') {
         document.getElementById('modalMessage').textContent = 'Staff member deleted successfully!';
@@ -503,51 +280,18 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modalMessage').textContent = 'Staff member updated successfully!';
         showSuccessModal();
     }
-
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('staffTable');
-    
-    if (searchInput && table) {
-        const tbody = table.getElementsByTagName('tbody')[0];
-        
-        searchInput.addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = tbody.getElementsByTagName('tr');
-            let visibleCount = 0;
-            
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const name = row.getAttribute('data-name').toLowerCase();
-                const surname = row.getAttribute('data-surname').toLowerCase();
-                const username = row.getAttribute('data-username').toLowerCase();
-                
-                const searchMatch = name.includes(searchText) || 
-                                  surname.includes(searchText) || 
-                                  username.includes(searchText);
-                
-                if (searchMatch) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-            
-            // Update count badge
-            const countBadge = document.getElementById('staffCount');
-            if (countBadge) {
-                countBadge.textContent = visibleCount + ' Staff Members';
-            }
-        });
-    }
 });
 
 // Show success modal
 function showSuccessModal() {
     const modal = document.getElementById('successModal');
     if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.querySelector('.transform').classList.remove('scale-95');
+            modal.querySelector('.transform').classList.add('scale-100');
+        }, 10);
     }
 }
 
@@ -555,19 +299,64 @@ function showSuccessModal() {
 function closeModal() {
     const modal = document.getElementById('successModal');
     if (modal) {
-        modal.style.display = 'none';
-        // Clean URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+        modal.querySelector('.transform').classList.remove('scale-100');
+        modal.querySelector('.transform').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 300);
     }
 }
 
 // Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('successModal');
-    if (event.target === modal) {
+document.getElementById('successModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
         closeModal();
     }
-}
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out backwards;
+    }
+
+    .animate-slideUp {
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .staff-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .staff-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    .staff-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    .staff-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    .staff-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+`;
+document.head.appendChild(style);
 </script>
 
 {% endblock %}

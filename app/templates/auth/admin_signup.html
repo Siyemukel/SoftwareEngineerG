@@ -2,61 +2,74 @@
 
 {% block title %}Admin Sign Up{% endblock %}
 {% block content %}
-<div class="signup-container">
-    <div class="signup-card">
-        <div class="signup-branding">
-            <img src="/static/images/dut_logo.png" alt="Company Logo" class="logo-image">
-            <h2>Welcome to the Admin Portal</h2>
-            <p>
-                Manage your digital presence with ease. This portal is designed to provide you with a powerful and intuitive platform to control content, users, and settings.
-            </p>
-        </div>
-        <div class="signup-form-container">
-            <h2>Admin Sign Up</h2>
-            <p>Create your administrator account to get started.</p>
-            <form method="POST" action="{{ url_for('main.home') }}">
-                {{ form.hidden_tag() }}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="md:flex">
+            <!-- Left Side - Branding -->
+            <div class="md:w-1/2 bg-blue p-8 text-white flex flex-col justify-center">
+                <div class="text-center md:text-left">
+                    <img src="/static/images/dut_logo.png" alt="Company Logo" class="logo-image mx-auto md:mx-0 w-24 h-24 mb-6">
+                    <h2 class="text-3xl font-primary mb-4">Welcome to the Admin Portal</h2>
+                    <p class="text-blue-100 leading-relaxed">
+                        Manage your digital presence with ease. This portal is designed to provide you with a powerful and intuitive platform to control content, users, and settings.
+                    </p>
+                </div>
+            </div>
 
-                <div class="form-group mb-3">
-                    {{ form.username(class="form-control", placeholder="Username") }}
-                    {% for error in form.username.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+            <!-- Right Side - Sign Up Form -->
+            <div class="md:w-1/2 p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-primary text-black mb-2">Admin Sign Up</h2>
+                    <p class="text-dark-grey">Create your administrator account to get started.</p>
                 </div>
 
-                <div class="form-group mb-3">
-                    {{ form.name(class="form-control", placeholder="Name") }}
-                    {% for error in form.name.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+                <form method="POST" action="{{ url_for('main.home') }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        {{ form.username(class="w-full px-4 py-3 border border-metallic-silver rounded-lg focus:outline-none focus:ring-2 focus:ring-blue focus:border-transparent", placeholder="Username") }}
+                        {% for error in form.username.errors %}
+                            <div class="text-red text-sm mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.name(class="w-full px-4 py-3 border border-metallic-silver rounded-lg focus:outline-none focus:ring-2 focus:ring-blue focus:border-transparent", placeholder="Name") }}
+                        {% for error in form.name.errors %}
+                            <div class="text-red text-sm mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.surname(class="w-full px-4 py-3 border border-metallic-silver rounded-lg focus:outline-none focus:ring-2 focus:ring-blue focus:border-transparent", placeholder="Surname") }}
+                        {% for error in form.surname.errors %}
+                            <div class="text-red text-sm mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.password(class="w-full px-4 py-3 border border-metallic-silver rounded-lg focus:outline-none focus:ring-2 focus:ring-blue focus:border-transparent", placeholder="Password") }}
+                        {% for error in form.password.errors %}
+                            <div class="text-red text-sm mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-6">
+                        {{ form.confirm_password(class="w-full px-4 py-3 border border-metallic-silver rounded-lg focus:outline-none focus:ring-2 focus:ring-blue focus:border-transparent", placeholder="Confirm Password") }}
+                        {% for error in form.confirm_password.errors %}
+                            <div class="text-red text-sm mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    {{ form.submit(class="w-full bg-blue hover:bg-blue-800 text-white font-medium py-3 px-4 rounded-lg transition duration-200 cursor-pointer") }}
+                </form>
+
+                <div class="text-center mt-6">
+                    <p class="text-dark-grey">
+                        Already have an account?
+                        <a href="/login" class="text-blue hover:text-blue-800 font-medium transition duration-200">Log in</a>
+                    </p>
                 </div>
-
-                <div class="form-group mb-3">
-                    {{ form.surname(class="form-control", placeholder="Surname") }}
-                    {% for error in form.surname.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
-                </div>
-
-                <div class="form-group mb-3">
-                    {{ form.password(class="form-control", placeholder="Password") }}
-                    {% for error in form.password.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
-                </div>
-
-                <div class="form-group mb-3">
-                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
-                    {% for error in form.confirm_password.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
-                </div>
-
-                {{ form.submit(class="btn btn-primary submit-btn w-100") }}
-            </form>
-
-            <div class="login-link">
-                Already have an account? <a href="/login">Log in</a>
             </div>
         </div>
     </div>

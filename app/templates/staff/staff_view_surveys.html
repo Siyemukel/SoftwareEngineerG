@@ -1,42 +1,375 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="student-survey-container">
-    <h2>{{ student.name }}'s Survey</h2>
-    <p class="student-details">Student ID: {{ student.id }} | Email: {{ student.student_email }}</p>
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
+    </div>
+
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
+
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_students') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-users mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Students</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_applications') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-file-alt mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Applications</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
+        </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}"
+         class="bg-[#4B68A5] hover:bg-[#3A528F] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2">
+        <i class="fas fa-arrow-left"></i>
+        Back to Student
+      </a>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="m-0 mb-2 text-2xl">Survey Responses</h1>
+          <div class="bg-white/25 p-3 rounded text-white">
+            <p class="m-0">Viewing survey responses for <strong>{{ student.name }} {{ student.surname }}</strong></p>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="bg-white/25 px-4 py-2 rounded-lg">
+            <div class="text-sm opacity-90">Student ID</div>
+            <div class="font-bold">#{{ student.id }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Student Info & Survey Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Student</div>
+            <div class="font-semibold text-gray-800">{{ student.name }} {{ student.surname }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Email</div>
+            <div class="font-semibold text-gray-800 text-sm">{{ student.student_email }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+            <i class="fas fa-poll"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Total Surveys</div>
+            <div class="font-semibold text-gray-800 text-xl">{{ surveys|length }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500">Latest Survey</div>
+            <div class="font-semibold text-gray-800 text-sm">
+              {% if surveys %}
+                {{ surveys[0].created_at.strftime('%b %d, %Y') }}
+              {% else %}
+                No surveys
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% if surveys %}
-        {% for survey in surveys %}
-        <div class="survey-card">
-            <h5>Survey taken on {{ survey.created_at.strftime('%b %d, %Y') }}</h5>
-            <table class="survey-table">
-                <thead>
-                    <tr>
-                        <th>Question</th>
-                        <th>Response</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for key, value in survey.survey_data.items() %}
-                    <tr>
-                        <td data-label="Question">{{ key.replace('_', ' ').title() }}</td>
-                        <td data-label="Response">
-                            {% if value == 1 %}
-                                <span class="response-struggle">Struggle</span>
-                            {% else %}
-                                <span class="response-no-struggle">No struggle</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Surveys List -->
+    <div class="space-y-6">
+      {% for survey in surveys %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden animate-fadeIn">
+        <!-- Survey Header -->
+        <div class="bg-gradient-to-r from-[#4B68A5] to-[#3A528F] p-6 text-white">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-xl">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold mb-1">Student Self-Assessment</h3>
+                <p class="text-white/80 flex items-center gap-2">
+                  <i class="fas fa-calendar-alt"></i>
+                  Completed on {{ survey.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                </p>
+              </div>
+            </div>
+            <div class="bg-white/20 px-4 py-2 rounded-lg text-center">
+              <div class="text-sm opacity-90">Survey #{{ loop.index }}</div>
+              <div class="font-bold text-lg">{{ loop.length - loop.index0 }}/{{ loop.length }}</div>
+            </div>
+          </div>
         </div>
-        {% endfor %}
-    {% else %}
-        <p class="student-details">No survey submitted by this student yet.</p>
-    {% endif %}
 
-    <a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
+        <!-- Survey Responses -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {% for key, value in survey.survey_data.items() %}
+            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+              <div class="flex items-start justify-between mb-3">
+                <h4 class="font-semibold text-gray-800 text-sm leading-relaxed">
+                  {{ key.replace('_', ' ').title() }}
+                </h4>
+                {% if value == 1 %}
+                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0 ml-3">
+                  <i class="fas fa-exclamation-circle"></i>
+                  Struggle
+                </span>
+                {% else %}
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0 ml-3">
+                  <i class="fas fa-check-circle"></i>
+                  No Struggle
+                </span>
+                {% endif %}
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full {% if value == 1 %}bg-red-500{% else %}bg-green-500{% endif %}"
+                       style="width: {% if value == 1 %}100%{% else %}100%{% endif %}">
+                  </div>
+                </div>
+                <div class="text-xs text-gray-500 font-medium w-8 text-center">
+                  {{ value }}/1
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Summary Stats -->
+          {% set total_questions = survey.survey_data|length %}
+          {% set struggle_count = survey.survey_data.values()|select('equalto', 1)|list|length %}
+          {% set no_struggle_count = survey.survey_data.values()|select('equalto', 0)|list|length %}
+
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-pie text-[#4B68A5]"></i>
+              Response Summary
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="text-center p-4 bg-gray-50 rounded-lg">
+                <div class="text-2xl font-bold text-gray-800">{{ total_questions }}</div>
+                <div class="text-sm text-gray-600 font-semibold">Total Questions</div>
+              </div>
+              <div class="text-center p-4 bg-red-50 rounded-lg">
+                <div class="text-2xl font-bold text-red-600">{{ struggle_count }}</div>
+                <div class="text-sm text-red-600 font-semibold">Areas of Struggle</div>
+              </div>
+              <div class="text-center p-4 bg-green-50 rounded-lg">
+                <div class="text-2xl font-bold text-green-600">{{ no_struggle_count }}</div>
+                <div class="text-sm text-green-600 font-semibold">No Struggle Areas</div>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mt-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-gray-700">Struggle Indicator</span>
+                <span class="text-sm font-semibold text-gray-700">{{ struggle_count }}/{{ total_questions }}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-red-500 h-3 rounded-full transition-all duration-500"
+                     style="width: {{ (struggle_count / total_questions * 100) if total_questions > 0 else 0 }}%">
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 mt-1 text-right">
+                {{ "%.1f"|format((struggle_count / total_questions * 100) if total_questions > 0 else 0) }}% areas indicate struggle
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-lightbulb text-[#4B68A5]"></i>
+          Survey Insights
+        </h4>
+        <div class="space-y-3 text-gray-600">
+          <p class="flex items-start gap-2">
+            <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+            <span>Surveys help identify specific areas where students may need additional support</span>
+          </p>
+          <p class="flex items-start gap-2">
+            <i class="fas fa-chart-line text-green-500 mt-1"></i>
+            <span>Compare survey results with test performance for comprehensive understanding</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <i class="fas fa-rocket text-[#4B68A5]"></i>
+          Quick Actions
+        </h4>
+        <div class="space-y-3">
+          <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
+             class="w-full bg-[#4B68A5] hover:bg-[#3A528F] text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2 justify-center">
+            <i class="fas fa-file-pdf"></i>
+            Generate Report
+          </a>
+          <a href="{{ url_for('main.staff_view_student_results', student_id=student.id) }}"
+             class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2 justify-center">
+            <i class="fas fa-chart-line"></i>
+            View Test Results
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-xl shadow-md p-12 text-center">
+      <div class="text-6xl text-gray-300 mb-4">📝</div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No Survey Responses</h3>
+      <p class="text-gray-500 text-lg mb-6">This student hasn't completed any surveys yet.</p>
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg max-w-md mx-auto">
+        <div class="flex items-start">
+          <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+          <div class="text-left">
+            <p class="text-blue-700 text-sm">
+              Surveys help students self-assess their learning challenges and provide valuable insights for personalized support.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out backwards;
+    }
+
+    .survey-card:nth-child(1) { animation-delay: 0.1s; }
+    .survey-card:nth-child(2) { animation-delay: 0.2s; }
+    .survey-card:nth-child(3) { animation-delay: 0.3s; }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock %}

@@ -17,10 +17,106 @@ try:
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
+    Image = None
+    ImageDraw = None
 
-# Configure Gemini
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.0-pro")
+# Configure Gemini only if an API key is present (check common env names)
+_api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+if _api_key:
+    genai.configure(api_key=_api_key)
+else:
+    # Do not configure; safe_generate_content will raise if used.
+    print("Warning: No Gemini/Google API key found in GEMINI_API_KEY or GOOGLE_API_KEY; AI features will be disabled.")
+
+# Candidate models to try (order: preferred -> fallback). Adjust as necessary.
+MODEL_CANDIDATES = [
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-1.5-flash",
+    "text-bison-001",
+]
+
+# Optional: auto-discover models at startup if API key is present and AUTO_DISCOVER_MODELS=1
+# if is_ai_enabled() and os.environ.get("AUTO_DISCOVER_MODELS", "0") in ("1", "true", "True"):
+#     try:
+#         available = discover_models(limit=200)
+#         # prefer models that match common keywords and preserve order
+#         keywords = ("gemini", "bison", "flash", "text")
+#         discovered = [m for m in available if any(k in m.lower() for k in keywords)]
+#         if discovered:
+#             # place discovered models at the front, keep defaults as fallback
+#             MODEL_CANDIDATES = discovered + [m for m in MODEL_CANDIDATES if m not in discovered]
+#             print(f"Auto-discovered and set MODEL_CANDIDATES: {MODEL_CANDIDATES}")
+#     except Exception as e:
+#         print(f"Auto model discovery failed at startup: {e}")
+
+
+def safe_generate_content(prompt, generation_config=None):
+    """
+    Try calling generate_content with several model candidates until one works.
+    Returns the successful response or raises the last exception.
+    Tries two calling styles: simple prompt string, then structured `contents` if available.
+    """
+    last_exc = None
+    for idx, model_name in enumerate(MODEL_CANDIDATES):
+        try:
+            m = genai.GenerativeModel(model_name)
+            # First, try the simple prompt string call
+            try:
+                if generation_config is not None:
+                    response = m.generate_content(
+                        prompt,
+                        generation_config=generation_config,
+                    )
+                else:
+                    response = m.generate_content(prompt)
+                # Validate that the response contains usable text
+                resp_text = safe_response_text(response)
+                if not resp_text:
+                    raise Exception("Model returned no usable text parts")
+                return response
+            except Exception as e:
+                # If the simple prompt call fails or returns no usable text, try structured contents if possible
+                print(f"Model {model_name} simple call failed: {str(e).splitlines()[0]}")
+                try:
+                    contents = None
+                    # Prefer SDK types if available
+                    if hasattr(types, 'Content') and hasattr(types, 'Part') and hasattr(types.Part, 'from_text'):
+                        contents = [
+                            types.Content(
+                                role='user',
+                                parts=[types.Part.from_text(text=prompt)]
+                            )
+                        ]
+                        if generation_config is not None:
+                            response = m.generate_content(contents=contents, generation_config=generation_config)
+                        else:
+                            response = m.generate_content(contents=contents)
+                        # Validate structured response
+                        resp_text = safe_response_text(response)
+                        if not resp_text:
+                            raise Exception("Model returned no usable text parts (structured)")
+                        return response
+                    else:
+                        # Fallback structured dict form
+                        contents = [{'role': 'user', 'parts': [{'text': prompt}]}]
+                        if generation_config is not None:
+                            response = m.generate_content(contents=contents, generation_config=generation_config)
+                        else:
+                            response = m.generate_content(contents=contents)
+                        resp_text = safe_response_text(response)
+                        if not resp_text:
+                            raise Exception("Model returned no usable text parts (dict structured)")
+                        return response
+                except Exception as e2:
+                    print(f"Model {model_name} structured call also failed: {str(e2).splitlines()[0]}")
+                    last_exc = e2
+                    continue
+        except Exception as e:
+            print(f"Attempt {idx + 1} with model {model_name} failed: {str(e).splitlines()[0]}")
+            last_exc = e
+    # If all attempts fail, raise the last exception so callers can fallback
+    raise last_exc
 
 
 # IMAGE GENERATION (AI + FALLBACK)
@@ -28,62 +124,69 @@ model = genai.GenerativeModel("gemini-1.0-pro")
 
 def generate_shape_image_ai(shape_type, question_data):
     """
-    Use Gemini to generate an image for shapes.
+    Placeholder for AI image generation. By default AI image generation is disabled to avoid
+    SDK compatibility and API key issues. To enable, set the environment variable
+    ENABLE_AI_IMAGES=1 and ensure a valid API key is configured.
     """
-    try:
-        prompt = f"Draw a simple black outline of a {shape_type}. No background, plain white canvas."
-        
-        response = model.generate_images(
-            prompt=prompt,
-            generation_config=genai.types.GenerationConfig(
-                size="512x512"
-            )
-        )
-        
-        if not response or not response.images:
-            return None
+    if os.environ.get("ENABLE_AI_IMAGES", "0") not in ("1", "true", "True"):
+        return None
 
-        # Convert first image to base64
-        image_data = response.images[0].image_bytes
-        img_str = base64.b64encode(image_data).decode()
-        return f"data:image/png;base64,{img_str}"
-    
+    # If explicitly enabled, try a minimal image generation flow but keep it optional and
+    # protected in case the installed SDK doesn't expose image generation.
+    try:
+        # Some SDK versions may not support image generation on GenerativeModel; we avoid
+        # calling it unless the environment explicitly enables AI images.
+        prompt = f"Draw a simple black outline of a {shape_type}. No background, plain white canvas."
+        try:
+            m = genai.GenerativeModel(MODEL_CANDIDATES[0])
+            # Attempt call if available
+            if hasattr(m, 'generate_images'):
+                response = m.generate_images(prompt=prompt)
+                if response and getattr(response, 'images', None):
+                    image_data = response.images[0].image_bytes
+                    img_str = base64.b64encode(image_data).decode()
+                    return f"data:image/png;base64,{img_str}"
+        except Exception as e:
+            print(f"AI image generation attempt failed: {e}")
+            return None
     except Exception as e:
         print(f"AI shape generation failed: {e}")
         return None
+
+    return None
 
 
 def generate_shape_image_pil(shape_type, question_data):
     """Generate a simple shape image using PIL (fallback)."""
     if not PIL_AVAILABLE:
         return None
-    
+
     try:
         width, height = 400, 300
         image = Image.new('RGB', (width, height), 'white')
         draw = ImageDraw.Draw(image)
         center_x, center_y = width // 2, height // 2
-        
+
         if shape_type == "circle":
             radius = question_data.get('radius', 60)
-            draw.ellipse([center_x - radius, center_y - radius, 
-                         center_x + radius, center_y + radius], 
+            draw.ellipse([center_x - radius, center_y - radius,
+                         center_x + radius, center_y + radius],
                         outline='black', width=3)
-                        
+
         elif shape_type == "square":
             side = question_data.get('side', 100)
             half_side = side // 2
             draw.rectangle([center_x - half_side, center_y - half_side,
-                           center_x + half_side, center_y + half_side], 
+                           center_x + half_side, center_y + half_side],
                           outline='black', width=3)
-                          
+
         elif shape_type == "rectangle":
             width_rect = question_data.get('width', 120)
             height_rect = question_data.get('height', 80)
             draw.rectangle([center_x - width_rect//2, center_y - height_rect//2,
-                           center_x + width_rect//2, center_y + height_rect//2], 
+                           center_x + width_rect//2, center_y + height_rect//2],
                           outline='black', width=3)
-                          
+
         elif shape_type == "triangle":
             points = [
                 (center_x, center_y - 60),  # top
@@ -91,12 +194,12 @@ def generate_shape_image_pil(shape_type, question_data):
                 (center_x + 60, center_y + 60)   # bottom right
             ]
             draw.polygon(points, outline='black', width=3)
-            
+
         buffer = BytesIO()
         image.save(buffer, format='PNG')
         img_str = base64.b64encode(buffer.getvalue()).decode()
         return f"data:image/png;base64,{img_str}"
-        
+
     except Exception as e:
         print(f"PIL fallback failed: {e}")
         return None
@@ -104,10 +207,15 @@ def generate_shape_image_pil(shape_type, question_data):
 
 def generate_shape_image(shape_type, question_data):
     """
-    Use PIL for shape images.
+    Use PIL for shape images by default; fall back to AI only if explicitly enabled.
     """
-    return generate_shape_image_pil(shape_type, question_data)
+    # Prefer quick local generation; if unavailable, try AI then fallback to PIL
+    img = generate_shape_image_pil(shape_type, question_data)
+    if img:
+        return img
 
+    # Try AI if PIL not available or failed
+    return generate_shape_image_ai(shape_type, question_data)
 
 
 # QUESTION GENERATION
@@ -137,24 +245,33 @@ def get_varied_question_seed(part, q_num, difficulty):
             5: ["complex geometry", "spatial visualization", "shape puzzles"]
         }
     }
-    
+
     question_types = seeds.get(part, {}).get(q_num, ["general question"])
     return random.choice(question_types)
 
 
+# Helper to check if AI features are enabled
+def is_ai_enabled():
+    return bool(_api_key)
+
+
 def get_next_question(part, difficulty="easy", q_num=1):
     """Generate questions with better error handling and variety"""
+    # If AI is not enabled, immediately return a fallback question to avoid noisy model attempts
+    if not is_ai_enabled():
+        return get_fallback_question(part, difficulty, q_num)
+
     seed_topic = get_varied_question_seed(part, q_num, difficulty)
     max_retries = 3
     retry_count = 0
-    
+
     while retry_count < max_retries:
         try:
             if part == "numbers":
                 prompt = f"""
                 Generate one {difficulty} level math question about {seed_topic}.
                 Create a multiple-choice question with 4 options.
-                
+
                 Format EXACTLY like this:
                 Question: [your question here]
                 A) [option A]
@@ -166,7 +283,7 @@ def get_next_question(part, difficulty="easy", q_num=1):
             elif part == "logic":
                 prompt = f"""
                 Generate one {difficulty} level logic reasoning question about {seed_topic}.
-                
+
                 Format EXACTLY like this:
                 Question: [your question here]
                 Answer: [short correct answer]
@@ -174,11 +291,11 @@ def get_next_question(part, difficulty="easy", q_num=1):
             elif part == "shapes":
                 shape_types = ["circle", "square", "rectangle", "triangle"]
                 chosen_shape = random.choice(shape_types)
-                
+
                 prompt = f"""
                 Generate one {difficulty} level spatial/geometric question about {seed_topic}.
                 Focus on {chosen_shape}.
-                
+
                 Format EXACTLY like this:
                 Question: [your question here]
                 Answer: [short correct answer]
@@ -187,20 +304,20 @@ def get_next_question(part, difficulty="easy", q_num=1):
             else:
                 return {"error": "Invalid test part"}
 
-            response = model.generate_content(
+            response = safe_generate_content(
                 prompt,
-                generation_config=genai.types.GenerationConfig(
+                generation_config=types.GenerationConfig(
                     temperature=0.7,
                     max_output_tokens=500
                 )
             )
-            
-            if not response or not response.text:
-                raise Exception("Empty response from Gemini")
-                
-            text = response.text.strip()
+
+            # Safely extract text from the response using our defensive helper.
+            text = safe_response_text(response)
+            if not text:
+                raise Exception("Empty response from Gemini or model returned non-text parts")
             result = parse_question_response(text, part)
-            
+
             if result and "error" not in result:
                 if part == "shapes" and "Shape:" in text:
                     shape_line = [line for line in text.split('\n') if line.startswith('Shape:')]
@@ -213,11 +330,11 @@ def get_next_question(part, difficulty="easy", q_num=1):
                 return result
             else:
                 retry_count += 1
-                
+
         except Exception as e:
-            print(f"Attempt {retry_count + 1} failed: {e}")
+            print(f"Attempt {retry_count + 1} failed: {str(e).splitlines()[0]}")
             retry_count += 1
-    
+
     return get_fallback_question(part, difficulty, q_num)
 
 
@@ -228,16 +345,16 @@ def get_next_question(part, difficulty="easy", q_num=1):
 def parse_question_response(text, part):
     try:
         lines = [line.strip() for line in text.split('\n') if line.strip()]
-        
+
         question_line = None
         answer_line = None
-        
+
         for line in lines:
             if line.startswith('Question:'):
                 question_line = line.replace('Question:', '').strip()
             elif line.startswith('Answer:'):
                 answer_line = line.replace('Answer:', '').strip()
-        
+
         if question_line and answer_line:
             result = {"question": question_line, "answer": answer_line}
             if part == "numbers":
@@ -251,7 +368,7 @@ def parse_question_response(text, part):
             return result
         else:
             return {"error": "Could not parse question"}
-            
+
     except Exception as e:
         return {"error": f"Parse error: {str(e)}"}
 
@@ -305,48 +422,54 @@ def get_fallback_question(part, difficulty, q_num):
 def ai_evaluate_answer(student_answer, correct_answer, part, question_text):
     if not student_answer or not correct_answer:
         return False
-    
+
     student_clean = student_answer.strip().upper()
     correct_clean = correct_answer.strip().upper()
-    
+
     if student_clean == correct_clean:
         return True
-    
+
     if part == "numbers" and correct_clean in "ABCD":
         return student_clean == correct_clean
-    
+
+    # If AI is not enabled, do not attempt network evaluation; use basic similarity instead
+    if not is_ai_enabled():
+        return basic_answer_similarity(student_answer, correct_answer)
+
     try:
         prompt = f"""
         You are evaluating a student's answer.
         Question: "{question_text}"
         Student answered: "{student_answer}"
         Expected answer: "{correct_answer}"
-        
+
         Reply ONLY 'YES' if correct, 'NO' if incorrect.
         """
-        response = model.generate_content(
+        response = safe_generate_content(
             prompt,
-            generation_config=genai.types.GenerationConfig(
+            generation_config=types.GenerationConfig(
                 temperature=0.1,
                 max_output_tokens=10
             )
         )
-        
-        if response and response.text:
-            return "YES" in response.text.strip().upper()
-    except Exception:
+
+        resp_text = safe_response_text(response)
+        if resp_text:
+            return "YES" in resp_text.strip().upper()
+    except Exception as e:
+        print(f"AI evaluation failed: {str(e).splitlines()[0]}")
         return basic_answer_similarity(student_answer, correct_answer)
-    
+
     return False
 
 
 def basic_answer_similarity(student, correct):
     student_words = set(student.lower().split())
     correct_words = set(correct.lower().split())
-    
+
     if not correct_words:
         return False
-    
+
     overlap = len(student_words.intersection(correct_words))
     similarity = overlap / len(correct_words)
     return similarity >= 0.6
@@ -467,9 +590,38 @@ Regards,
 
     mail.send(msg)
 
+def discover_models(limit=50):
+    """Discover available models using the Google Generative AI SDK."""
+    try:
+        models = genai.list_models()
+        model_names = [m.name for m in models]
+        return model_names[:limit]
+    except Exception as e:
+        print(f"Error discovering models: {e}")
+        return []
 
 
-
-
-
-
+def safe_response_text(response):
+    """Safely extract text from a model response, handling different formats."""
+    if response is None:
+        return None
+    # Google Generative AI responses may have .text or .candidates[0].content.parts[0].text
+    if hasattr(response, 'text') and response.text:
+        return response.text
+    if hasattr(response, 'candidates') and response.candidates:
+        for candidate in response.candidates:
+            if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                for part in candidate.content.parts:
+                    if hasattr(part, 'text') and part.text:
+                        return part.text
+    # Fallback: try to get text from dict-like responses
+    if isinstance(response, dict):
+        if 'text' in response:
+            return response['text']
+        if 'candidates' in response:
+            for candidate in response['candidates']:
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    for part in candidate['content']['parts']:
+                        if 'text' in part:
+                            return part['text']
+    return None

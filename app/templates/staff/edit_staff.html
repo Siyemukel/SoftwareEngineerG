@@ -1,34 +1,282 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="edit-staff-container">
-    <h2>Edit Staff Member</h2>
-    <form method="POST" class="edit-staff-form">
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        <div class="form-group">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" name="username" id="username" class="form-input" value="{{ staff.username }}" required>
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
+    </div>
+
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
+
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.add_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-plus mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Add Staff</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-cog mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Staff</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
+        </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="input-group max-w-[300px]">
+        <span class="input-group-text bg-white border border-gray-300 border-r-0 rounded-l-lg px-3 py-2"><i class="fas fa-search text-gray-400"></i></span>
+        <input type="text" class="form-control border border-gray-300 border-l-0 rounded-r-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent" placeholder="Search..." id="dashboard-search">
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <h1 class="m-0 mb-2 text-2xl">Edit Staff Member</h1>
+      <div class="bg-white/25 p-3 rounded text-white">
+        <p>Update the details for {{ staff.name }} {{ staff.surname }}.</p>
+      </div>
+    </section>
+
+    <!-- Edit Staff Form -->
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-xl shadow-md p-8">
+        <div class="text-center mb-8">
+          <div class="w-20 h-20 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+            <i class="fas fa-user-edit"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-[#4B68A5]">Update Staff Information</h3>
+          <p class="text-gray-600 mt-2">Modify the details for {{ staff.name }} {{ staff.surname }}</p>
         </div>
 
-        <div class="form-group">
-            <label for="name" class="form-label">First Name</label>
-            <input type="text" name="name" id="name" class="form-input" value="{{ staff.name }}" required>
-        </div>
+        <form method="POST" class="space-y-6">
+          {{ form.hidden_tag() }}
 
-        <div class="form-group">
-            <label for="surname" class="form-label">Surname</label>
-            <input type="text" name="surname" id="surname" class="form-input" value="{{ staff.surname }}" required>
-        </div>
+          <!-- Staff ID Display -->
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+            <span class="text-sm text-gray-500">Staff ID:</span>
+            <span class="ml-2 font-bold text-[#4B68A5] text-lg">#{{ staff.id }}</span>
+          </div>
 
-        <div class="form-group">
-            <label for="password" class="form-label">Password (leave blank if not changing)</label>
-            <input type="password" name="password" id="password" class="form-input">
-        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="username" class="block text-gray-700 font-medium mb-2">
+                <i class="fas fa-user mr-2 text-[#4B68A5]"></i>
+                Username
+              </label>
+              <input type="text" name="username" id="username"
+                     class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300"
+                     value="{{ staff.username }}" required>
+            </div>
 
-        <div class="button-group">
-            <button type="submit" class="submit-btn">Update Staff</button>
-            <a href="{{ url_for('main.staff_dashboard') }}" class="cancel-btn">Cancel</a>
+            <div>
+              <label for="name" class="block text-gray-700 font-medium mb-2">
+                <i class="fas fa-id-card mr-2 text-[#4B68A5]"></i>
+                First Name
+              </label>
+              <input type="text" name="name" id="name"
+                     class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300"
+                     value="{{ staff.name }}" required>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="surname" class="block text-gray-700 font-medium mb-2">
+                <i class="fas fa-id-card mr-2 text-[#4B68A5]"></i>
+                Surname
+              </label>
+              <input type="text" name="surname" id="surname"
+                     class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300"
+                     value="{{ staff.surname }}" required>
+            </div>
+
+            <div>
+              <label for="password" class="block text-gray-700 font-medium mb-2">
+                <i class="fas fa-lock mr-2 text-[#4B68A5]"></i>
+                Password
+              </label>
+              <input type="password" name="password" id="password"
+                     class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300"
+                     placeholder="Leave blank to keep current password">
+              <small class="text-gray-500 text-sm mt-1 block">
+                Only enter a new password if you want to change it
+              </small>
+            </div>
+          </div>
+
+          <!-- Current Role Display -->
+          <div class="bg-blue-50 border-l-4 border-[#4B68A5] p-4 rounded-r-lg">
+            <div class="flex items-center">
+              <i class="fas fa-user-tie text-[#4B68A5] mr-3"></i>
+              <div>
+                <h4 class="font-bold text-[#4B68A5] mb-1">Current Role</h4>
+                <p class="text-gray-600">
+                  {% if staff.is_admin %}
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Administrator</span>
+                  {% else %}
+                    <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-semibold">Staff Member</span>
+                  {% endif %}
+                </p>
+                <p class="text-gray-500 text-sm mt-1">Role changes require admin privileges</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Button Group -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-4">
+            <button type="submit"
+                    class="flex-1 bg-[#4B68A5] hover:bg-[#3A528F] text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              <i class="fas fa-save"></i>
+              Update Staff
+            </button>
+            <a href="{{ url_for('main.manage_staff') }}"
+               class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-center">
+              <i class="fas fa-times"></i>
+              Cancel
+            </a>
+          </div>
+        </form>
+
+        <!-- Additional Info -->
+        <div class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+          <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+            <div>
+              <h4 class="font-bold text-yellow-700 mb-1">Important Notes</h4>
+              <ul class="text-yellow-600 text-sm space-y-1">
+                <li>• Username must be unique across all staff members</li>
+                <li>• Password must be at least 6 characters long if changed</li>
+                <li>• Changes take effect immediately after saving</li>
+              </ul>
+            </div>
+          </div>
         </div>
-    </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+
+    if (password.length > 0 && password.length < 6) {
+        e.preventDefault();
+        alert('❌ Password must be at least 6 characters long!');
+        document.getElementById('password').focus();
+        return false;
+    }
+
+    const username = document.getElementById('username').value;
+    const name = document.getElementById('name').value;
+    const surname = document.getElementById('surname').value;
+
+    if (!username.trim() || !name.trim() || !surname.trim()) {
+        e.preventDefault();
+        alert('❌ Please fill in all required fields!');
+        return false;
+    }
+});
+
+// Add focus effects to form inputs
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.classList.add('ring-2', 'ring-[#4B68A5]', 'ring-opacity-20');
+    });
+
+    input.addEventListener('blur', function() {
+        this.classList.remove('ring-2', 'ring-[#4B68A5]', 'ring-opacity-20');
+    });
+});
+
+// Real-time validation for username
+const usernameInput = document.getElementById('username');
+if (usernameInput) {
+    usernameInput.addEventListener('input', function() {
+        const username = this.value.trim();
+        if (username.length < 3) {
+            this.classList.add('border-yellow-400');
+            this.classList.remove('border-gray-300');
+        } else {
+            this.classList.remove('border-yellow-400');
+            this.classList.add('border-gray-300');
+        }
+    });
+}
+</script>
+
 {% endblock %}

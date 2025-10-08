@@ -802,7 +802,6 @@ def staff_dashboard():
         else:
             exercises_progress = "Completed"
 
-
         test_results = student.test_results
         if not test_results:
             test_progress = "Not Taken"
@@ -814,8 +813,8 @@ def staff_dashboard():
         flagged = any(result.disability_likelihood == "high" for result in test_results) if test_results else False
 
 
-        assigned_staff = [link.staff.name for link in student.staff_links] if getattr(user, "is_admin", False) else None
-
+        # Always show assigned staff for each student
+        assigned_staff = [link.staff.name for link in student.staff_links]
 
         unread_count = Message.query.filter_by(
             sender_id=student.id,
@@ -965,7 +964,7 @@ def manage_staff():
         return redirect(url_for("main.staff_dashboard"))
 
     staff_list = Staff.query.all()  # Fetch all staff members
-    return render_template("/staff/manage_staff.html", staff_list=staff_list)
+    return render_template("/staff/manage_staff.html", staff_list=staff_list, user=current_user)
 
 
 
@@ -1000,8 +999,8 @@ def add_staff():
         print("Staff member added successfully!", "success")
         return redirect(url_for("main.manage_staff"))
 
-    return render_template("/staff/add_staff.html", form=form)
- 
+    return render_template("/staff/add_staff.html", form=form, user=current_user)
+
 
    
 #-------------------- Edit Staff (admin only)--------------------
@@ -1014,26 +1013,30 @@ def edit_staff(staff_id):
         return redirect(url_for("main.staff_dashboard"))
 
     staff_member = Staff.query.get_or_404(staff_id)
+    form = StaffSignupForm(obj=staff_member)
 
     if request.method == "POST":
-        staff_member.username = request.form.get("username")
-        staff_member.name = request.form.get("name")
-        staff_member.surname = request.form.get("surname")
-        # Optionally: update password
-        new_password = request.form.get("password")
-        if new_password:
-            staff_member.set_password(new_password)
+        if form.validate_on_submit():
+            staff_member.username = form.username.data
+            staff_member.name = form.name.data
+            staff_member.surname = form.surname.data
+            # Optionally: update password
+            new_password = form.password.data
+            if new_password:
+                staff_member.set_password(new_password)
+            try:
+                db.session.commit()
+                print("Staff updated successfully!", "success")
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error updating staff: {e}", "danger")
+            return redirect(url_for("main.staff_dashboard"))
+        # If form not valid, fall through to re-render with errors
+    else:
+        # On GET, pre-populate form with staff_member data
+        form = StaffSignupForm(obj=staff_member)
 
-        try:
-            db.session.commit()
-            print("Staff updated successfully!", "success")
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error updating staff: {e}", "danger")
-
-        return redirect(url_for("main.staff_dashboard"))
-
-    return render_template("/staff/edit_staff.html", staff=staff_member)
+    return render_template("/staff/edit_staff.html", staff=staff_member, user=current_user, form=form)
 
 
 
@@ -1144,7 +1147,7 @@ def staff_applications():
     )
     
     
-    return render_template("staff/staff_applications.html", applications=assigned_proofs)
+    return render_template("staff/staff_applications.html", applications=assigned_proofs, user=current_user)
 
 
 
@@ -1330,7 +1333,7 @@ def staff_view_student_results(student_id):
             db.session.add(view)
     db.session.commit()
 
-    return render_template("/staff/staff_view_results.html", student=student, results=results)
+    return render_template("/staff/staff_view_results.html", student=student, results=results, user=current_user)
 
  
 
@@ -1398,7 +1401,7 @@ def staff_view_student_surveys(student_id):
             db.session.add(view)
 
     db.session.commit()
-    return render_template("/staff/staff_view_surveys.html", student=student, surveys=surveys)
+    return render_template("/staff/staff_view_surveys.html", student=student, surveys=surveys, user=current_user)
 
  
  
@@ -1415,7 +1418,8 @@ def staff_view_student_exercises(student_id):
         "/staff/staff_view_student_exercises.html",
         student=student,
         exercises=exercises,
-        completed_ex_ids=completed_ex_ids
+        completed_ex_ids=completed_ex_ids,
+        user=current_user
     )
 
 
@@ -1454,7 +1458,7 @@ def refer_student_department(student_id):
         flash(f"Student referred to {department} successfully.", "success")
         return redirect(url_for("main.staff_view_student_results", student_id=student.id))
 
-    return render_template("/staff/staff_refer_department.html", student=student, departments=departments)
+    return render_template("/staff/staff_refer_department.html", student=student, departments=departments, user=current_user)
 
   
  
@@ -1506,7 +1510,8 @@ def staff_view_student(student_id):
         tests=tests,
         surveys=surveys,
         medical_proofs=medical_proofs,
-        referrals=referrals
+        referrals=referrals,
+        user=current_user
     )
    
 
@@ -1681,3 +1686,63 @@ def reset_password(token):
             flash("User not found.", "danger")
 
     return render_template("auth/reset_password.html", token=token)
+
+#--------------------Delete Account (students only)--------------------
+@main.route("/student/delete_account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    if not isinstance(current_user, Student):
+        flash("Access denied!", "danger")
+        return redirect(url_for("main.home"))
+
+    if request.method == "POST":
+        student_id = current_user.id
+        logout_user()
+        student = Student.query.get(student_id)
+        db.session.delete(student)
+        db.session.commit()
+        flash("Your account and all associated data have been deleted.", "success")
+        return redirect(url_for("main.home"))
+
+    return render_template("student/delete_account.html")
+
+#--------------------Assign Staff (admin only)--------------------
+@main.route("/assign_staff", methods=["GET", "POST"])
+@login_required
+# You may want to restrict this to admin or certain staff roles
+# @admin_required
+def assign_staff():
+    form = AssignStaffForm()
+    # Populate staff choices
+    staff_members = Staff.query.all()
+    form.staff.choices = [(s.id, f"{s.name} {s.surname}") for s in staff_members]
+    # Populate students choices
+    students = Student.query.all()
+    form.students.choices = [(st.id, f"{st.name} {st.surname}") for st in students]
+    print("DEBUG: Staff choices:", form.staff.choices)
+    print("DEBUG: Student choices:", form.students.choices)
+    if request.method == "POST":
+        print('DEBUG: Assign staff form submitted')
+        print('DEBUG: form.data:', form.data)
+        print('DEBUG: form.errors:', form.errors)
+    if form.validate_on_submit():
+        print('DEBUG: Assign staff form validated successfully')
+        staff_id = form.staff.data
+        role = form.role.data
+        student_ids = form.students.data
+        # Assign each selected student to the staff (example logic)
+        for student_id in student_ids:
+            link = StaffStudentLink.query.filter_by(student_id=student_id, staff_id=staff_id).first()
+            if not link:
+                new_link = StaffStudentLink(student_id=student_id, staff_id=staff_id, role=role)
+                db.session.add(new_link)
+            else:
+                link.role = role  # Update role if already assigned
+        db.session.commit()
+        all_links = StaffStudentLink.query.all()
+        print('DEBUG: StaffStudentLink records after assignment:', [f'staff_id={l.staff_id}, student_id={l.student_id}' for l in all_links])
+        flash("Staff assigned to selected students successfully!", "success")
+        return redirect(url_for("main.staff_dashboard"))
+    if form.students.data is None:
+        form.students.data = []
+    return render_template("staff/assign_staff.html", form=form, user=current_user)

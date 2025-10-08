@@ -3,688 +3,270 @@
 {% block title %}Dyscalculia Survey{% endblock %}
 
 {% block content %}
-<!-- Navigation Bar -->
-<nav class="navbar navbar-exercise">
-    <div class="nav-container">
-        <div class="nav-brand">
-            <span class="brand-text">Numeraid</span>
-        </div>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About</a>
-            <a href="/contact" class="nav-link">Contact Us</a>
-            <a href="/support" class="nav-link">Support</a>
-            <a href="/logout" class="nav-link logout-link">Logout</a>
-        </div>
-    </div>
-</nav>
-
 <!-- Floating Background Bubbles -->
-<div class="bubble blue one"></div>
-<div class="bubble light-blue two"></div>
-<div class="bubble extra-light-blue three"></div>
-<div class="bubble blue four"></div>
-<div class="bubble light-blue five"></div>
-<div class="bubble extra-light-blue six"></div>
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="bubble absolute w-20 h-20 bg-blue-600 opacity-40 top-1/4 left-10 animate-float"></div>
+    <div class="bubble absolute w-12 h-12 bg-blue-400 opacity-40 bottom-1/5 right-15 animate-float animation-delay-2000"></div>
+    <div class="bubble absolute w-24 h-24 bg-blue-300 opacity-40 top-2/5 right-5 animate-float animation-delay-4000"></div>
+    <div class="bubble absolute w-10 h-10 bg-blue-600 opacity-40 bottom-10 left-5 animate-float animation-delay-1000"></div>
+    <div class="bubble absolute w-16 h-16 bg-blue-400 opacity-40 top-3/5 left-15 animate-float animation-delay-3000"></div>
+    <div class="bubble absolute w-14 h-14 bg-blue-300 opacity-40 top-1/4 left-3/5 animate-float animation-delay-5000"></div>
+</div>
 
-<div class="test-full-container">
+<div class="min-h-screen relative pt-20 flex items-start justify-center w-full z-10 pb-8">
     <!-- Main Survey Content -->
-    <div class="test-main-content">
-        <div class="test-header">
-            <h2 class="test-title">Dyscalculia Survey</h2>
-            <p class="test-subtitle">Your responses help us provide personalized support</p>
+    <div class="flex flex-col items-center justify-start max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 relative">
+        <!-- Header Section -->
+        <div class="text-center py-8 px-4 bg-blue-600 text-white rounded-2xl shadow-lg mb-8 relative z-10 w-full max-w-3xl">
+            <h2 class="text-white text-3xl sm:text-4xl font-semibold mb-2">Dyscalculia Survey</h2>
+            <p class="text-white text-lg sm:text-xl mt-2 leading-relaxed">Your responses help us provide personalized support</p>
         </div>
-        
-        <div class="test-card">
-            <form method="POST" class="test-form">
+
+        <!-- Survey Card -->
+        <div class="bg-white border-2 border-blue-100 rounded-2xl p-6 sm:p-8 text-left transition-all duration-300 h-full shadow-lg hover:shadow-xl hover:-translate-y-1 relative z-10 w-full max-w-3xl mx-auto">
+            <form method="POST" class="flex flex-col gap-6">
                 {{ form.hidden_tag() }}
 
                 <!-- Numbers & Math Section -->
-                <div class="question-block">
-                    <h4 class="section-title">🔢 Numbers & Math</h4>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.math_difficulty.label.text }}</strong></p>
-                        {{ form.math_difficulty(class="form-select") }}
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-300 flex flex-col gap-4 transition-all duration-500 opacity-0 transform translate-y-5">
+                    <h4 class="text-blue-600 text-xl font-semibold mb-3 pb-2 border-b-2 border-blue-100 flex items-center gap-2">
+                        <span>🔢</span> Numbers & Math
+                    </h4>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.math_difficulty.label.text }}</p>
+                        {{ form.math_difficulty(class="px-4 py-3 border-2 border-gray-300 rounded-lg text-base bg-white text-gray-800 transition-all duration-300 focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100 min-h-12 w-full") }}
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.reading_numbers.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.reading_numbers(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have difficulty reading numbers</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.reading_numbers.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.reading_numbers(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have difficulty reading numbers</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.math_anxiety.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.math_anxiety(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I experience math anxiety</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.math_anxiety.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.math_anxiety(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I experience math anxiety</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.time_management.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.time_management(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have time management difficulties</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.time_management.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.time_management(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have time management difficulties</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.previous_diagnosis.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.previous_diagnosis(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have received a previous diagnosis</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.previous_diagnosis.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.previous_diagnosis(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have received a previous diagnosis</span>-->
                         </label>
                     </div>
                 </div>
 
                 <!-- Reading, Writing & Memory Section -->
-                <div class="question-block">
-                    <h4 class="section-title">📚 Reading, Writing & Memory</h4>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.reading_difficulty.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.reading_difficulty(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have reading difficulties</span>
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-300 flex flex-col gap-4 transition-all duration-500 opacity-0 transform translate-y-5">
+                    <h4 class="text-blue-600 text-xl font-semibold mb-3 pb-2 border-b-2 border-blue-100 flex items-center gap-2">
+                        <span>📚</span> Reading, Writing & Memory
+                    </h4>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.reading_difficulty.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.reading_difficulty(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have reading difficulties</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.writing_numbers.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.writing_numbers(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have difficulty writing numbers</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.writing_numbers.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.writing_numbers(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have difficulty writing numbers</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.memory_issues.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.memory_issues(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have memory issues</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.memory_issues.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.memory_issues(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have memory issues</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.attention_difficulty.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.attention_difficulty(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have attention difficulties</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.attention_difficulty.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.attention_difficulty(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have attention difficulties</span>-->
                         </label>
                     </div>
                 </div>
 
                 <!-- Daily Challenges Section -->
-                <div class="question-block">
-                    <h4 class="section-title">🏠 Daily Challenges</h4>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.daily_math_challenges.label.text }}</strong></p>
-                        {{ form.daily_math_challenges(class="form-textarea", placeholder="Describe your daily math challenges...") }}
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-300 flex flex-col gap-4 transition-all duration-500 opacity-0 transform translate-y-5">
+                    <h4 class="text-blue-600 text-xl font-semibold mb-3 pb-2 border-b-2 border-blue-100 flex items-center gap-2">
+                        <span>🏠</span> Daily Challenges
+                    </h4>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.daily_math_challenges.label.text }}</p>
+                        {{ form.daily_math_challenges(class="px-4 py-3 border-2 border-gray-300 rounded-lg text-base bg-white text-gray-800 transition-all duration-300 focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100 min-h-24 w-full resize-y", placeholder="Describe your daily math challenges...") }}
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.daily_challenges.label.text }}</strong></p>
-                        {{ form.daily_challenges(class="form-textarea", placeholder="Describe your daily challenges...") }}
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.daily_challenges.label.text }}</p>
+                        {{ form.daily_challenges(class="px-4 py-3 border-2 border-gray-300 rounded-lg text-base bg-white text-gray-800 transition-all duration-300 focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100 min-h-24 w-full resize-y", placeholder="Describe your daily challenges...") }}
                     </div>
                 </div>
 
                 <!-- Support Needed Section -->
-                <div class="question-block">
-                    <h4 class="section-title">🤝 Support Needed</h4>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.support_needed.label.text }}</strong></p>
-                        {{ form.support_needed(class="form-textarea", placeholder="Describe the support you need...") }}
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-300 flex flex-col gap-4 transition-all duration-500 opacity-0 transform translate-y-5">
+                    <h4 class="text-blue-600 text-xl font-semibold mb-3 pb-2 border-b-2 border-blue-100 flex items-center gap-2">
+                        <span>🤝</span> Support Needed
+                    </h4>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.support_needed.label.text }}</p>
+                        {{ form.support_needed(class="px-4 py-3 border-2 border-gray-300 rounded-lg text-base bg-white text-gray-800 transition-all duration-300 focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100 min-h-24 w-full resize-y", placeholder="Describe the support you need...") }}
                     </div>
                 </div>
 
                 <!-- Other Areas Section -->
-                <div class="question-block">
-                    <h4 class="section-title">🧠 Other Areas</h4>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.processing_speed.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.processing_speed(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have slow processing speed</span>
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-300 flex flex-col gap-4 transition-all duration-500 opacity-0 transform translate-y-5">
+                    <h4 class="text-blue-600 text-xl font-semibold mb-3 pb-2 border-b-2 border-blue-100 flex items-center gap-2">
+                        <span>🧠</span> Other Areas
+                    </h4>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.processing_speed.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.processing_speed(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have slow processing speed</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.problem_solving_difficulty.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.problem_solving_difficulty(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have problem-solving difficulties</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.problem_solving_difficulty.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.problem_solving_difficulty(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have problem-solving difficulties</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.visual_confusion.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.visual_confusion(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I experience visual confusion</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.visual_confusion.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.visual_confusion(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I experience visual confusion</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.anxiety_other_subjects.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.anxiety_other_subjects(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I have anxiety in other subjects</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.anxiety_other_subjects.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.anxiety_other_subjects(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I have anxiety in other subjects</span>-->
                         </label>
                     </div>
-                    
-                    <div class="question-item">
-                        <p class="question-text"><strong>{{ form.fatigue.label.text }}</strong></p>
-                        <label class="checkbox-label">
-                            {{ form.fatigue(class="checkbox-input") }}
-                            <span class="checkbox-text">Yes, I experience fatigue</span>
+
+                    <div class="bg-white rounded-xl p-4 border border-gray-300 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                        <p class="text-gray-800 text-lg font-semibold mb-0 leading-relaxed">{{ form.fatigue.label.text }}</p>
+                        <label class="flex items-start gap-3 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-blue-50">
+                            {{ form.fatigue(class="mt-1 scale-125 accent-blue-600 cursor-pointer") }}
+<!--                            <span class="text-gray-700 text-base leading-relaxed flex-1">Yes, I experience fatigue</span>-->
                         </label>
                     </div>
                 </div>
 
-                <div class="button-group">
-                    {{ form.submit(class="submit-btn") }}
-                    <a href="/" class="quit-btn">Cancel</a>
+                <!-- Submit Buttons -->
+                <div class="flex justify-center gap-4 mt-8 flex-wrap">
+                    {{ form.submit(class="bg-blue-600 text-white border-none px-10 py-4 rounded-xl font-semibold text-lg cursor-pointer transition-all duration-300 shadow-lg hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-xl") }}
+                    <a href="/" class="inline-block bg-white text-blue-600 rounded-xl px-10 py-4 font-semibold text-lg shadow-lg border-2 border-blue-100 transition-all duration-300 hover:bg-blue-50 hover:-translate-y-0.5 hover:shadow-xl">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Back to Dashboard Button -->
-<a href="/student_dashboard" class="back-btn">← Back to Dashboard</a>
-
 <style>
-/* CSS Variables following the theme */
-:root {
-  --primary-blue: #4B68A5;
-  --white: #ffffff;
-  --pastel-blue: #d6ecff;
-  --light-gray: #f8f9fa;
-  --medium-gray: #e0e0e0;
-  --dark-gray: #333333;
-  --text-gray: #555555;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
+/* Custom animations for bubbles */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+        transform: translateY(-10px) rotate(120deg);
+    }
+    66% {
+        transform: translateY(5px) rotate(240deg);
+    }
 }
 
-/* Reset and base styles for survey page */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-    background: var(--light-gray);
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    position: relative;
-    padding-bottom: 100px; /* Space for Back to Dashboard button */
-}
-
-/* Floating Background Bubbles */
-.bubble {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.4;
-    z-index: 0;
+.animate-float {
     animation: float 6s ease-in-out infinite;
 }
 
-.bubble.blue { background: var(--primary-blue); }
-.bubble.light-blue { background: #66ccff; }
-.bubble.extra-light-blue { background: #99e6ff; }
+.animation-delay-1000 { animation-delay: 1s; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-3000 { animation-delay: 3s; }
+.animation-delay-4000 { animation-delay: 4s; }
+.animation-delay-5000 { animation-delay: 5s; }
 
-/* Bubble Positions */
-.bubble.one { width: 90px; height: 90px; top: 15%; left: 10%; animation-delay: 0s; }
-.bubble.two { width: 50px; height: 50px; bottom: 20%; right: 15%; animation-delay: 2s; }
-.bubble.three { width: 110px; height: 110px; top: 40%; right: 5%; animation-delay: 4s; }
-.bubble.four { width: 40px; height: 40px; bottom: 10%; left: 5%; animation-delay: 1s; }
-.bubble.five { width: 70px; height: 70px; top: 60%; left: 15%; animation-delay: 3s; }
-.bubble.six { width: 60px; height: 60px; top: 25%; left: 60%; animation-delay: 5s; }
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-10px) rotate(120deg); }
-    66% { transform: translateY(5px) rotate(240deg); }
+/* Ensure form elements have proper styling */
+input[type="checkbox"] {
+    min-width: 18px;
 }
 
-/* Navigation styles */
-.navbar-exercise {
-    background: var(--primary-blue) !important;
-    padding: 1rem 2rem !important;
-    box-shadow: var(--shadow) !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 100 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    max-width: none !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-}
-
-.navbar-exercise .nav-container {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-}
-
-.navbar-exercise .nav-brand {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    color: white !important;
-    font-weight: 700 !important;
-    font-size: 1.5rem !important;
-    text-decoration: none !important;
-}
-
-.brand-text {
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-}
-
-.navbar-exercise .nav-links {
-    display: flex !important;
-    gap: 1.5rem !important;
-    align-items: center !important;
-}
-
-.navbar-exercise .nav-link {
-    color: white !important;
-    text-decoration: none !important;
-    padding: 0.6rem 1.4rem !important;
-    border-radius: 10px !important;
-    font-weight: 500 !important;
-    font-size: 0.9rem !important;
-    transition: var(--transition) !important;
-    background: transparent !important;
-    border: 2px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-.navbar-exercise .nav-link:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-    transform: translateY(-2px) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
-}
-
-.navbar-exercise .logout-link {
-    background: rgba(211, 31, 45, 0.2) !important;
-    border-color: rgba(211, 31, 45, 0.4) !important;
-}
-
-.navbar-exercise .logout-link:hover {
-    background: rgba(211, 31, 45, 0.3) !important;
-    border-color: rgba(211, 31, 45, 0.6) !important;
-}
-
-/* Full container covering entire viewport */
-.test-full-container {
-    min-height: 100vh;
-    position: relative;
-    padding-top: 80px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    width: 100%;
-    z-index: 1;
-    padding-bottom: 2rem;
-}
-
-/* Main Test Content */
-.test-main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    width: 100%;
-    z-index: 1;
-    position: relative;
-}
-
-/* Header Section */
-.test-header {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: var(--primary-blue);
-    color: var(--white);
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow);
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 700px;
-}
-
-.test-title {
-    color: white;
-    font-size: 2.5rem;
-    margin: 0.5rem 0;
-    font-weight: 600;
-}
-
-.test-subtitle {
-    color: #fff;
-    font-size: 1.2rem;
-    margin-top: 0.5rem;
-    line-height: 1.4;
-}
-
-/* Test Card */
-.test-card {
-    background: var(--white);
-    border: 2px solid var(--pastel-blue);
-    border-radius: 15px;
-    padding: 2rem;
-    text-align: left;
-    transition: var(--transition);
-    height: 100%;
-    box-shadow: var(--shadow);
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.test-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Form Styles */
-.test-form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.question-block {
-    background: var(--light-gray);
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid var(--medium-gray);
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-.section-title {
-    color: var(--primary-blue);
-    font-size: 1.4rem;
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--pastel-blue);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-}
-
-.question-item {
-    background: var(--white);
-    border-radius: 10px;
-    padding: 1.2rem;
-    border: 1px solid var(--medium-gray);
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    transition: var(--transition);
-}
-
-.question-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-.question-text {
-    color: var(--dark-gray);
-    font-size: 1.1rem;
-    margin: 0;
-    line-height: 1.4;
-    font-weight: 600;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: var(--transition);
-}
-
-.checkbox-label:hover {
-    background: var(--pastel-blue);
-}
-
-.checkbox-input {
-    margin-top: 0.2rem;
-    transform: scale(1.2);
-    accent-color: var(--primary-blue);
-    cursor: pointer;
-}
-
-.checkbox-text {
-    color: var(--text-gray);
-    font-size: 1rem;
-    line-height: 1.4;
-    flex: 1;
-}
-
-.form-select,
-.form-textarea {
-    padding: 1rem;
-    border: 2px solid var(--medium-gray);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: var(--white);
-    color: var(--dark-gray);
-    transition: var(--transition);
-    min-height: 50px;
-    width: 100%;
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
+/* Custom focus states */
 .form-select:focus,
 .form-textarea:focus {
     outline: none;
-    border-color: var(--primary-blue);
+    border-color: #4B68A5;
     box-shadow: 0 0 0 3px rgba(75, 104, 165, 0.1);
 }
 
-/* Button Group */
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
-
-.submit-btn {
-    background: var(--primary-blue);
-    color: var(--white);
-    border: none;
-    padding: 1rem 2.5rem;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: var(--transition);
-    box-shadow: var(--shadow);
-}
-
-.submit-btn:hover {
-    background: #3a5291;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.quit-btn {
-    display: inline-block;
-    background: var(--white);
-    color: var(--primary-blue);
-    border-radius: 10px;
-    padding: 1rem 2.5rem;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 1.1rem;
-    box-shadow: var(--shadow);
-    border: 2px solid var(--pastel-blue);
-    transition: var(--transition);
-}
-
-.quit-btn:hover {
-    background: var(--pastel-blue);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    text-decoration: none;
-    color: var(--primary-blue);
-}
-
-/* Back to Dashboard Button */
-.back-btn {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background: var(--primary-blue);
-    color: var(--white);
-    padding: 1rem 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    z-index: 50;
-}
-
-.back-btn:hover {
-    background: #3a5291;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    text-decoration: none;
-    color: var(--white);
-}
-
-/* Responsive Design */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .navbar-exercise {
-        padding: 1rem !important;
+    .min-h-screen {
+        padding-top: 100px;
     }
-    
-    .navbar-exercise .nav-container {
-        flex-direction: column !important;
-        gap: 1rem !important;
-    }
-    
-    .navbar-exercise .nav-links {
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 0.8rem !important;
-    }
-    
-    .test-main-content {
-        padding: 1rem;
-    }
-    
-    .test-header {
-        padding: 1.5rem 1rem;
-    }
-    
-    .test-title {
-        font-size: 2rem;
-    }
-    
-    .test-subtitle {
-        font-size: 1rem;
-    }
-    
-    .test-card {
-        padding: 1.5rem;
-    }
-    
-    .question-block {
-        padding: 1rem;
-    }
-    
-    .question-item {
-        padding: 1rem;
-    }
-    
-    .button-group {
+
+    .flex.justify-center.gap-4 {
         flex-direction: column;
         align-items: center;
     }
-    
-    .submit-btn,
-    .quit-btn {
-        width: 100%;
-        max-width: 300px;
+
+    .bg-blue-600.text-white.rounded-2xl {
+        padding: 1.5rem 1rem;
     }
-    
-    .back-btn {
-        bottom: 1rem;
-        right: 1rem;
-        padding: 0.8rem 1.2rem;
+
+    .text-3xl.sm\\:text-4xl {
+        font-size: 2rem;
     }
 }
 
 @media (max-width: 480px) {
-    .test-main-content {
-        padding: 0.5rem;
+    .min-h-screen {
+        padding-top: 80px;
     }
-    
-    .test-title {
-        font-size: 1.8rem;
-    }
-    
-    .test-card {
+
+    .bg-white.rounded-2xl {
         padding: 1rem;
     }
-    
-    .question-block {
-        padding: 0.8rem;
-    }
-    
-    .question-item {
-        padding: 0.8rem;
-    }
-    
-    .section-title {
+
+    .text-xl {
         font-size: 1.2rem;
     }
-    
-    .question-text {
+
+    .text-lg {
         font-size: 1rem;
     }
 }
@@ -693,7 +275,7 @@ html, body {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Add smooth scrolling animation for sections
-    const questionBlocks = document.querySelectorAll('.question-block');
+    const questionBlocks = document.querySelectorAll('.bg-gray-50.rounded-xl');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -702,21 +284,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, { threshold: 0.1 });
-    
+
     questionBlocks.forEach(block => {
         block.style.opacity = '0';
         block.style.transform = 'translateY(20px)';
         block.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         observer.observe(block);
     });
-    
+
     // Add focus enhancement for form elements
-    const formElements = document.querySelectorAll('.form-select, .form-textarea');
+    const formElements = document.querySelectorAll('select, textarea');
     formElements.forEach(element => {
         element.addEventListener('focus', function() {
             this.parentElement.style.backgroundColor = '#f0f8ff';
         });
-        
+
         element.addEventListener('blur', function() {
             this.parentElement.style.backgroundColor = '';
         });

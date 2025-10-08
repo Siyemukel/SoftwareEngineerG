@@ -4,69 +4,95 @@
 
 {% block content %}
 <!-- Background bubbles -->
-<div class="bubble" style="width: 100px; height: 100px; top: 40px; left: 10%;"></div>
-<div class="bubble blue" style="width: 140px; height: 140px; top: 200px; right: 8%;"></div>
-<div class="bubble" style="width: 90px; height: 90px; bottom: 120px; left: 25%;"></div>
+<div class="fixed w-24 h-24 top-10 left-1/10 rounded-full bg-[#4B68A5] opacity-20 animate-float-bubble z-0"></div>
+<div class="fixed w-32 h-32 top-48 right-1/10 rounded-full bg-[#3A528F] opacity-20 animate-float-bubble animation-delay-2000 z-0"></div>
+<div class="fixed w-20 h-20 bottom-28 left-1/4 rounded-full bg-[#4B68A5] opacity-20 animate-float-bubble animation-delay-4000 z-0"></div>
 
-<div class="container py-5 position-relative">
-  <h2 class="text-center dashboard-heading">Results</h2>
-  
+<div class="container mx-auto px-4 py-8 relative z-10">
+  <h2 class="text-3xl font-semibold text-center text-[#4B68A5] mb-8">Results</h2>
+
   {% if no_results %}
-    <div class="results-card">
-      <div class="alert alert-info text-center">
-        <h4>No Test Results Available</h4>
-        <p>You haven't completed any tests yet. <a href="{{ url_for('main.start_test') }}">Start your first test</a> to see your results here.</p>
+    <div class="bg-white rounded-xl shadow-lg p-8 border-2 border-[#4B68A5]/30 mb-6">
+      <div class="bg-[#4B68A5]/10 rounded-lg p-6 text-center">
+        <h4 class="text-xl font-semibold text-[#4B68A5] mb-2">No Test Results Available</h4>
+        <p class="text-gray-600">You haven't completed any tests yet. <a href="{{ url_for('main.start_test') }}" class="text-[#4B68A5] hover:text-[#3A528F] font-medium underline">Start your first test</a> to see your results here.</p>
       </div>
     </div>
   {% else %}
     <!-- Subject Bar Chart Section -->
-    <div class="results-card">
-      <div class="score-chart-title mb-3 text-center">Overall Progress by Subject</div>
+    <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-[#4B68A5]/30 mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div class="text-xl font-semibold text-[#4B68A5] mb-4 text-center">Overall Progress by Subject</div>
       <canvas id="subjectChart" height="200"></canvas>
     </div>
-    
+
     <!-- Summary Box -->
-    <div class="results-card">
-      <div class="score-chart-title mb-3">Summary</div>
-      <ul class="list-unstyled mb-0">
-        <li><strong>Numbers Score:</strong> {{ numbers_score }} / 5</li>
-        <li><strong>Logic Score:</strong> {{ logic_score }} / 5</li>
-        <li><strong>Shapes Score:</strong> {{ shapes_score }} / 5</li>
-        <li><strong>Total Test Score:</strong> {{ total_test_score }} / 15</li>
-        <li><strong>Survey Score:</strong> {{ total_survey_score }}</li>
-        <li><strong>Combined Risk Score:</strong> {{ combined_risk_score }}</li>
-        <li><strong>Disability Likelihood:</strong> <span class="badge bg-{{ 'danger' if likelihood == 'High' else 'warning' if likelihood == 'Moderate' else 'success' }}">{{ likelihood }}</span></li>
-        <li><strong>Outcome Message:</strong> {{ message }}</li>
+    <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-[#4B68A5]/30 mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div class="text-xl font-semibold text-[#4B68A5] mb-4">Summary</div>
+      <ul class="space-y-3">
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Numbers Score:</span>
+          <span>{{ numbers_score }} / 5</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Logic Score:</span>
+          <span>{{ logic_score }} / 5</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Shapes Score:</span>
+          <span>{{ shapes_score }} / 5</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Total Test Score:</span>
+          <span>{{ total_test_score }} / 15</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Survey Score:</span>
+          <span>{{ total_survey_score }}</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Combined Risk Score:</span>
+          <span>{{ combined_risk_score }}</span>
+        </li>
+        <li class="flex justify-between items-center py-2 border-b border-gray-200">
+          <span class="font-semibold text-[#4B68A5]">Disability Likelihood:</span>
+          <span class="px-3 py-1 rounded-full text-white bg-{{ 'red-500' if likelihood == 'High' else 'yellow-500' if likelihood == 'Moderate' else 'green-500' }} text-sm font-medium">
+            {{ likelihood }}
+          </span>
+        </li>
+        <li class="pt-2">
+          <span class="font-semibold text-[#4B68A5] block mb-1">Outcome Message:</span>
+          <span class="text-gray-700">{{ message }}</span>
+        </li>
       </ul>
     </div>
-    
+
     <!-- Test Table -->
-    <div class="results-card">
-      <h5 class="score-chart-title mb-3">Test Breakdown</h5>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
+    <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-[#4B68A5]/30 mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <h5 class="text-xl font-semibold text-[#4B68A5] mb-4">Test Breakdown</h5>
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto">
+          <thead class="bg-[#4B68A5]/10">
             <tr>
-              <th>Section</th>
-              <th>Score</th>
-              <th>Percentage</th>
+              <th class="px-4 py-3 text-left font-semibold text-[#4B68A5]">Section</th>
+              <th class="px-4 py-3 text-left font-semibold text-[#4B68A5]">Score</th>
+              <th class="px-4 py-3 text-left font-semibold text-[#4B68A5]">Percentage</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Numbers</td>
-              <td>{{ numbers_score }} / 5</td>
-              <td>{{ (numbers_score / 5 * 100) | round(1) }}%</td>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-[#4B68A5]/5 transition-colors">
+              <td class="px-4 py-3">Numbers</td>
+              <td class="px-4 py-3">{{ numbers_score }} / 5</td>
+              <td class="px-4 py-3">{{ (numbers_score / 5 * 100) | round(1) }}%</td>
             </tr>
-            <tr>
-              <td>Logic</td>
-              <td>{{ logic_score }} / 5</td>
-              <td>{{ (logic_score / 5 * 100) | round(1) }}%</td>
+            <tr class="hover:bg-[#4B68A5]/5 transition-colors">
+              <td class="px-4 py-3">Logic</td>
+              <td class="px-4 py-3">{{ logic_score }} / 5</td>
+              <td class="px-4 py-3">{{ (logic_score / 5 * 100) | round(1) }}%</td>
             </tr>
-            <tr>
-              <td>Shapes</td>
-              <td>{{ shapes_score }} / 5</td>
-              <td>{{ (shapes_score / 5 * 100) | round(1) }}%</td>
+            <tr class="hover:bg-[#4B68A5]/5 transition-colors">
+              <td class="px-4 py-3">Shapes</td>
+              <td class="px-4 py-3">{{ shapes_score }} / 5</td>
+              <td class="px-4 py-3">{{ (shapes_score / 5 * 100) | round(1) }}%</td>
             </tr>
           </tbody>
         </table>
@@ -76,203 +102,39 @@
 </div>
 
 <!-- Back Button -->
-<a href="{{ url_for('main.student_dashboard') }}" class="back-btn">Back to Dashboard</a>
+<a href="{{ url_for('main.student_dashboard') }}" class="fixed bottom-5 left-5 bg-[#4B68A5] text-white py-3 px-5 rounded-full no-underline font-medium shadow-lg transition-all duration-300 hover:bg-[#3A528F] hover:-translate-y-1 z-50 flex items-center gap-2">
+  ⬅ Back to Dashboard
+</a>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <style>
-:root {
-  --primary-blue: #4B68A5;
-  --pastel-blue: #d6ecff;
-  --pastel-purple: #e6d6ff;
-  --white: #ffffff;
-  --light-gray: #f8f9fa;
-  --medium-gray: #e0e0e0;
-  --dark-gray: #333333;
-  --text-gray: #555555;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
-}
-
-body {
-  background: var(--light-gray);
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  position: relative;
-  padding-bottom: 100px;
-  overflow-x: hidden;
-}
-
-.dashboard-heading {
-  color: var(--primary-blue);
-  font-weight: 600;
-  margin-bottom: 2rem;
-  z-index: 2;
-  position: relative;
-}
-
-/* Floating Background Bubbles */
-.bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--pastel-purple);
-  opacity: 0.4;
-  animation: floatBubble 12s infinite ease-in-out;
-  z-index: 0;
-}
-
-.bubble.blue { 
-  background: var(--pastel-blue); 
-}
-
 @keyframes floatBubble {
-  0% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
-  33% { transform: translateY(-20px) rotate(120deg); opacity: 0.3; }
-  66% { transform: translateY(10px) rotate(240deg); opacity: 0.5; }
-  100% { transform: translateY(0) rotate(360deg); opacity: 0.4; }
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+  33% { transform: translateY(-20px) rotate(120deg); opacity: 0.15; }
+  66% { transform: translateY(10px) rotate(240deg); opacity: 0.25; }
+  100% { transform: translateY(0) rotate(360deg); opacity: 0.2; }
 }
 
-/* Contact Cards */
-.results-card {
-  background: var(--white);
-  border: 2px solid var(--pastel-blue);
-  border-radius: 15px;
-  padding: 2rem;
-  text-align: center;
-  transition: var(--transition);
-  height: 100%;
-  box-shadow: var(--shadow);
-  position: relative;
-  z-index: 1;
-  margin-bottom: 2rem;
+.animate-float-bubble {
+  animation: floatBubble 12s infinite ease-in-out;
 }
 
-.results-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.animation-delay-2000 {
+  animation-delay: 2s;
 }
 
-.score-chart-title {
-  color: var(--primary-blue);
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-align: left;
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
 
-/* Back to Dashboard Button */
-.back-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: var(--primary-blue);
-  color: var(--white);
-  padding: 0.8rem 1.2rem;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: 500;
-  box-shadow: var(--shadow);
-  z-index: 10000;
-  transition: var(--transition);
+.left-1/10 {
+  left: 10%;
 }
 
-.back-btn:hover {
-  background: #3a5588;
-  color: var(--white);
-  text-decoration: none;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Table styling */
-.table {
-  background: var(--white);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.table thead {
-  background: var(--pastel-blue);
-}
-
-.table thead th {
-  border: none;
-  color: var(--primary-blue);
-  font-weight: 600;
-  padding: 1rem;
-}
-
-.table tbody td {
-  border: none;
-  padding: 1rem;
-  vertical-align: middle;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid var(--medium-gray);
-}
-
-.table tbody tr:hover {
-  background-color: rgba(214, 236, 255, 0.3);
-}
-
-/* Summary list styling */
-.list-unstyled li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--medium-gray);
-  text-align: left;
-  color: var(--dark-gray);
-}
-
-.list-unstyled li:last-child {
-  border-bottom: none;
-}
-
-.list-unstyled strong {
-  color: var(--primary-blue);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding: 2rem 1rem;
-  }
-  
-  .results-card {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .dashboard-heading {
-    font-size: 1.8rem;
-  }
-  
-  .back-btn {
-    bottom: 10px;
-    left: 10px;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
-  
-  /* Adjust bubble sizes for mobile */
-  .bubble {
-    width: 60px !important;
-    height: 60px !important;
-  }
-  
-  .bubble.blue {
-    width: 80px !important;
-    height: 80px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .score-chart-title {
-    font-size: 1rem;
-  }
-  
-  .table {
-    font-size: 0.9rem;
-  }
+.right-1/10 {
+  right: 8%;
 }
 </style>
 
@@ -290,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
         data: [{{ numbers_score }}, {{ logic_score }}, {{ shapes_score }}],
         backgroundColor: [
           '#4B68A5',
-          '#e53935',
-          '#ffb400'
+          '#3A528F',
+          '#2D3E75'
         ],
         borderRadius: 10,
         barThickness: 30,
@@ -305,24 +167,24 @@ document.addEventListener('DOMContentLoaded', function() {
         x: {
           beginAtZero: true,
           max: 5,
-          ticks: { 
+          ticks: {
             color: '#333',
             font: {
               family: "'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif"
             }
           },
-          grid: { 
+          grid: {
             display: true,
             color: '#e0e0e0'
           }
         },
         y: {
-          ticks: { 
-            color: '#333', 
-            font: { 
+          ticks: {
+            color: '#333',
+            font: {
               weight: '600',
               family: "'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif"
-            } 
+            }
           },
           grid: { display: false }
         }

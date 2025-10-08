@@ -200,10 +200,10 @@
     document.getElementById("sendBtn").addEventListener("click", () => {
         const txt = document.getElementById("msgInput").value.trim();
         if (!txt) return;
-        
-        socket.emit("send_message", { 
-            student_id, 
-            staff_id, 
+
+        socket.emit("send_message", {
+            student_id,
+            staff_id,
             content: txt,
             sender_type: "{{ 'student' if current_user.get_id().startswith('student') else 'staff' }}"
         });

@@ -1,478 +1,342 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-:root {
-  --primary-blue: #0d6efd;
-  --success-green: #28a745;
-  --danger-red: #dc3545;
-  --warning-yellow: #ffc107;
-  --info-cyan: #17a2b8;
-  --white: #ffffff;
-  --light-gray: #f8f9fa;
-  --medium-gray: #e0e0e0;
-  --dark-gray: #333333;
-  --text-gray: #555555;
-  --black: #121212;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
-}
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-body {
-  background: var(--light-gray);
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-}
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
+    </div>
 
-.manage-students-container {
-  max-width: 1600px;
-  margin: 2rem auto;
-  padding: 0 20px;
-}
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
 
-.page-header {
-  background: var(--white);
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_students') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-users mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Students</span>
+        </a>
+      </li>
+      {% endif %}
 
-.page-header h2 {
-  color: var(--primary-blue);
-  margin: 0;
-  font-weight: 700;
-  font-size: 2rem;
-}
+      {% if not user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_applications') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-file-alt mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Applications</span>
+        </a>
+      </li>
+      {% endif %}
 
-.stats-badge {
-  background: var(--primary-blue);
-  color: var(--white);
-  padding: 0.5rem 1.5rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
+      {% if user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.add_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-plus mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Add Staff</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-cog mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Staff</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
 
-.search-section {
-  background: var(--white);
-  padding: 1.5rem;
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  margin-bottom: 2rem;
-}
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
 
-.search-input {
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--medium-gray);
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: var(--transition);
-  width: 100%;
-}
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
 
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.students-table-container {
-  background: var(--white);
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.students-table {
-  width: 100%;
-  margin: 0;
-}
-
-.students-table thead {
-  background: var(--black);
-  color: var(--white);
-}
-
-.students-table thead th {
-  padding: 1.2rem 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
-  border: none;
-  white-space: nowrap;
-}
-
-.students-table tbody td {
-  padding: 1.2rem 1rem;
-  vertical-align: middle;
-  border-bottom: 1px solid var(--medium-gray);
-}
-
-.students-table tbody tr {
-  transition: var(--transition);
-}
-
-.students-table tbody tr:hover {
-  background: var(--light-gray);
-}
-
-.student-id {
-  font-weight: 700;
-  color: var(--primary-blue);
-  font-size: 1.1rem;
-}
-
-.student-name {
-  font-weight: 600;
-  color: var(--dark-gray);
-}
-
-.student-email {
-  color: var(--text-gray);
-  font-size: 0.9rem;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  text-decoration: none;
-  display: inline-block;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.btn-danger {
-  background: var(--danger-red);
-  color: var(--white);
-}
-
-.btn-danger:hover {
-  background: #c82333;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.btn-warning {
-  background: var(--warning-yellow);
-  color: var(--black);
-}
-
-.btn-warning:hover {
-  background: #e0a800;
-  color: var(--black);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-}
-
-.btn-info {
-  background: var(--info-cyan);
-  color: var(--white);
-}
-
-.btn-info:hover {
-  background: #138496;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
-}
-
-.btn-success {
-  background: var(--success-green);
-  color: var(--white);
-}
-
-.btn-success:hover {
-  background: #218838;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.btn-primary {
-  background: var(--primary-blue);
-  color: var(--white);
-}
-
-.btn-primary:hover {
-  background: #0b5ed7;
-  color: var(--white);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: var(--white);
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-}
-
-.empty-state-icon {
-  font-size: 5rem;
-  color: var(--medium-gray);
-  margin-bottom: 1rem;
-}
-
-.empty-state h3 {
-  color: var(--dark-gray);
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  color: var(--text-gray);
-  font-size: 1.1rem;
-}
-
-.back-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: var(--primary-blue);
-  color: var(--white);
-  padding: 0.8rem 1.2rem;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: 500;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  z-index: 1000;
-}
-
-.back-btn:hover {
-  background: #0b5ed7;
-  color: var(--white);
-  transform: translateY(-2px);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.students-table tbody tr {
-  animation: fadeIn 0.3s ease-out backwards;
-}
-
-.students-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.students-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
-.students-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
-.students-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
-.students-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .manage-students-container {
-    padding: 0 15px;
-  }
-
-  .students-table-container {
-    overflow-x: auto;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    min-width: 150px;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
-  }
-
-  .page-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .back-btn {
-    bottom: 15px;
-    left: 15px;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
-}
-</style>
-
-<div class="manage-students-container">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h2>Manage Students</h2>
-        <div class="stats-badge" id="studentCount">
-            {{ students|length }} Students
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
         </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="input-group max-w-[300px]">
+        <span class="input-group-text bg-white border border-gray-300 border-r-0 rounded-l-lg px-3 py-2"><i class="fas fa-search text-gray-400"></i></span>
+        <input type="text" class="form-control border border-gray-300 border-l-0 rounded-r-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent" placeholder="Search..." id="dashboard-search">
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <h1 class="m-0 mb-2 text-2xl">Manage Students</h1>
+      <div class="bg-white/25 p-3 rounded text-white">
+        <p>View and manage all student accounts and their progress.</p>
+      </div>
+    </section>
+
+    <!-- Page Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+      <div class="flex items-center gap-4">
+        <div class="bg-[#4B68A5] text-white px-6 py-3 rounded-xl font-bold text-lg">
+          {{ students|length }} Students
+        </div>
+      </div>
     </div>
 
     {% if students %}
     <!-- Search Section -->
-    <div class="search-section">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by name, surname, email, course, or faculty...">
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="relative">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, surname, email, course, or faculty..."
+               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300">
+      </div>
     </div>
 
     <!-- Students Table -->
-    <div class="students-table-container">
-        <table class="students-table" id="studentsTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>NAME</th>
-                    <th>SURNAME</th>
-                    <th>EMAIL</th>
-                    <th>COURSE</th>
-                    <th>YEAR</th>
-                    <th>FACULTY</th>
-                    <th>DEPARTMENT</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
-                <tr data-name="{{ student.name }}"
-                    data-surname="{{ student.surname }}"
-                    data-email="{{ student.student_email }}"
-                    data-course="{{ student.course }}"
-                    data-faculty="{{ student.faculty }}">
-                    <td>
-                        <span class="student-id">#{{ student.id }}</span>
-                    </td>
-                    <td>
-                        <span class="student-name">{{ student.name }}</span>
-                    </td>
-                    <td>
-                        <span class="student-name">{{ student.surname }}</span>
-                    </td>
-                    <td>
-                        <span class="student-email">{{ student.student_email }}</span>
-                    </td>
-                    <td>{{ student.course }}</td>
-                    <td>{{ student.year_of_study }}</td>
-                    <td>{{ student.faculty }}</td>
-                    <td>
-                        {% if student.referrals %}
-                            {% for referral in student.referrals %}
-                                {{ referral.department }}{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            {% if current_user.is_admin %}
-                            <a href="#" class="btn btn-danger"
-                               data-bs-toggle="modal" 
-                               data-bs-target="#confirmDeleteModal" 
-                               data-student-id="{{ student.id }}"
-                               onclick="return confirm('Are you sure you want to DELETE this student?\n\nStudent: {{ student.name }} {{ student.surname }}\nEmail: {{ student.student_email }}\n\nThis action is PERMANENT and cannot be undone!');">
-                               Delete
-                            </a>
-                            {% else %}
-                            <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}" 
-                               class="btn btn-warning">Request Deletion</a>
-                            {% endif %}
-                          
-                            <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}" 
-                               class="btn btn-info">View Progress</a>
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full" id="studentsTable">
+          <thead>
+            <tr class="bg-[#4B68A5] text-white">
+              <th class="p-4 text-left font-semibold whitespace-nowrap">ID</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">NAME</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">SURNAME</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">EMAIL</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">COURSE</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">YEAR</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">FACULTY</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">DEPARTMENT</th>
+              <th class="p-4 text-left font-semibold whitespace-nowrap">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-300 animate-fadeIn"
+                data-name="{{ student.name }}"
+                data-surname="{{ student.surname }}"
+                data-email="{{ student.student_email }}"
+                data-course="{{ student.course }}"
+                data-faculty="{{ student.faculty }}">
+              <td class="p-4">
+                <span class="font-bold text-[#4B68A5] text-lg">#{{ student.id }}</span>
+              </td>
+              <td class="p-4">
+                <span class="font-semibold text-gray-800">{{ student.name }}</span>
+              </td>
+              <td class="p-4">
+                <span class="font-semibold text-gray-800">{{ student.surname }}</span>
+              </td>
+              <td class="p-4">
+                <span class="text-gray-600 text-sm">{{ student.student_email }}</span>
+              </td>
+              <td class="p-4 text-gray-700">{{ student.course }}</td>
+              <td class="p-4">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  Year {{ student.year_of_study }}
+                </span>
+              </td>
+              <td class="p-4 text-gray-700">{{ student.faculty }}</td>
+              <td class="p-4 text-gray-600">
+                {% if student.referrals %}
+                  {% for referral in student.referrals %}
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                      {{ referral.department }}
+                    </span>
+                    {% if not loop.last %}<br>{% endif %}
+                  {% endfor %}
+                {% else %}
+                  <span class="text-gray-400">-</span>
+                {% endif %}
+              </td>
+              <td class="p-4">
+                <div class="flex flex-col gap-2 min-w-[200px]">
+                  <div class="flex gap-2 flex-wrap">
+                    {% if current_user.is_admin %}
+                    <form method="POST" action="{{ url_for('main.delete_student', student_id=student.id) }}" class="m-0">
+                      <button type="submit"
+                              class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-1"
+                              onclick="return confirm('Are you sure you want to DELETE this student?\n\nStudent: {{ student.name }} {{ student.surname }}\nEmail: {{ student.student_email }}\n\nThis action is PERMANENT and cannot be undone!');">
+                        <i class="fas fa-trash text-xs"></i>
+                        Delete
+                      </button>
+                    </form>
+                    {% else %}
+                    <a href="{{ url_for('main.request_delete_student', student_id=student.id) }}"
+                       class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-1">
+                       <i class="fas fa-exclamation-triangle text-xs"></i>
+                       Request Deletion
+                    </a>
+                    {% endif %}
 
-                            <a href="{{ url_for('main.refer_student_department', student_id=student.id) }}" 
-                               class="btn btn-success">Refer Student</a>
+                    <a href="{{ url_for('main.staff_view_student', student_id=student.id) }}"
+                       class="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-1">
+                       <i class="fas fa-chart-line text-xs"></i>
+                       View Progress
+                    </a>
+                  </div>
 
-                            <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
-                               class="btn btn-primary">Generate Report</a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                  <div class="flex gap-2 flex-wrap">
+                    <a href="{{ url_for('main.refer_student_department', student_id=student.id) }}"
+                       class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-1">
+                       <i class="fas fa-share text-xs"></i>
+                       Refer Student
+                    </a>
+
+                    <a href="{{ url_for('main.generate_student_report', student_id=student.id) }}"
+                       class="bg-[#4B68A5] hover:bg-[#3A528F] text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-1">
+                       <i class="fas fa-file-pdf text-xs"></i>
+                       Generate Report
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
+      </div>
     </div>
     {% else %}
     <!-- Empty State -->
-    <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
-        <h3>No Students Found</h3>
-        <p>There are no students in the system at this time.</p>
+    <div class="bg-white rounded-xl shadow-md p-12 text-center">
+      <div class="text-6xl text-gray-300 mb-4">📚</div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No Students Found</h3>
+      <p class="text-gray-500 text-lg">There are no students in the system at this time.</p>
     </div>
     {% endif %}
+  </div>
 </div>
 
-<!-- Back Button -->
-<a href="{{ url_for('main.staff_dashboard') }}" class="back-btn">Back to Dashboard</a>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const table = document.getElementById('studentsTable');
-    
-    if (searchInput && table) {
-        const tbody = table.getElementsByTagName('tbody')[0];
-        
-        searchInput.addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = tbody.getElementsByTagName('tr');
-            let visibleCount = 0;
-            
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const name = row.getAttribute('data-name').toLowerCase();
-                const surname = row.getAttribute('data-surname').toLowerCase();
-                const email = row.getAttribute('data-email').toLowerCase();
-                const course = row.getAttribute('data-course').toLowerCase();
-                const faculty = row.getAttribute('data-faculty').toLowerCase();
-                
-                const searchMatch = name.includes(searchText) || 
-                                  surname.includes(searchText) || 
-                                  email.includes(searchText) ||
-                                  course.includes(searchText) ||
-                                  faculty.includes(searchText);
-                
-                if (searchMatch) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-            
-            // Update count badge
-            const countBadge = document.getElementById('studentCount');
-            if (countBadge) {
-                countBadge.textContent = visibleCount + ' Students';
-            }
-        });
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
     }
 });
+
+// Dashboard search
+const searchInput = document.getElementById('dashboard-search');
+searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    // Implement dashboard-wide search if needed
+});
+
+// Students table search functionality
+const studentsSearchInput = document.getElementById('searchInput');
+const studentsTable = document.getElementById('studentsTable');
+
+if (studentsSearchInput && studentsTable) {
+    const tbody = studentsTable.getElementsByTagName('tbody')[0];
+
+    studentsSearchInput.addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = tbody.getElementsByTagName('tr');
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const name = row.getAttribute('data-name').toLowerCase();
+            const surname = row.getAttribute('data-surname').toLowerCase();
+            const email = row.getAttribute('data-email').toLowerCase();
+            const course = row.getAttribute('data-course').toLowerCase();
+            const faculty = row.getAttribute('data-faculty').toLowerCase();
+
+            const searchMatch = name.includes(searchText) ||
+                              surname.includes(searchText) ||
+                              email.includes(searchText) ||
+                              course.includes(searchText) ||
+                              faculty.includes(searchText);
+
+            if (searchMatch) {
+                row.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden');
+            }
+        }
+
+        // Update count badge
+        const countBadge = document.querySelector('.bg-\\[\\#4B68A5\\]');
+        if (countBadge) {
+            countBadge.textContent = visibleCount + ' Students';
+        }
+    });
+}
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out backwards;
+    }
+
+    .students-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .students-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    .students-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    .students-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    .students-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+`;
+document.head.appendChild(style);
 </script>
 
 {% endblock %}

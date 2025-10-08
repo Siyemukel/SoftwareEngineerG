@@ -1,118 +1,72 @@
-# Learning Disability Detection System
+# SoftwareEngineerG
 
-This project is a web-based system designed to help detect potential learning disabilities, specifically dyscalculia, through a series of interactive tests (Numbers, Logic, and Shapes). The application dynamically generates questions, evaluates responses using AI (Google Gemini), and provides results for students in a simple and accessible interface.
-
----
+## Overview
+SoftwareEngineerG is a web application built with Flask, SQLAlchemy, and Flask-SocketIO. It provides a platform for managing students and staff, handling referrals, generating and evaluating questions (including AI-powered features), and supporting real-time communication.
 
 ## Features
-
-- **User Authentication**
-  - Secure Sign Up and Login for Students and Staff
-  - Student and Staff Dashboards
-  - Admin management for staff accounts
-
-- **Adaptive Testing**
-  - Numbers, Logic, and Shapes Tests
-  - Questions progress in difficulty (easy → medium → hard)
-  - AI-generated questions for each test part
-
-- **AI-Powered Evaluation**
-  - Student answers are dynamically assessed using Google Gemini
-  - Neutral, supportive feedback
-  - No correction or diagnosis provided
-
-- **Survey**
-  - Students complete a dyscalculia-related survey
-  - Survey results stored and viewable by staff
-
-- **Test Results**
-  - Scores tracked across test parts
-  - Clear summary of performance
-  - Disability likelihood estimation (non-diagnostic)
-  - Results viewable by staff
-
-- **Staff Management**
-  - Admins can add, edit, and delete staff accounts
-  - Staff can manage students and view individual results/surveys
-
----
+- User authentication and management (students, staff, admin)
+- Student-staff assignment system
+- AI-powered question generation and answer evaluation (Google Generative AI)
+- Medical proof uploads and review
+- Real-time communication via SocketIO
+- Email notifications for referrals
+- Admin and staff dashboards
+- Survey and exercise tracking
 
 ## Project Structure
-
 ```
 SoftwareEngineerG/
-├── app/
-│   ├── extensions.py
-│   ├── forms.py
-│   ├── __init__.py
-│   ├── models.py
-│   ├── routes.py
-│   ├── services.py
-│   ├── static/
-│   │   ├── images/
-│   │   ├── script.js
-│   │   └── style.css
-│   └── templates/
-│       ├── add_staff.html
-│       ├── admin_signup.html
-│       ├── base.html
-│       ├── conversation.html
-│       ├── home.html
-│       ├── login.html
-│       ├── manage_staff.html
-│       ├── manage_students.html
-│       ├── messages.html
-│       ├── staff_dashboard.html
-│       ├── staff_view_results.html
-│       ├── staff_view_survey.html
-│       ├── student_dashboard.html
-│       ├── student_signup.html
-│       ├── survey.html
-│       ├── test_part.html
-│       └── test_results.html
-├── config.py
-├── .env
-├── README.md
-└── run.py
+├── app/                # Main application package
+│   ├── extensions.py   # Flask extensions (db, mail, login, etc.)
+│   ├── forms.py        # WTForms definitions
+│   ├── models.py       # SQLAlchemy models
+│   ├── routes.py       # Flask routes/views
+│   ├── services.py     # Business logic and AI helpers
+│   ├── sockets.py      # SocketIO event handlers
+│   ├── static/         # CSS, JS, images
+│   └── templates/      # Jinja2 HTML templates
+├── config.py           # App configuration
+├── run.py              # Application entry point
+├── requirements.txt    # Python dependencies
+├── migrations/         # Alembic migration scripts
+├── tests/              # Unit tests
+├── uploads/            # Uploaded files (e.g., medical proofs)
+└── instance/site.db    # SQLite database
+```
 
-
----
-
-## Setup Instructions
-
-1. **Create a virtual environment**
-
-   ```sh
-   python -m venv venv
-   source venv/bin/activate   # Mac/Linux
-   # venv\Scripts\activate    # Windows
-   ```
-
-2. **Install dependencies**
-
-   ```sh
+## Setup & Installation
+1. **Clone the repository**
+2. **Install dependencies:**
+   ```bash
    pip install -r requirements.txt
    ```
-
-3. **Configure environment variables**
-
-   - Copy `.env.example` to .env and set your `GEMINI_API_KEY`, `SECRET_KEY`, and `DATABASE_URL`.
-
-4. **Run the application**
-
-   ```sh
+3. **Set environment variables:**
+   - `GEMINI_API_KEY` or `GOOGLE_API_KEY` for AI features
+   - `MAIL_SERVER`, `MAIL_USERNAME`, `MAIL_PASSWORD`, etc. for email
+4. **Run database migrations:**
+   ```bash
+   flask db upgrade
+   ```
+5. **Start the application:**
+   ```bash
    python run.py
    ```
+   The app will run on http://localhost:5000
 
----
+## Main Modules
+- **app/models.py**: Defines database models for users, staff, students, links, surveys, exercises, etc.
+- **app/services.py**: Contains business logic, AI helpers, question generation, answer evaluation, and email functions.
+- **app/routes.py**: Implements web routes for authentication, dashboards, student/staff management, and more.
+- **app/sockets.py**: Handles real-time events and messaging.
+- **app/extensions.py**: Initializes Flask extensions (db, mail, login manager).
+- **app/forms.py**: Contains form definitions for user input.
+- **app/static/**: Static assets (CSS, JS, images).
+- **app/templates/**: HTML templates for all pages.
+- **migrations/**: Database migration scripts managed by Alembic.
+- **tests/**: Unit tests for services and business logic.
+- **uploads/**: Stores uploaded files (e.g., medical proofs).
 
-## Notes
+## AI Features
+- AI-powered question generation and answer evaluation use Google Generative AI (Gemini).
+- Configure your API key in environment variables to enable these features.
 
-- The system uses Google Gemini for AI-powered question generation and answer evaluation.
-- All assessments are preliminary and non-diagnostic.
-- Only admins can manage staff accounts; staff can manage students and view results/surveys.
-- Survey and test results are stored in the database and accessible via the dashboard.
-
----
-
-For more details, see the code in routes.py, services.py, and models.py.

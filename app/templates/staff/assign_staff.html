@@ -1,50 +1,372 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 800px;">
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <div class="card shadow-sm p-4">
-        <h3 class="mb-3 text-center">Assign Staff to Students</h3>
-        <p class="text-muted text-center mb-4">
+<div class="flex min-h-screen" id="app-dashboard">
+  <!-- Sidebar -->
+  <div class="w-64 bg-[#4B68A5] text-white flex flex-col h-screen fixed top-0 left-0 py-6 transition-transform duration-300 z-50" id="sidebar">
+    <div class="logo">
+      <h1 class="text-white text-xl pl-4 m-0">Staff Dashboard</h1>
+    </div>
+
+    <div class="text-center px-3 mb-3">
+      <div class="w-16 h-16 rounded-full bg-white/12 inline-flex items-center justify-center font-bold text-lg text-white mb-2">{{ user.name[0]|upper }}</div>
+      <div class="text-xs text-white/70">Manage Profile</div>
+    </div>
+    <hr class="border-white/20 mx-6 my-4">
+
+    <ul class="list-none pl-0 flex-grow m-0">
+      <li class="mb-2">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-home mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.profile') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user mr-4 w-5 text-center text-white text-lg"></i>
+          <span>My Profile</span>
+        </a>
+      </li>
+      {% if user.is_admin %}
+      <li class="mb-2">
+        <a href="{{ url_for('main.add_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-plus mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Add Staff</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.manage_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 hover:bg-white/8 hover:border-l-4 hover:border-white">
+          <i class="fas fa-user-cog mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Manage Staff</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="{{ url_for('main.assign_staff') }}" class="flex items-center py-2 px-6 text-white no-underline transition-all duration-300 active bg-white/8 border-l-4 border-white">
+          <i class="fas fa-user-friends mr-4 w-5 text-center text-white text-lg"></i>
+          <span>Assign Staff</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+
+    <div class="mt-auto p-6">
+      <button class="flex items-center w-full py-2 px-4 bg-[#3A528F] border-none text-white rounded-xl cursor-pointer justify-center transition-all duration-300 font-inherit logout-btn hover:bg-[#2D3E75]">
+        <i class="fas fa-sign-out-alt mr-2"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="ml-64 p-6 transition-all duration-300 flex-1 min-h-screen" id="main-content">
+    <!-- Header with Hamburger -->
+    <div class="mb-3 flex items-center">
+      <div class="block w-10 h-10 bg-[#4B68A5] text-white border-none rounded-lg cursor-pointer transition-all duration-300 relative flex items-center justify-center text-lg hamburger hover:bg-[#3a5588] hover:scale-105" id="hamburger">
+        <i class="fas fa-bars text-white"></i>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <div class="user-icon mr-3">
+          <div class="w-12 h-12 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-lg">
+            {{ user.name[0]|upper }}{{ user.surname[0]|upper if user.surname else '' }}
+          </div>
+        </div>
+        <div>
+          <h2 class="m-0">{{ user.name }} {{ user.surname if user.surname else '' }}</h2>
+          <div class="text-sm text-gray-500">
+            {% if user.is_admin %} Administrator {% else %} Staff Member {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="input-group max-w-[300px]">
+        <span class="input-group-text bg-white border border-gray-300 border-r-0 rounded-l-lg px-3 py-2"><i class="fas fa-search text-gray-400"></i></span>
+        <input type="text" class="form-control border border-gray-300 border-l-0 rounded-r-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent" placeholder="Search..." id="dashboard-search">
+      </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <section class="bg-[#4B68A5] text-white p-6 rounded-xl mb-8 shadow-md">
+      <h1 class="m-0 mb-2 text-2xl">Assign Staff to Students</h1>
+      <div class="bg-white/25 p-3 rounded text-white">
+        <p>Select staff members and assign them to students who may need additional support and guidance.</p>
+      </div>
+    </section>
+
+    <!-- Main Form Card -->
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white rounded-xl shadow-md p-8 animate-fadeIn">
+        <div class="text-center mb-8">
+          <div class="w-20 h-20 rounded-full bg-[#4B68A5] flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-[#4B68A5]">Student-Staff Assignment</h3>
+          <p class="text-gray-600 mt-2 max-w-2xl mx-auto">
             Select a staff member and assign them to students who may need support.
-            <br>
-            <small>Students with no high-risk tests or surveys are excluded to keep focus on students needing help.</small>
-        </p>
+            <span class="block text-sm text-gray-500 mt-1">
+              Students with no high-risk tests or surveys are excluded to keep focus on students needing help.
+            </span>
+          </p>
+        </div>
 
-        <form method="POST">
-            {{ form.hidden_tag() }}
+        <form method="POST" class="space-y-8">
+          {{ form.hidden_tag() }}
 
-            <!-- Staff Selection -->
-            <div class="mb-3">
-                {{ form.staff.label(class="form-label fw-bold") }}
-                {{ form.staff(class="form-select") }}
+          <!-- Staff Selection -->
+          <div>
+            <label for="staff" class="block text-gray-700 font-semibold mb-3 text-lg">
+              <i class="fas fa-user-tie mr-2 text-[#4B68A5]"></i>
+              Select Staff Member
+            </label>
+            <select name="staff" id="staff"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300 bg-white cursor-pointer text-gray-700">
+              {% for choice in form.staff.choices %}
+                <option value="{{ choice[0] }}" {% if choice[0] == form.staff.data %}selected{% endif %}>
+                  {{ choice[1] }}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="text-gray-500 mt-2 block">
+              Choose the staff member who will provide support to the selected students
+            </small>
+          </div>
+
+          <!-- Role Selection -->
+          <div>
+            <label for="role" class="block text-gray-700 font-semibold mb-3 text-lg">
+              <i class="fas fa-user-tag mr-2 text-[#4B68A5]"></i>
+              Select Role
+            </label>
+            <select name="role" id="role"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300 bg-white cursor-pointer text-gray-700">
+              {% for value, label in form.role.choices %}
+                <option value="{{ value }}" {% if value == form.role.data %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <small class="text-gray-500 mt-2 block">
+              Choose the role for the staff member (Advisor or Reviewer)
+            </small>
+          </div>
+
+          <!-- Students Multi-Select -->
+          <div>
+            <label for="students" class="block text-gray-700 font-semibold mb-3 text-lg">
+              <i class="fas fa-users mr-2 text-[#4B68A5]"></i>
+              Select Students
+            </label>
+            <select name="students" id="students" multiple
+                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4B68A5] focus:border-transparent transition-all duration-300 bg-white cursor-pointer text-gray-700 min-h-48">
+              {% for choice in form.students.choices %}
+                <option value="{{ choice[0] }}" {% if choice[0] in form.students.data %}selected{% endif %}>
+                  {{ choice[1] }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="flex justify-between items-center mt-2">
+              <small class="text-gray-500">
+                <i class="fas fa-info-circle mr-1"></i>
+                Hold <kbd class="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">Ctrl</kbd> (or <kbd class="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs">Cmd</kbd> on Mac) to select multiple students
+              </small>
+              <small class="text-gray-500 font-medium" id="selectedCount">
+                0 students selected
+              </small>
             </div>
+          </div>
 
-            <!-- Students Multi-Select -->
-            <div class="mb-3">
-                {{ form.students.label(class="form-label fw-bold") }}
-                {{ form.students(class="form-select", multiple=True, size=10) }}
-                <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple students.</small>
-            </div>
+          <!-- Button Group -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-6">
+            <button type="submit"
+                    class="flex-1 bg-[#4B68A5] hover:bg-[#3A528F] text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+              <i class="fas fa-save"></i>
+              Save Assignments
+            </button>
 
-            <!-- Submit Button -->
-            <div class="d-flex justify-content-between mt-4">
-                {{ form.submit(class="btn btn-primary btn-lg") }}
-
-                {% if auto_assign_possible %}
-                <a href="{{ url_for('main.auto_assign_students') }}" class="btn btn-success btn-lg">
-                    Auto-Assign Students
-                </a>
-                {% endif %}
-            </div>
+            {% if auto_assign_possible %}
+            <a href="{{ url_for('main.auto_assign_students') }}"
+               class="flex-1 bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-center">
+              <i class="fas fa-robot"></i>
+              Auto-Assign Students
+            </a>
+            {% endif %}
+          </div>
         </form>
 
         <!-- Back to Dashboard -->
-        <div class="text-center mt-3">
-            <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-outline-secondary">
-                Back to Dashboard
-            </a>
+        <div class="text-center mt-8 pt-6 border-t border-gray-200">
+          <a href="{{ url_for('main.staff_dashboard') }}"
+             class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+          </a>
         </div>
+      </div>
+
+      <!-- Information Section -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-lg">
+          <h4 class="text-lg font-semibold text-blue-800 mb-3 flex items-center gap-2">
+            <i class="fas fa-lightbulb text-blue-500"></i>
+            Assignment Guidelines
+          </h4>
+          <ul class="text-blue-700 space-y-2 text-sm">
+            <li class="flex items-start gap-2">
+              <i class="fas fa-check-circle text-blue-500 mt-1 flex-shrink-0"></i>
+              <span>Focus on students with high-risk test results or survey responses</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fas fa-check-circle text-blue-500 mt-1 flex-shrink-0"></i>
+              <span>Consider staff expertise and current workload</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i class="fas fa-check-circle text-blue-500 mt-1 flex-shrink-0"></i>
+              <span>Balance assignments across available staff members</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-green-50 border-l-4 border-green-400 p-6 rounded-r-lg">
+          <h4 class="text-lg font-semibold text-green-800 mb-3 flex items-center gap-2">
+            <i class="fas fa-robot text-green-500"></i>
+            Auto-Assign Feature
+          </h4>
+          <p class="text-green-700 text-sm">
+            The auto-assign feature intelligently matches students with staff based on risk levels,
+            staff availability, and expertise to ensure optimal support distribution.
+          </p>
+          {% if not auto_assign_possible %}
+          <div class="mt-3 bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+            <p class="text-yellow-700 text-xs flex items-center gap-2">
+              <i class="fas fa-info-circle"></i>
+              Auto-assign is currently unavailable. Ensure you have both staff and students in the system.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Hamburger toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('main-content');
+const hamburger = document.getElementById('hamburger');
+hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+    mainContent.classList.toggle('ml-0');
+    mainContent.classList.toggle('ml-64');
+});
+
+// Logout
+document.querySelector('.logout-btn').addEventListener('click', () => {
+    if(confirm('Are you sure you want to logout?')) {
+        window.location.href = "{{ url_for('main.logout') }}";
+    }
+});
+
+// Dashboard search
+const searchInput = document.getElementById('dashboard-search');
+searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    // Implement dashboard-wide search if needed
+});
+
+// Selected students counter
+const studentsSelect = document.getElementById('students');
+const selectedCount = document.getElementById('selectedCount');
+
+function updateSelectedCount() {
+    const selected = studentsSelect.selectedOptions.length;
+    selectedCount.textContent = `${selected} student${selected !== 1 ? 's' : ''} selected`;
+
+    if (selected > 0) {
+        selectedCount.classList.add('text-green-600', 'font-semibold');
+        selectedCount.classList.remove('text-gray-500');
+    } else {
+        selectedCount.classList.remove('text-green-600', 'font-semibold');
+        selectedCount.classList.add('text-gray-500');
+    }
+}
+
+if (studentsSelect && selectedCount) {
+    studentsSelect.addEventListener('change', updateSelectedCount);
+    // Initialize count
+    updateSelectedCount();
+}
+
+// Form validation
+const form = document.querySelector('form');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        const staffSelect = document.getElementById('staff');
+        const studentsSelect = document.getElementById('students');
+
+        if (!staffSelect.value) {
+            e.preventDefault();
+            alert('⚠️ Please select a staff member before submitting.');
+            staffSelect.focus();
+            return false;
+        }
+
+        if (studentsSelect.selectedOptions.length === 0) {
+            e.preventDefault();
+            alert('⚠️ Please select at least one student to assign.');
+            studentsSelect.focus();
+            return false;
+        }
+
+        // Confirmation dialog
+        const confirmed = confirm(
+            `Confirm Assignment\n\n` +
+            `Staff: ${staffSelect.options[staffSelect.selectedIndex].text}\n` +
+            `Students: ${studentsSelect.selectedOptions.length} selected\n\n` +
+            `Are you sure you want to assign these students to the selected staff member?`
+        );
+
+        if (!confirmed) {
+            e.preventDefault();
+            return false;
+        }
+    });
+}
+
+// Add focus effects to form inputs
+document.querySelectorAll('select').forEach(select => {
+    select.addEventListener('focus', function() {
+        this.classList.add('ring-2', 'ring-[#4B68A5]', 'ring-opacity-20');
+    });
+
+    select.addEventListener('blur', function() {
+        this.classList.remove('ring-2', 'ring-[#4B68A5]', 'ring-opacity-20');
+    });
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.5s ease-out;
+    }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock %}

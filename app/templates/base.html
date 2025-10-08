@@ -2,36 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tailwind CSS via CDN (for development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configure Tailwind with your custom colors and fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'blue': '#4B68A5',
+                        'red': '#D11F2D',
+                        'light-purple': '#A56EAE',
+                        'green': '#16a34a',
+                        'teal': '#7AB4B6',
+                        'deep-purple': '#812575',
+                        'black': '#231F20',
+                        'dark-grey': '#565759',
+                        'metallic-silver': '#959B9D',
+                    },
+                    fontFamily: {
+                        'primary': ['Bebas Neue', 'sans-serif'],
+                        'secondary': ['Open Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
 
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body>
+<body class="font-secondary bg-white">
     {% if not current_user.is_authenticated %}
-    <header>
-        <nav>
-            <div class="logo"><a href="{{ url_for('main.home') }}">Numeraid</a></div>
+    <header class="bg-blue text-white">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="logo">
+                <a href="{{ url_for('main.home') }}" class="text-2xl font-primary tracking-wide">Numeraid</a>
+            </div>
             <div>
-                <a href="{{ url_for('main.login') }}">Login</a>
+                <a href="{{ url_for('main.login') }}" class="hover:underline">Login</a>
             </div>
         </nav>
     </header>
     {% endif %}
 
-    <main>
+    <main class="min-h-screen">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="flash-messages-container">
+                <div class="container mx-auto px-4 py-2">
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} mt-2" role="alert">
+                        <div class="alert alert-{{ category }} p-3 rounded mb-2
+                            {% if category == 'success' %}bg-green-100 text-green-800 border border-green-300
+                            {% elif category == 'error' or category == 'danger' %}bg-red-100 text-red-800 border border-red-300
+                            {% elif category == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-300
+                            {% else %}bg-blue-100 text-blue-800 border border-blue-300{% endif %}"
+                            role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}
@@ -43,6 +78,5 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='dashboard.js') }}"></script> -->
 </body>
 </html>

@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 
@@ -11,3 +12,4 @@ mail = Mail()
 
 # initialize SocketIO but don't attach app yet
 socketio = SocketIO(cors_allowed_origins="*")
+migrate = Migrate()
